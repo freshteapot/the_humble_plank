@@ -12,11 +12,13 @@ import 'package:the_humble_plank/learnalist/challenge.dart';
 import 'package:the_humble_plank/learnalist/dialog_error.dart';
 import 'package:the_humble_plank/plank_repository.dart';
 import 'package:the_humble_plank/challenge_repository.dart';
+import 'package:the_humble_plank/user_repository.dart';
 
 class PlankModel extends ChangeNotifier {
   final PlankRepository repository;
   final ChallengeRepository challengeRepo;
   final CredentialsRepository credentialsRepo;
+  final UserRepository userRepo;
 
   Credentials _credentials = Credentials();
   Credentials get credentials => _credentials;
@@ -75,7 +77,8 @@ class PlankModel extends ChangeNotifier {
   PlankModel(
       {@required this.repository,
       @required this.challengeRepo,
-      @required this.credentialsRepo})
+      @required this.credentialsRepo,
+      @required this.userRepo})
       : _isLoading = false,
         _isError = false,
         _loggedIn = false,
@@ -362,10 +365,23 @@ class PlankModel extends ChangeNotifier {
 
   // User model
 
-  Future<void> setDisplayName(String newValue) async {
-    // TODO save to the server
-    _displayName = newValue;
-    notifyListeners();
+  Future<bool> setDisplayName(String newValue) async {
+    try {
+      var success =
+          await userRepo.setDisplayName(_credentials.login.userUuid, newValue);
+
+      if (success) {
+        _displayName = newValue;
+        notifyListeners();
+      }
+      return success;
+    } catch (error) {
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      _lastError = error;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<void> setShowCallToActionForDisplayName(bool newValue) async {

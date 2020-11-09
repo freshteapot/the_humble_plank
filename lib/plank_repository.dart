@@ -7,11 +7,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:openapi/api.dart';
 import 'package:the_humble_plank/credentials_repository.dart';
 
-class PlankRepository extends ChangeNotifier {
+abstract class PlankRepository {
+  Future<Credentials> loadCredentials();
+  Future<List<Plank>> history();
+  Future<bool> addEntry(Plank record, String challengeUuid);
+}
+
+class RemotePlankRepository implements PlankRepository {
   final PlankApi plankApi;
   final ApiClient apiClient;
 
-  PlankRepository({@required this.plankApi, @required this.apiClient});
+  RemotePlankRepository({@required this.plankApi, @required this.apiClient});
 
   Future<Credentials> loadCredentials() async {
     var prefs = await SharedPreferences.getInstance();

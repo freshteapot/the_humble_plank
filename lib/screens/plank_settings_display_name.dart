@@ -1,5 +1,8 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:the_humble_plank/plank_model.dart';
 
 class PlankSettingsDisplayNameScreen extends StatelessWidget {
   @override
@@ -86,18 +89,22 @@ class _PlankSettingsDisplayNameState
                 return;
               }
 
-              // TODO save to server
-              Flushbar(
-                flushbarPosition: FlushbarPosition.TOP,
-                flushbarStyle: FlushbarStyle.GROUNDED,
-                title: "TODO",
-                message: "Save displayName to the backend '${displayName}'",
-                duration: Duration(seconds: 5),
-                blockBackgroundInteraction: true,
-              )..show(context);
+              bool saved =
+                  await context.read<PlankModel>().setDisplayName(displayName);
 
-              // On success close this
-              //Navigator.of(context).pop();
+              if (!saved) {
+                Flushbar(
+                  flushbarPosition: FlushbarPosition.TOP,
+                  flushbarStyle: FlushbarStyle.GROUNDED,
+                  title: "Error",
+                  message: "Failed to save new display name",
+                  duration: Duration(seconds: 5),
+                  blockBackgroundInteraction: true,
+                )..show(context);
+                return;
+              }
+
+              Navigator.of(context).pop();
             },
             child: Text(
               "Save",

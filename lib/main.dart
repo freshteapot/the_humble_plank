@@ -8,6 +8,7 @@ import 'package:the_humble_plank/app.dart';
 import 'package:the_humble_plank/plank_repository.dart';
 import 'package:the_humble_plank/credentials_repository.dart';
 import 'package:the_humble_plank/challenge_repository.dart';
+import 'package:the_humble_plank/user_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,12 +18,17 @@ Future<void> main() async {
   PlankApi plankApi = PlankApi(apiClient);
   ChallengeApi challengeApi = ChallengeApi(apiClient);
 
+  RemoteUserRepository userRepo = RemoteUserRepository(
+    userApi: userApi,
+    apiClient: apiClient,
+  );
+
   RemoteCredentialsRepository credentialsRepo = RemoteCredentialsRepository(
     userApi: userApi,
     apiClient: apiClient,
   );
 
-  PlankRepository plankRepo = PlankRepository(
+  RemotePlankRepository plankRepo = RemotePlankRepository(
     plankApi: plankApi,
     apiClient: apiClient,
   );
@@ -31,6 +37,7 @@ Future<void> main() async {
     challengeApi: challengeApi,
     apiClient: apiClient,
   );
+
   Provider.debugCheckInvalidValueType = null;
 
   runApp(
@@ -39,6 +46,7 @@ Future<void> main() async {
         plankRepo: plankRepo,
         credentialsRepo: credentialsRepo,
         challengeRepo: challengeRepo,
+        userRepo: userRepo,
       ),
     ),
   );

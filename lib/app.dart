@@ -10,15 +10,19 @@ import 'package:the_humble_plank/plank_repository.dart';
 import 'package:the_humble_plank/credentials_repository.dart';
 import 'package:the_humble_plank/challenge_repository.dart';
 import 'package:the_humble_plank/plank_model.dart';
+import 'package:the_humble_plank/user_repository.dart';
 
 class App extends StatelessWidget {
   final CredentialsRepository credentialsRepo;
   final PlankRepository plankRepo;
   final ChallengeRepository challengeRepo;
+  final UserRepository userRepo;
+
   App({
     @required this.plankRepo,
     @required this.credentialsRepo,
     @required this.challengeRepo,
+    @required this.userRepo,
   });
 
   @override
@@ -31,6 +35,7 @@ class App extends StatelessWidget {
                 repository: plankRepo,
                 challengeRepo: challengeRepo,
                 credentialsRepo: credentialsRepo,
+                userRepo: userRepo,
               );
 
               m.bootstrap();

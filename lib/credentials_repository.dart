@@ -67,6 +67,9 @@ class RemoteCredentialsRepository implements CredentialsRepository {
   Future<Credentials> loadCredentials() async {
     var prefs = await SharedPreferences.getInstance();
     Credentials credentials = Credentials();
+    credentials.login.token = "";
+    credentials.login.userUuid = "";
+    credentials.serverBasePath = "";
 
     if (prefs.containsKey("token")) {
       credentials.login.token = prefs.getString("token");

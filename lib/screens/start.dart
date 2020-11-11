@@ -15,11 +15,9 @@ class StartScreen extends StatelessWidget {
       Widget body = SizedBox.shrink();
       return Scaffold(backgroundColor: Colors.white, body: body);
     }
+
     // When the app loaded were we logged in?
     var loggedIn = context.select((PlankModel model) => model.bootstrapLogin);
-    //var idpLoggedIn = context.select((PlankModel model) => model.idpLoggedIn);
-
-    //if (!loggedIn || !idpLoggedIn) {
     if (!loggedIn) {
       _showLogin(context);
     } else {

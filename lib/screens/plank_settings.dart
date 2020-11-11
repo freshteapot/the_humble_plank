@@ -78,8 +78,8 @@ class _PlankSettingsState extends State<PlankSettings> {
                       value: false,
                       activeColor: Colors.red,
                       inactiveTrackColor: Colors.red,
-                      onChanged: (bool value) {
-                        context.read<PlankModel>().logout();
+                      onChanged: (bool value) async {
+                        await context.read<PlankModel>().logout();
                         Phoenix.rebirth(context);
                       }),
                 ])));

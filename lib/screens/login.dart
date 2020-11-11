@@ -135,14 +135,6 @@ class LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     LoginInfo loginInfo = defaultValues();
-    /*
-    var loggedIn = context.select((PlankModel model) => model.loggedIn);
-    if (loggedIn) {
-      Future.delayed(const Duration(milliseconds: 100), () async {
-        redirectAfterLogin(context);
-      });
-    }*/
-
     // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
@@ -235,8 +227,8 @@ class LoginFormState extends State<LoginForm> {
                     disabledTextColor: Colors.black,
                     padding: EdgeInsets.all(8.0),
                     splashColor: Colors.blueAccent,
-                    onPressed: () {
-                      context.read<PlankModel>().loginWithGoogle();
+                    onPressed: () async {
+                      await context.read<PlankModel>().loginWithGoogle();
                     },
                     child: Text(
                       "Login with google",

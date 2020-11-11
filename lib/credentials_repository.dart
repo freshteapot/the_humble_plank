@@ -77,6 +77,10 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     return SharedPreferences.getInstance().then((prefs) {
       prefs.clear();
       _credentials = new Credentials();
+      this
+          .apiClient
+          .getAuthentication<HttpBearerAuth>('bearerAuth')
+          .setAccessToken("");
       return;
     });
   }

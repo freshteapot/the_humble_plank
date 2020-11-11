@@ -28,8 +28,6 @@ class PlankModel extends ChangeNotifier {
   final CredentialsRepository credentialsRepo;
   final UserRepository userRepo;
 
-  GoogleSignInAccount _googleCurrentUser;
-
   Credentials _credentials = Credentials();
   Credentials get credentials => _credentials;
 
@@ -103,9 +101,7 @@ class PlankModel extends ChangeNotifier {
         _bootstrapped = false,
         _bootstrapLogin = false,
         _displayName = "",
-        _showCallToActionForDisplayName = true,
-        _googleCurrentUser = null,
-        _idpGoogleBootstrapped = false;
+        _showCallToActionForDisplayName = true;
 
   _notifyListeners() {
     if (_bootstrapping) {
@@ -141,11 +137,11 @@ class PlankModel extends ChangeNotifier {
     await loadCredentials();
     if (_credentials.idpGoogleEnabled) {
       // This gets reloaded needs protection
+      // The listener will update credentials.idpGoogle
       _bootstrapGoogleSignIn();
     }
 
     _loggedIn = credentialsRepo.isLoggedIn();
-    //_loggedIn = _credentials.login.token != "" ? true : false;
 
     await loadSettings();
     await loadHistory();
@@ -381,17 +377,20 @@ class PlankModel extends ChangeNotifier {
 
   Future<void> logout() async {
     _isLoading = true;
+    print("logout");
+    if (_credentials.idpGoogle != null) {
+      print("Why is this not login me out?");
+      await _googleSignIn.disconnect();
+    }
+
     await credentialsRepo.unloadCredentials();
 
     _credentials = Credentials();
     _credentials.login.token = "";
     _credentials.login.userUuid = "";
     _credentials.serverBasePath = "";
-
-    if (_googleCurrentUser != null) {
-      await _googleSignIn.disconnect();
-      _googleCurrentUser = null;
-    }
+    _credentials.idpGoogle = null;
+    _credentials.idpGoogleEnabled = false;
 
     // Add logout to the site
     _loggedIn = false;
@@ -434,62 +433,33 @@ class PlankModel extends ChangeNotifier {
     }
   }
 
-  bool _idpLoggedIn = false;
-  bool get idpLoggedIn => _idpLoggedIn;
-
-  //bool _idpGoogleEnabled = false;
-  bool _idpGoogleLoading = false;
-
-  bool _idpGoogleBootstrapped;
   void _bootstrapGoogleSignIn() {
     if (!_credentials.idpGoogleEnabled) {
       print("idp:google not enabled");
       return;
     }
 
-    if (_idpGoogleBootstrapped) {
-      if (_idpLoggedIn) {
-        _bootstrapLogin = true;
-        _notifyListeners();
-      }
-      print("idp:google enabled and bootstrapped, skipping");
-      return;
-    }
-
     _googleSignIn.onCurrentUserChanged.listen(_handleGoogleSignIn);
 
     _googleSignIn.signInSilently();
-    _idpGoogleBootstrapped = true;
     print("idp:google enabled and setup");
   }
 
   _handleGoogleSignIn(GoogleSignInAccount account) async {
-    _googleCurrentUser = account;
-    if (_googleCurrentUser == null) {
+    _credentials.idpGoogle = account;
+    if (_credentials.idpGoogle == null) {
       _loggedIn = false;
-      _idpLoggedIn = false;
-      // Still need to get the user
+      _bootstrapLogin = false;
       _notifyListeners();
-      return;
-    }
-
-    if (_idpGoogleLoading) {
-      print("idp:google skipping as one request has already been sent");
-      return;
-    }
-
-    if (_idpLoggedIn && _bootstrapLogin) {
-      print("idp:google We are logged in, skipping another login request");
       return;
     }
 
     print("idp:google Trying to login");
 
-    _idpGoogleLoading = true;
     String basePath = "https://learnalist.net/api/v1";
     HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
 
-    var auth = await _googleCurrentUser.authentication;
+    var auth = await _credentials.idpGoogle.authentication;
     input.idp = "google";
     input.idToken = auth.idToken;
     input.accessToken = auth.accessToken;
@@ -500,20 +470,17 @@ class PlankModel extends ChangeNotifier {
       var newCredentials = Credentials();
       newCredentials.login = session;
       newCredentials.idpGoogleEnabled = true;
-      // Maybe move it
-      //newCredentials.idpGoogle = null;
 
       await credentialsRepo.saveCredentials(newCredentials, basePath);
       await loadCredentials();
+      // Need to add it back as the credentials are reloaded.
+      _credentials.idpGoogle = account;
 
       _loggedIn = true;
-      _idpLoggedIn = true; // might not need this
       _bootstrapLogin = true;
       _notifyListeners();
     } catch (error) {
       print(error);
     }
-    // Unlock login
-    _idpGoogleLoading = false;
   }
 }

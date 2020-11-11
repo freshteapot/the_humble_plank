@@ -1,27 +1,36 @@
 import 'dart:async';
 import 'dart:core';
 import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:openapi/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Credentials {
   HttpUserLoginResponse login;
   String serverBasePath;
 
+  GoogleSignInAccount idpGoogle;
+  bool idpGoogleEnabled;
   Credentials()
       : login = HttpUserLoginResponse(),
-        serverBasePath = "";
+        serverBasePath = "",
+        idpGoogle = null,
+        idpGoogleEnabled = false;
 }
 
 abstract class CredentialsRepository {
+  Future<HttpUserLoginResponse> loginWithIdp(
+      HttpUserLoginIDPInput input, String serverBasePath);
+
   Future<HttpUserLoginResponse> loginWithUsername(
       HttpUserLoginRequest input, String serverBasePath);
   Future<bool> saveCredentials(
-      HttpUserLoginResponse input, String serverBasePath);
+      Credentials newCredentials, String serverBasePath);
   Future<Credentials> loadCredentials();
   Future<void> unloadCredentials();
   Credentials getCredentials();
+  bool isLoggedIn();
+  void setIdpGoogle(GoogleSignInAccount account);
 }
 
 class RemoteCredentialsRepository implements CredentialsRepository {
@@ -37,22 +46,30 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     return await userApi.loginWithUsernameAndPassword(input);
   }
 
+  Future<HttpUserLoginResponse> loginWithIdp(
+      HttpUserLoginIDPInput input, String serverBasePath) async {
+    this.apiClient.basePath = serverBasePath;
+    return await userApi.loginWithIdpIdToken(input);
+  }
+
   Future<bool> saveCredentials(
-      HttpUserLoginResponse input, String serverBasePath) async {
+      Credentials newCredentials, String serverBasePath) async {
     bool ok;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    ok = await prefs.setString("token", input.token);
-
-    print(ok);
-    ok = await prefs.setString("user_uuid", input.userUuid);
-    print(ok);
+    ok = await prefs.setString("token", newCredentials.login.token);
+    print("Saving token $ok");
+    ok = await prefs.setString("user_uuid", newCredentials.login.userUuid);
+    print("Saving user_uuid $ok");
     ok = await prefs.setString("server_basepath", serverBasePath);
-    print(ok);
+    print("Saving server_basepath $ok");
+    ok = await prefs.setBool(
+        "idp_google_enabled", newCredentials.idpGoogleEnabled);
+    print("Saving idp_google_enabled $ok");
 
     this
         .apiClient
         .getAuthentication<HttpBearerAuth>('bearerAuth')
-        .setAccessToken(input.token);
+        .setAccessToken(newCredentials.login.token);
     return true;
   }
 
@@ -70,6 +87,8 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     credentials.login.token = "";
     credentials.login.userUuid = "";
     credentials.serverBasePath = "";
+    credentials.idpGoogleEnabled = false;
+    credentials.idpGoogle = null;
 
     if (prefs.containsKey("token")) {
       credentials.login.token = prefs.getString("token");
@@ -81,6 +100,10 @@ class RemoteCredentialsRepository implements CredentialsRepository {
 
     if (prefs.containsKey("server_basepath")) {
       credentials.serverBasePath = prefs.getString("server_basepath");
+    }
+
+    if (prefs.containsKey("idp_google_enabled")) {
+      credentials.idpGoogleEnabled = prefs.getBool("idp_google_enabled");
     }
 
     apiClient.basePath = credentials.serverBasePath;
@@ -96,5 +119,32 @@ class RemoteCredentialsRepository implements CredentialsRepository {
 
   Credentials getCredentials() {
     return _credentials;
+  }
+
+  bool isLoggedIn() {
+    if (_credentials.idpGoogle != null) {
+      return true;
+    }
+
+    return _credentials.login.token != "" ? true : false;
+  }
+
+  void setIdpGoogle(GoogleSignInAccount account) {
+    _credentials.idpGoogle = account;
+    if (_credentials.idpGoogle != null) {
+      _credentials.login.userUuid = _credentials.idpGoogle.id;
+    }
+    _debugGoogle();
+  }
+
+  Future<void> _debugGoogle() async {
+    if (_credentials.idpGoogle == null) {
+      return;
+    }
+    print(_credentials.idpGoogle);
+    var a = await _credentials.idpGoogle.authentication;
+    print("idToken: ${a.idToken}");
+    print("accessToken: ${a.accessToken}");
+    print("serverAuthCode: ${a.serverAuthCode}");
   }
 }

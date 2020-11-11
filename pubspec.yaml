@@ -32,6 +32,7 @@ dependencies:
   jiffy: ^3.0.1
   animations: ^1.1.2
   flushbar: ^1.10.4
+  google_sign_in: ^4.5.6
   openapi:
     path: /tmp/openapi/dart
 

@@ -17,6 +17,9 @@ class StartScreen extends StatelessWidget {
     }
     // When the app loaded were we logged in?
     var loggedIn = context.select((PlankModel model) => model.bootstrapLogin);
+    //var idpLoggedIn = context.select((PlankModel model) => model.idpLoggedIn);
+
+    //if (!loggedIn || !idpLoggedIn) {
     if (!loggedIn) {
       _showLogin(context);
     } else {

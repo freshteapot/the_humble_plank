@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:core';
+
 import 'dart:io';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/widgets.dart';
@@ -13,12 +14,21 @@ import 'package:the_humble_plank/learnalist/dialog_error.dart';
 import 'package:the_humble_plank/plank_repository.dart';
 import 'package:the_humble_plank/challenge_repository.dart';
 import 'package:the_humble_plank/user_repository.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: <String>[
+    'email',
+  ],
+);
 
 class PlankModel extends ChangeNotifier {
   final PlankRepository repository;
   final ChallengeRepository challengeRepo;
   final CredentialsRepository credentialsRepo;
   final UserRepository userRepo;
+
+  GoogleSignInAccount _googleCurrentUser;
 
   Credentials _credentials = Credentials();
   Credentials get credentials => _credentials;
@@ -93,7 +103,9 @@ class PlankModel extends ChangeNotifier {
         _bootstrapped = false,
         _bootstrapLogin = false,
         _displayName = "",
-        _showCallToActionForDisplayName = true;
+        _showCallToActionForDisplayName = true,
+        _googleCurrentUser = null,
+        _idpGoogleBootstrapped = false;
 
   _notifyListeners() {
     if (_bootstrapping) {
@@ -127,7 +139,13 @@ class PlankModel extends ChangeNotifier {
   Future<void> bootstrap() async {
     _bootstrapping = true;
     await loadCredentials();
-    _loggedIn = _credentials.login.token != "" ? true : false;
+    if (_credentials.idpGoogleEnabled) {
+      // This gets reloaded needs protection
+      _bootstrapGoogleSignIn();
+    }
+
+    _loggedIn = credentialsRepo.isLoggedIn();
+    //_loggedIn = _credentials.login.token != "" ? true : false;
 
     await loadSettings();
     await loadHistory();
@@ -330,13 +348,23 @@ class PlankModel extends ChangeNotifier {
     return credentialsRepo
         .loginWithUsername(input, serverBasePath)
         .then((loggedIn) async {
-      await credentialsRepo.saveCredentials(loggedIn, serverBasePath);
+      // Maybe pass in
+      var newCredentials = Credentials();
+      newCredentials.login = loggedIn;
+      newCredentials.idpGoogleEnabled = false;
+      newCredentials.idpGoogle = null;
+      await credentialsRepo.saveCredentials(newCredentials, serverBasePath);
       await loadCredentials();
     }).catchError((error) async {
       var loggedIn = HttpUserLoginResponse();
       loggedIn.token = "";
       loggedIn.userUuid = "";
-      await credentialsRepo.saveCredentials(loggedIn, serverBasePath);
+      var newCredentials = Credentials();
+      newCredentials.login = loggedIn;
+      newCredentials.idpGoogleEnabled = false;
+      newCredentials.idpGoogle = null;
+
+      await credentialsRepo.saveCredentials(newCredentials, serverBasePath);
 
       _checkErrorForOffline(error);
       _checkErrorFor403(error);
@@ -354,11 +382,19 @@ class PlankModel extends ChangeNotifier {
   Future<void> logout() async {
     _isLoading = true;
     await credentialsRepo.unloadCredentials();
+
     _credentials = Credentials();
     _credentials.login.token = "";
     _credentials.login.userUuid = "";
     _credentials.serverBasePath = "";
 
+    if (_googleCurrentUser != null) {
+      await _googleSignIn.disconnect();
+      _googleCurrentUser = null;
+    }
+
+    // Add logout to the site
+    _loggedIn = false;
     _isLoading = false;
     _notifyListeners();
   }
@@ -387,5 +423,97 @@ class PlankModel extends ChangeNotifier {
   Future<void> setShowCallToActionForDisplayName(bool newValue) async {
     _showCallToActionForDisplayName = newValue;
     notifyListeners();
+  }
+
+  Future<void> loginWithGoogle() async {
+    try {
+      var account = await _googleSignIn.signIn();
+      _handleGoogleSignIn(account);
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  bool _idpLoggedIn = false;
+  bool get idpLoggedIn => _idpLoggedIn;
+
+  //bool _idpGoogleEnabled = false;
+  bool _idpGoogleLoading = false;
+
+  bool _idpGoogleBootstrapped;
+  void _bootstrapGoogleSignIn() {
+    if (!_credentials.idpGoogleEnabled) {
+      print("idp:google not enabled");
+      return;
+    }
+
+    if (_idpGoogleBootstrapped) {
+      if (_idpLoggedIn) {
+        _bootstrapLogin = true;
+        _notifyListeners();
+      }
+      print("idp:google enabled and bootstrapped, skipping");
+      return;
+    }
+
+    _googleSignIn.onCurrentUserChanged.listen(_handleGoogleSignIn);
+
+    _googleSignIn.signInSilently();
+    _idpGoogleBootstrapped = true;
+    print("idp:google enabled and setup");
+  }
+
+  _handleGoogleSignIn(GoogleSignInAccount account) async {
+    _googleCurrentUser = account;
+    if (_googleCurrentUser == null) {
+      _loggedIn = false;
+      _idpLoggedIn = false;
+      // Still need to get the user
+      _notifyListeners();
+      return;
+    }
+
+    if (_idpGoogleLoading) {
+      print("idp:google skipping as one request has already been sent");
+      return;
+    }
+
+    if (_idpLoggedIn && _bootstrapLogin) {
+      print("idp:google We are logged in, skipping another login request");
+      return;
+    }
+
+    print("idp:google Trying to login");
+
+    _idpGoogleLoading = true;
+    String basePath = "https://learnalist.net/api/v1";
+    HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
+
+    var auth = await _googleCurrentUser.authentication;
+    input.idp = "google";
+    input.idToken = auth.idToken;
+    input.accessToken = auth.accessToken;
+
+    try {
+      var session = await credentialsRepo.loginWithIdp(input, basePath);
+
+      var newCredentials = Credentials();
+      newCredentials.login = session;
+      newCredentials.idpGoogleEnabled = true;
+      // Maybe move it
+      //newCredentials.idpGoogle = null;
+
+      await credentialsRepo.saveCredentials(newCredentials, basePath);
+      await loadCredentials();
+
+      _loggedIn = true;
+      _idpLoggedIn = true; // might not need this
+      _bootstrapLogin = true;
+      _notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+    // Unlock login
+    _idpGoogleLoading = false;
   }
 }

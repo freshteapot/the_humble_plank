@@ -60,6 +60,20 @@ class LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
+  Future<void> redirectAfterLogin(BuildContext context) async {
+    await context.read<PlankModel>().bootstrap();
+
+    var curveTween = CurveTween(curve: Curves.easeIn);
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, animation, ___) => FadeTransition(
+            opacity: animation.drive(curveTween), child: PlankShellScreen()),
+        transitionDuration: Duration(seconds: 1),
+      ),
+    );
+  }
+
   void validateform(BuildContext context) async {
     // Validate returns true if the form is valid, or false
     // otherwise.
@@ -121,6 +135,14 @@ class LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     LoginInfo loginInfo = defaultValues();
+    /*
+    var loggedIn = context.select((PlankModel model) => model.loggedIn);
+    if (loggedIn) {
+      Future.delayed(const Duration(milliseconds: 100), () async {
+        redirectAfterLogin(context);
+      });
+    }*/
+
     // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
@@ -200,6 +222,29 @@ class LoginFormState extends State<LoginForm> {
                   ),
                 ],
               )),
+          Container(
+              margin: const EdgeInsets.only(top: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FlatButton(
+                    focusNode: _submitFocus,
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                    disabledColor: Colors.grey,
+                    disabledTextColor: Colors.black,
+                    padding: EdgeInsets.all(8.0),
+                    splashColor: Colors.blueAccent,
+                    onPressed: () {
+                      context.read<PlankModel>().loginWithGoogle();
+                    },
+                    child: Text(
+                      "Login with google",
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -248,8 +293,8 @@ class LoginInfo {
 }
 
 LoginInfo defaultValues() {
-  //return LoginInfo(
-  //    username: "", password: "", basePath: "https://learnalist.net/api/v1");
+  return LoginInfo(
+      username: "", password: "", basePath: "https://learnalist.net/api/v1");
   return LoginInfo(
       username: "iamtest1",
       password: "test123",

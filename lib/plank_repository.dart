@@ -2,10 +2,8 @@ import 'dart:core';
 
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:openapi/api.dart';
-import 'package:the_humble_plank/credentials_repository.dart';
 
 abstract class PlankRepository {
   Future<List<Plank>> history();

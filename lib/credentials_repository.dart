@@ -5,17 +5,34 @@ import 'package:openapi/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+const CredentialsLoginTypeGoogle = "google";
+const CredentialsLoginTypeUsername = "username";
+const CredentialsLoginTypeNone = "na";
+
 class Credentials {
   HttpUserLoginResponse login;
   String serverBasePath;
 
   GoogleSignInAccount idpGoogle;
-  bool idpGoogleEnabled;
+  String loginType;
+
+  bool idpGoogleEnabled() => loginType == CredentialsLoginTypeGoogle;
+
   Credentials()
       : login = HttpUserLoginResponse(),
         serverBasePath = "",
         idpGoogle = null,
-        idpGoogleEnabled = false;
+        loginType = CredentialsLoginTypeNone;
+
+  factory Credentials.defaultValues() {
+    var _credentials = Credentials();
+    _credentials.login.token = "";
+    _credentials.login.userUuid = "";
+    _credentials.serverBasePath = "";
+    _credentials.loginType = CredentialsLoginTypeNone;
+    _credentials.idpGoogle = null;
+    return _credentials;
+  }
 }
 
 abstract class CredentialsRepository {
@@ -62,9 +79,8 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     print("Saving user_uuid $ok");
     ok = await prefs.setString("server_basepath", serverBasePath);
     print("Saving server_basepath $ok");
-    ok = await prefs.setBool(
-        "idp_google_enabled", newCredentials.idpGoogleEnabled);
-    print("Saving idp_google_enabled $ok");
+    ok = await prefs.setString("login_type", newCredentials.loginType);
+    print("Saving login_type $ok");
 
     this
         .apiClient
@@ -76,7 +92,7 @@ class RemoteCredentialsRepository implements CredentialsRepository {
   Future<void> unloadCredentials() async {
     return SharedPreferences.getInstance().then((prefs) {
       prefs.clear();
-      _credentials = new Credentials();
+      _credentials = Credentials.defaultValues();
       this
           .apiClient
           .getAuthentication<HttpBearerAuth>('bearerAuth')
@@ -87,12 +103,7 @@ class RemoteCredentialsRepository implements CredentialsRepository {
 
   Future<Credentials> loadCredentials() async {
     var prefs = await SharedPreferences.getInstance();
-    Credentials credentials = Credentials();
-    credentials.login.token = "";
-    credentials.login.userUuid = "";
-    credentials.serverBasePath = "";
-    credentials.idpGoogleEnabled = false;
-    credentials.idpGoogle = null;
+    Credentials credentials = Credentials.defaultValues();
 
     if (prefs.containsKey("token")) {
       credentials.login.token = prefs.getString("token");
@@ -106,8 +117,8 @@ class RemoteCredentialsRepository implements CredentialsRepository {
       credentials.serverBasePath = prefs.getString("server_basepath");
     }
 
-    if (prefs.containsKey("idp_google_enabled")) {
-      credentials.idpGoogleEnabled = prefs.getBool("idp_google_enabled");
+    if (prefs.containsKey("login_type")) {
+      credentials.loginType = prefs.getString("login_type");
     }
 
     apiClient.basePath = credentials.serverBasePath;

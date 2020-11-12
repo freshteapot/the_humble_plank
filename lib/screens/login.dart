@@ -60,9 +60,7 @@ class LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  Future<void> redirectAfterLogin(BuildContext context) async {
-    await context.read<PlankModel>().bootstrap();
-
+  Future<void> _redirectAfterLogin(BuildContext context) async {
     var curveTween = CurveTween(curve: Curves.easeIn);
     Navigator.push(
       context,
@@ -118,17 +116,7 @@ class LoginFormState extends State<LoginForm> {
         return;
       }
 
-      await context.read<PlankModel>().bootstrap();
-
-      var curveTween = CurveTween(curve: Curves.easeIn);
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (_, animation, ___) => FadeTransition(
-              opacity: animation.drive(curveTween), child: PlankShellScreen()),
-          transitionDuration: Duration(seconds: 1),
-        ),
-      );
+      _redirectAfterLogin(context);
     }
   }
 
@@ -229,6 +217,7 @@ class LoginFormState extends State<LoginForm> {
                     splashColor: Colors.blueAccent,
                     onPressed: () async {
                       await context.read<PlankModel>().loginWithGoogle();
+                      _redirectAfterLogin(context);
                     },
                     child: Text(
                       "Login with google",

@@ -1,5 +1,42 @@
 # The Humble Plank
 
+```
+_googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+      });
+      if (_currentUser != null) {
+        print(_currentUser);
+        _peek();
+      }
+    });
+    _googleSignIn.signInSilently();
+
+
+
+  Future<void> _handleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<void> _peek() async {
+    var a = await _currentUser.authentication;
+    print("idToken: ${a.idToken}");
+    print("accessToken: ${a.accessToken}");
+    print("serverAuthCode: ${a.serverAuthCode}");
+  }
+
+  Future<void> _handleSignOut() => _googleSignIn.disconnect();
+
+
+
+```
+
+
+
 - Simple plank app
 
 ```sh
@@ -38,3 +75,5 @@ userUUID=$(echo $response | jq -r '.user_uuid')
 token=$(echo $response | jq -r '.token')
 curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v1/user/${userUUID}"
 ```
+
+

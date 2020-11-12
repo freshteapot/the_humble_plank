@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:core';
+
 import 'dart:io';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/widgets.dart';
@@ -13,6 +14,14 @@ import 'package:the_humble_plank/learnalist/dialog_error.dart';
 import 'package:the_humble_plank/plank_repository.dart';
 import 'package:the_humble_plank/challenge_repository.dart';
 import 'package:the_humble_plank/user_repository.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+const LearnalistBasepath = "https://learnalist.net/api/v1";
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: <String>[
+    'email',
+  ],
+);
 
 class PlankModel extends ChangeNotifier {
   final PlankRepository repository;
@@ -73,7 +82,7 @@ class PlankModel extends ChangeNotifier {
 
   bool _showCallToActionForDisplayName;
   bool get showCallToActionForDisplayName => _showCallToActionForDisplayName;
-
+  bool _skipNotification;
   PlankModel(
       {@required this.repository,
       @required this.challengeRepo,
@@ -93,12 +102,18 @@ class PlankModel extends ChangeNotifier {
         _bootstrapped = false,
         _bootstrapLogin = false,
         _displayName = "",
-        _showCallToActionForDisplayName = true;
+        _showCallToActionForDisplayName = true,
+        _skipNotification = false;
 
   _notifyListeners() {
     if (_bootstrapping) {
       return;
     }
+
+    if (_skipNotification) {
+      return;
+    }
+
     notifyListeners();
   }
 
@@ -126,12 +141,16 @@ class PlankModel extends ChangeNotifier {
 
   Future<void> bootstrap() async {
     _bootstrapping = true;
-    await loadCredentials();
-    _loggedIn = _credentials.login.token != "" ? true : false;
+    await _loadCredentials();
+    if (_credentials.idpGoogleEnabled()) {
+      // This gets reloaded needs protection
+      // The listener will update credentials.idpGoogle
+      _bootstrapGoogleSignIn();
+    }
 
-    await loadSettings();
-    await loadHistory();
-    await loadChallenges();
+    _loggedIn = credentialsRepo.isLoggedIn();
+
+    await _loadState();
 
     _bootstrapping = false;
     _bootstrapped = true;
@@ -139,6 +158,12 @@ class PlankModel extends ChangeNotifier {
     print(
         "bootstrap $_loggedIn 2 ${_credentials.login.token} $_bootstrapLogin");
     _notifyListeners();
+  }
+
+  Future<void> _loadState() async {
+    await loadSettings();
+    await loadHistory();
+    await loadChallenges();
   }
 
   Future<void> loadSettings() async {
@@ -161,14 +186,18 @@ class PlankModel extends ChangeNotifier {
   }
 
   Future<void> loadHistory() async {
+    if (!_loggedIn) {
+      return;
+    }
+
     try {
       var loadedEntries = await repository.history();
       _history = loadedEntries;
       _notifyListeners();
     } catch (error) {
+      _lastError = error;
       _checkErrorFor403(error);
       _checkErrorForOffline(error);
-      _lastError = error;
     }
   }
 
@@ -178,11 +207,11 @@ class PlankModel extends ChangeNotifier {
       _challenge = Challenge(uuid: "", description: "");
       await loadHistory();
     } catch (error) {
-      _checkErrorForOffline(error);
-      _checkErrorFor403(error);
       _lastError = error;
       _isLoading = false;
-      notifyListeners();
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      _notifyListeners();
     }
   }
 
@@ -190,14 +219,14 @@ class PlankModel extends ChangeNotifier {
     _showIntervals = newValue;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("plank.settings.showIntervals", _showIntervals);
-    notifyListeners();
+    _notifyListeners();
   }
 
   Future<void> setIntervalTime(int newValue) async {
     _intervalTime = newValue;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("plank.settings.intervalTime", _intervalTime);
-    notifyListeners();
+    _notifyListeners();
   }
 
   Future<void> setShowChallenge(bool newValue) async {
@@ -206,12 +235,12 @@ class PlankModel extends ChangeNotifier {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("plank.settings.showChallenge", _showChallenge);
-    notifyListeners();
+    _notifyListeners();
   }
 
   Future<void> setChallenge(Challenge newValue) async {
     _challenge = newValue;
-    notifyListeners();
+    _notifyListeners();
   }
 
   Future<bool> addChallenge(BuildContext context, Challenge challenge) async {
@@ -225,6 +254,8 @@ class PlankModel extends ChangeNotifier {
       _challenges.insert(
           0, Challenge(uuid: response.uuid, description: response.description));
     } catch (error) {
+      _checkErrorForOffline(error);
+
       print("Issue adding challenge plankmodel.addChallenge error $error");
       if (error is ApiException) {
         if (error.code == 403) {
@@ -241,7 +272,7 @@ class PlankModel extends ChangeNotifier {
       success = false;
     }
 
-    notifyListeners();
+    _notifyListeners();
     return success;
   }
 
@@ -255,10 +286,9 @@ class PlankModel extends ChangeNotifier {
       await loadChallenges();
       return true;
     } catch (error) {
+      _lastError = error;
       _checkErrorFor403(error);
       _checkErrorForOffline(error);
-      _lastError = error;
-
       return false;
     }
   }
@@ -273,12 +303,12 @@ class PlankModel extends ChangeNotifier {
         setChallenge(Challenge(
             uuid: challenge.uuid, description: challenge.description));
       }
+
       return true;
     } catch (error) {
+      _lastError = error;
       _checkErrorFor403(error);
       _checkErrorForOffline(error);
-      _lastError = error;
-
       return false;
     }
   }
@@ -288,6 +318,9 @@ class PlankModel extends ChangeNotifier {
     //  Challenge(uuid: "fake-123", description: "Daily plank"),
     //  Challenge(uuid: "fake-456", description: "Group plank"),
     //];
+    if (!_loggedIn) {
+      return;
+    }
 
     try {
       var temp =
@@ -297,14 +330,14 @@ class PlankModel extends ChangeNotifier {
         return Challenge(
             uuid: challenge.uuid, description: challenge.description);
       }).toList();
+      _notifyListeners();
     } catch (error) {
-      _checkErrorFor403(error);
-      _checkErrorForOffline(error);
       _challenges = [];
       _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
     }
 
-    _notifyListeners();
     return;
   }
 
@@ -318,48 +351,16 @@ class PlankModel extends ChangeNotifier {
         records: challenge.records,
       ));
     } catch (error) {
+      _lastError = error;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);
-      _lastError = error;
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
-  Future<void> loginWithUsername(
-      HttpUserLoginRequest input, String serverBasePath) async {
-    return credentialsRepo
-        .loginWithUsername(input, serverBasePath)
-        .then((loggedIn) async {
-      await credentialsRepo.saveCredentials(loggedIn, serverBasePath);
-      await loadCredentials();
-    }).catchError((error) async {
-      var loggedIn = HttpUserLoginResponse();
-      loggedIn.token = "";
-      loggedIn.userUuid = "";
-      await credentialsRepo.saveCredentials(loggedIn, serverBasePath);
-
-      _checkErrorForOffline(error);
-      _checkErrorFor403(error);
-      _lastError = error;
-      throw error;
-    });
-  }
-
-  Future<void> loadCredentials() async {
+  Future<void> _loadCredentials() async {
     var credentials = await credentialsRepo.loadCredentials();
     _credentials = credentials;
-    _notifyListeners();
-  }
-
-  Future<void> logout() async {
-    _isLoading = true;
-    await credentialsRepo.unloadCredentials();
-    _credentials = Credentials();
-    _credentials.login.token = "";
-    _credentials.login.userUuid = "";
-    _credentials.serverBasePath = "";
-
-    _isLoading = false;
     _notifyListeners();
   }
 
@@ -369,23 +370,137 @@ class PlankModel extends ChangeNotifier {
     try {
       var success =
           await userRepo.setDisplayName(_credentials.login.userUuid, newValue);
-
-      if (success) {
-        _displayName = newValue;
-        notifyListeners();
-      }
       return success;
     } catch (error) {
+      _lastError = error;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);
-      _lastError = error;
-      notifyListeners();
       return false;
     }
   }
 
   Future<void> setShowCallToActionForDisplayName(bool newValue) async {
     _showCallToActionForDisplayName = newValue;
-    notifyListeners();
+    _notifyListeners();
+  }
+
+  Future<void> _handleGoogleSignIn(GoogleSignInAccount account) async {
+    _credentials.idpGoogle = account;
+    if (_credentials.idpGoogle == null) {
+      _loggedIn = false;
+      _bootstrapLogin = false;
+      _notifyListeners();
+      return;
+    }
+
+    print("idp:google Trying to login");
+
+    HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
+
+    var auth = await _credentials.idpGoogle.authentication;
+    input.idp = CredentialsLoginTypeGoogle;
+    input.idToken = auth.idToken;
+    input.accessToken = auth.accessToken;
+
+    try {
+      var session =
+          await credentialsRepo.loginWithIdp(input, LearnalistBasepath);
+
+      var newCredentials = Credentials();
+      newCredentials.login = session;
+      newCredentials.loginType = CredentialsLoginTypeGoogle;
+
+      await credentialsRepo.saveCredentials(newCredentials, LearnalistBasepath);
+      await _loadCredentials();
+
+      _loggedIn = credentialsRepo.isLoggedIn();
+      // Need to add it back as the credentials are reloaded.
+      _credentials.idpGoogle = account;
+      _skipNotification = true;
+      await _loadState();
+      _skipNotification = false;
+      _bootstrapLogin = true;
+      _notifyListeners();
+    } catch (error) {
+      _skipNotification = false;
+      var newCredentials = Credentials.defaultValues();
+      await credentialsRepo.saveCredentials(newCredentials, LearnalistBasepath);
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+    }
+  }
+
+  Future<void> logout() async {
+    _isLoading = true;
+    if (_credentials.idpGoogle != null) {
+      await _googleSignIn.disconnect();
+    }
+
+    await credentialsRepo.unloadCredentials();
+
+    _credentials = Credentials.defaultValues();
+
+    // Add logout to the site
+    _loggedIn = false;
+    _isLoading = false;
+    _notifyListeners();
+  }
+
+  Future<void> loginWithUsername(
+      HttpUserLoginRequest input, String serverBasePath) async {
+    return credentialsRepo
+        .loginWithUsername(input, serverBasePath)
+        .then((session) async {
+      // Maybe pass in
+      var newCredentials = Credentials.defaultValues();
+      newCredentials.login = session;
+      newCredentials.loginType = CredentialsLoginTypeUsername;
+      await credentialsRepo.saveCredentials(newCredentials, serverBasePath);
+
+      _skipNotification = true;
+      await _loadCredentials();
+      _loggedIn = credentialsRepo.isLoggedIn();
+      await _loadState();
+      _skipNotification = false;
+      _notifyListeners();
+    }).catchError((error) async {
+      _skipNotification = false;
+      var newCredentials = Credentials.defaultValues();
+      await credentialsRepo.saveCredentials(newCredentials, serverBasePath);
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      throw error;
+    });
+  }
+
+  Future<void> loginWithGoogle() async {
+    try {
+      var account = await _googleSignIn.signIn();
+      _skipNotification = true;
+      await _handleGoogleSignIn(account);
+      _skipNotification = false;
+      _notifyListeners();
+    } catch (error) {
+      _skipNotification = false;
+      var newCredentials = Credentials.defaultValues();
+      await credentialsRepo.saveCredentials(newCredentials, LearnalistBasepath);
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+    }
+  }
+
+  void _bootstrapGoogleSignIn() {
+    if (!_credentials.idpGoogleEnabled()) {
+      print("idp:google not enabled");
+      return;
+    }
+
+    _googleSignIn.onCurrentUserChanged.listen(_handleGoogleSignIn);
+
+    _googleSignIn.signInSilently();
+    print("idp:google enabled and setup");
   }
 }

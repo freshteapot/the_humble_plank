@@ -54,6 +54,7 @@ class App extends StatelessWidget {
     String initialRoute = AppRoutes.start;
 
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Humble plank',
         initialRoute: initialRoute,
         theme: AppTheme.theme,

@@ -24,12 +24,9 @@ class SettingsModal extends StatelessWidget {
           child: GestureDetector(
               //behavior: HitTestBehavior.opaque,
               onTap: () {
-                print("H1");
-
                 myFocusNode.unfocus();
               }, //prevents taps inside the sheet from popping it
               onVerticalDragStart: (_) {
-                print("H2");
                 Navigator.of(context).pop();
               },
               child: Container(

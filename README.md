@@ -48,3 +48,6 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v
 ```
 
 
+
+
+https://developers.google.com/android/guides/client-auth

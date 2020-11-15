@@ -1,6 +1,7 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:openapi/api.dart';
 import 'package:provider/provider.dart';
 import 'package:the_humble_plank/learnalist/challenge.dart';
 
@@ -71,6 +72,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     bool offline = context.select((PlankModel model) => model.offline);
 
     if (offline) {
+      // TODO
       print("We are offline, give some indication");
     }
 
@@ -118,8 +120,17 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       historyChallengeScreen()
     ].elementAt(_challengeScreenIndex);
 
+    List<Challenge> challenges =
+        context.select((PlankModel model) => model.challenges);
+
+    List<Plank> history = context.select((PlankModel model) => model.history);
+
     List<Widget> screens = [
-      PlankHistoryScreen(),
+      PlankHistoryScreen(
+        challenges: challenges,
+        currentChallenge: challenge,
+        history: history,
+      ),
       PlankScreen(
         showIntervals: showIntervals,
         intervalTime: intervalTime,

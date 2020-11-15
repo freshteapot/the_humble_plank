@@ -151,46 +151,6 @@ class _PlankChallenge1State extends State<PlankChallenge1> {
           width: 60, // specific value
           child: RaisedButton(
             color: Colors.white,
-            padding: EdgeInsets.all(8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.history,
-                  size: 18,
-                ),
-                Text("History"),
-              ],
-            ),
-            onPressed: () async {
-              await context
-                  .read<PlankModel>()
-                  .getChallengeWithHistory(challenge.uuid);
-              //context.read<PlankModel>().setChallenge(challenge);
-              widget.onHistory();
-            },
-          )),
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.timer, size: 18),
-                Text("plank"),
-              ],
-            ),
-            onPressed: () {
-              context.read<PlankModel>().setChallenge(challenge);
-              widget.onPressed();
-            },
-          )),
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
             padding: EdgeInsets.all(8.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,

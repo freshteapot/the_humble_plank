@@ -6,6 +6,7 @@ import 'package:openapi/api.dart';
 import 'package:the_humble_plank/learnalist/challenge.dart';
 
 import 'package:the_humble_plank/plank_model.dart';
+import 'package:the_humble_plank/widget/plank_screen_call_to_action.dart';
 
 class PlankScreen extends StatefulWidget {
   final int intervalTime;
@@ -108,12 +109,34 @@ class _PlankScreenState extends State<PlankScreen> {
                 context.read<PlankModel>().setChallenge(Challenge.empty());
               },
               direction: DismissDirection.endToStart,
+
               background: Container(color: Colors.red),
               child: ListTile(
-                  title: Text(
-                widget.challenge.description,
-                style: TextStyle(color: Colors.black),
-              )),
+                  title: Container(
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                          onTap: () async {
+                            await showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return WillPopScope(
+                                      onWillPop: () async {
+                                        Navigator.of(context).pop();
+                                        return false;
+                                      },
+                                      child: Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              2.0,
+                                          child: plankScreenCallToAction(
+                                              context, widget.challenge)));
+                                });
+                          },
+                          child: Text(
+                            widget.challenge.description,
+                            style: TextStyle(color: Colors.black),
+                          )))),
             ),
           ],
         ],

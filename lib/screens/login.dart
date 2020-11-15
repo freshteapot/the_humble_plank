@@ -84,7 +84,7 @@ class LoginFormState extends State<LoginForm> {
             .loginWithUsername(_loginInput, _serverBasePath);
       } catch (err) {
         if (err is ApiException) {
-          if ((err as ApiException).code == 403) {
+          if (err.code == 403) {
             Flushbar(
               flushbarPosition: FlushbarPosition.TOP,
               flushbarStyle: FlushbarStyle.GROUNDED,

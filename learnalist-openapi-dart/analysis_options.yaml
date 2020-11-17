@@ -1,0 +1,4 @@
+analyzer:
+  errors:
+    todo: ignore
+    unused_local_variable: ignore

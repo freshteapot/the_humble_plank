@@ -1,42 +1,12 @@
 # The Humble Plank
 
-```
-_googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      setState(() {
-        _currentUser = account;
-      });
-      if (_currentUser != null) {
-        print(_currentUser);
-        _peek();
-      }
-    });
-    _googleSignIn.signInSilently();
 
+## learnalist-openapi-dart
+This comes from generating dart client library for [learnalist.net](https://github.com/freshteapot/learnalist-api).
 
+# Development
 
-  Future<void> _handleSignIn() async {
-    try {
-      await _googleSignIn.signIn();
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Future<void> _peek() async {
-    var a = await _currentUser.authentication;
-    print("idToken: ${a.idToken}");
-    print("accessToken: ${a.accessToken}");
-    print("serverAuthCode: ${a.serverAuthCode}");
-  }
-
-  Future<void> _handleSignOut() => _googleSignIn.disconnect();
-
-
-
-```
-
-
-
+## Register users
 - Simple plank app
 
 ```sh
@@ -64,6 +34,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 
 ```
 
+## Delete user
 ```sh
 response=$(curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 {

@@ -1,0 +1,70 @@
+library openapi.api;
+
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart';
+
+part 'api_client.dart';
+part 'api_helper.dart';
+part 'api_exception.dart';
+part 'auth/authentication.dart';
+part 'auth/api_key_auth.dart';
+part 'auth/oauth.dart';
+part 'auth/http_basic_auth.dart';
+part 'auth/http_bearer_auth.dart';
+
+part 'api/a_list_api.dart';
+part 'api/asset_api.dart';
+part 'api/challenge_api.dart';
+part 'api/default_api.dart';
+part 'api/plank_api.dart';
+part 'api/spaced_repetition_api.dart';
+part 'api/user_api.dart';
+
+part 'model/alist.dart';
+part 'model/alist_all_of.dart';
+part 'model/alist_data_v1.dart';
+part 'model/alist_data_v2.dart';
+part 'model/alist_from.dart';
+part 'model/alist_info.dart';
+part 'model/alist_input.dart';
+part 'model/alist_interact.dart';
+part 'model/alist_item_v2.dart';
+part 'model/any_type.dart';
+part 'model/challenge_info.dart';
+part 'model/challenge_info_all_of.dart';
+part 'model/challenge_info_all_of_users.dart';
+part 'model/challenge_input.dart';
+part 'model/challenge_plank_record.dart';
+part 'model/challenge_plank_record_all_of.dart';
+part 'model/challenge_short_info.dart';
+part 'model/challenge_short_info_all_of.dart';
+part 'model/http_asset_share_request_body.dart';
+part 'model/http_asset_upload_request_body.dart';
+part 'model/http_asset_upload_response.dart';
+part 'model/http_response_message.dart';
+part 'model/http_user_info_input.dart';
+part 'model/http_user_login_idp_input.dart';
+part 'model/http_user_login_request.dart';
+part 'model/http_user_login_response.dart';
+part 'model/http_user_register_input.dart';
+part 'model/http_user_register_response.dart';
+part 'model/kind.dart';
+part 'model/plank.dart';
+part 'model/spaced_repetition_base.dart';
+part 'model/spaced_repetition_base_new.dart';
+part 'model/spaced_repetition_base_settings.dart';
+part 'model/spaced_repetition_base_settings_show.dart';
+part 'model/spaced_repetition_data_v2.dart';
+part 'model/spaced_repetition_entry_viewed.dart';
+part 'model/spaced_repetition_settings_v2.dart';
+part 'model/spaced_repetition_v1.dart';
+part 'model/spaced_repetition_v1_new.dart';
+part 'model/spaced_repetition_v1_new_all_of.dart';
+part 'model/spaced_repetition_v2.dart';
+part 'model/spaced_repetition_v2_new.dart';
+part 'model/spaced_repetition_v2_new_all_of.dart';
+part 'model/version.dart';
+
+
+ApiClient defaultApiClient = ApiClient();

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:jiffy/jiffy.dart';
 
-import 'package:the_humble_plank/learnalist/challenge.dart';
-import 'package:the_humble_plank/plank_model.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/plank_model.dart';
 
 class PlankChallenge2 extends StatelessWidget {
   final void Function(Challenge challenge) onCreate;
@@ -61,7 +61,7 @@ class PlankChallenge2 extends StatelessWidget {
               if (challenge.description.isEmpty) {
                 challenge.description = _defaultTitle;
               }
-
+              // TODO after add, ask for permission to send notifications.
               context.read<PlankModel>().addChallenge(context, challenge);
               onCreate(challenge);
             },

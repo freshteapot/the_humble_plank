@@ -5,10 +5,10 @@ import 'package:flushbar/flushbar.dart';
 
 import 'package:openapi/api.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
+import 'package:thehumbleplank/plank_model.dart';
 
-import 'package:the_humble_plank/screens/plank_shell.dart';
-import 'package:the_humble_plank/widget/topbar.dart';
+import 'package:thehumbleplank/screens/plank_shell.dart';
+import 'package:thehumbleplank/widget/topbar.dart';
 
 class LoginScreen extends StatelessWidget {
   @override

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:jiffy/jiffy.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
-import 'package:the_humble_plank/utils.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
-import 'package:the_humble_plank/widget/onshare.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/widget/onshare.dart';
 
 class PlankChallengeHistory extends StatelessWidget {
   final VoidCallback onPlank;

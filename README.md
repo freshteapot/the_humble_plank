@@ -1,8 +1,20 @@
 # The Humble Plank
 
-
 ## learnalist-openapi-dart
 This comes from generating dart client library for [learnalist.net](https://github.com/freshteapot/learnalist-api).
+
+```
+mkdir -p ~/git/secrets/thehumbleplank/android/app
+```
+
+```
+mkdir -p ~/git/secrets/thehumbleplank/android/app/google-services.json
+cp ~/git/secrets/thehumbleplank/android/app/google-services.json android/app/google-services.json
+```
+
+```
+cp ~/git/secrets/ios-thehumbleplank-GoogleService-Info.plist ios/Runner/GoogleService-Info.plist
+```
 
 # Development
 

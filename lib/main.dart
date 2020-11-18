@@ -4,14 +4,15 @@ import 'package:provider/provider.dart';
 
 import 'package:openapi/api.dart';
 
-import 'package:the_humble_plank/app.dart';
-import 'package:the_humble_plank/plank_repository.dart';
-import 'package:the_humble_plank/credentials_repository.dart';
-import 'package:the_humble_plank/challenge_repository.dart';
-import 'package:the_humble_plank/user_repository.dart';
+import 'package:thehumbleplank/app.dart';
+import 'package:thehumbleplank/plank_repository.dart';
+import 'package:thehumbleplank/credentials_repository.dart';
+import 'package:thehumbleplank/challenge_repository.dart';
+import 'package:thehumbleplank/user_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   ApiClient apiClient = ApiClient();
 
   UserApi userApi = UserApi(apiClient);

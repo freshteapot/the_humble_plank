@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
-import 'package:the_humble_plank/screens/plank_settings_display_name.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/screens/plank_settings_display_name.dart';
 
 class PlankSettings extends StatefulWidget {
   PlankSettings();

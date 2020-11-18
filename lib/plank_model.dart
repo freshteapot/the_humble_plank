@@ -8,12 +8,12 @@ import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:openapi/api.dart';
-import 'package:the_humble_plank/credentials_repository.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
-import 'package:the_humble_plank/learnalist/dialog_error.dart';
-import 'package:the_humble_plank/plank_repository.dart';
-import 'package:the_humble_plank/challenge_repository.dart';
-import 'package:the_humble_plank/user_repository.dart';
+import 'package:thehumbleplank/credentials_repository.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/learnalist/dialog_error.dart';
+import 'package:thehumbleplank/plank_repository.dart';
+import 'package:thehumbleplank/challenge_repository.dart';
+import 'package:thehumbleplank/user_repository.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 const LearnalistBasepath = "https://learnalist.net/api/v1";
@@ -384,6 +384,49 @@ class PlankModel extends ChangeNotifier {
     _notifyListeners();
   }
 
+// Handle when  the notification is challenge:updated
+  // Get challenge
+  // Set challenge
+  // Update index for the screen
+  // await plankModel.notificationChallengeUpdated(challengeUUID)
+
+  // Start at the plank screen
+
+  String _notificationAction = "";
+  String get notificationAction => _notificationAction;
+
+  String _latestNotificationId = "";
+  String get latestNotificationId => _latestNotificationId;
+
+  String _lastNotificationId = "";
+  String get lastNotificationId => _lastNotificationId;
+
+  Future<void> notificationChallengeUpdated(
+      String messageId, String uuid) async {
+    _skipNotification = true;
+    await getChallengeWithHistory(uuid);
+
+    _notificationAction = "challenge:updated";
+    _lastNotificationId = _latestNotificationId;
+    _latestNotificationId = messageId;
+    _skipNotification = false;
+    _notifyListeners();
+  }
+
+  bool _newHistory = false;
+  bool get newHistory => _newHistory;
+
+  void setNewHistory() {
+    _newHistory = true;
+    _notifyListeners();
+  }
+
+  void clearNewHistorySignal() {
+    _newHistory = false;
+    _notifyListeners();
+  }
+
+  // ----
   Future<void> _handleGoogleSignIn(GoogleSignInAccount account) async {
     _credentials.idpGoogle = account;
     if (_credentials.idpGoogle == null) {

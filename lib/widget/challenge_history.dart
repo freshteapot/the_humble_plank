@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:jiffy/jiffy.dart';
 
-import 'package:the_humble_plank/utils.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
+import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
 
 Widget challengeHistoryDataView(BuildContext context, Challenge challenge) {
   Map<String, String> users = new Map<String, String>();

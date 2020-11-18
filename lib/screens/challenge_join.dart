@@ -2,7 +2,7 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
+import 'package:thehumbleplank/plank_model.dart';
 
 class ChallengeJoinScreen extends StatelessWidget {
   @override

@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:openapi/api.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
-import 'package:the_humble_plank/widget/plank_screen_call_to_action.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/widget/plank_screen_call_to_action.dart';
 
 class PlankScreen extends StatefulWidget {
   final int intervalTime;

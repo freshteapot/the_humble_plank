@@ -7,5 +7,6 @@ class AppRoutes {
   static final login = '/login';
   static final plankView = '/plank/view';
   static final plankHistory = '/plank/history';
+  static final plankTimer = '/plank/timer';
   static final challengeJoin = '/challenge/join';
 }

@@ -5,9 +5,12 @@ import 'package:jiffy/jiffy.dart';
 
 import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/notifications.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/widget/bottombar.dart';
 import 'package:thehumbleplank/widget/challenge_history.dart';
+import 'package:thehumbleplank/widget/topbar.dart';
 
 class HistoryMenu {
   String name;
@@ -17,11 +20,11 @@ class HistoryMenu {
   HistoryMenu({this.name, this.type, this.data});
 }
 
-class PlankHistoryScreen extends StatefulWidget {
+class PlankHistoryScreen2 extends StatefulWidget {
   List<Plank> history;
   List<Challenge> challenges;
   Challenge currentChallenge;
-  PlankHistoryScreen({
+  PlankHistoryScreen2({
     this.history,
     this.challenges,
     this.currentChallenge,
@@ -31,9 +34,16 @@ class PlankHistoryScreen extends StatefulWidget {
   _PlankHistoryScreenState createState() => _PlankHistoryScreenState();
 }
 
-class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
+class _PlankHistoryScreenState extends State<PlankHistoryScreen2> {
   @override
   Widget build(BuildContext context) {
+    final MessageArguments args = ModalRoute.of(context).settings.arguments;
+    print("MessageArguments $args");
+    widget.currentChallenge =
+        context.select((PlankModel model) => model.challenge);
+    widget.challenges = context.select((PlankModel model) => model.challenges);
+    widget.history = context.select((PlankModel model) => model.history);
+
     Widget historyView;
     double historyHeight = MediaQuery.of(context).size.height / 1.3;
     bool showChallenges = widget.challenges.length > 0;
@@ -59,8 +69,21 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
           });
     }
 
+    Widget bottomNav = bottomBar((newIndex) {
+      if (newIndex == 0) {
+        // Maybe reload challenge history or my history
+        return;
+      }
+      if (newIndex == 1) {
+        Navigator.popAndPushNamed(context, '/plank/timer');
+        return;
+      }
+    }, 0, false);
+
     return Scaffold(
+        appBar: topBar(),
         backgroundColor: Colors.white,
+        bottomNavigationBar: bottomNav,
         body: Align(
             alignment: Alignment.topCenter,
             child: Column(

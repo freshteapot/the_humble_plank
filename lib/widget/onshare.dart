@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
 
 shareChallenge(BuildContext context, Challenge challenge) async {
   final RenderBox box = context.findRenderObject();

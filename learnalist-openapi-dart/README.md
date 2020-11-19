@@ -83,7 +83,7 @@ Class | Method | HTTP request | Description
 *ChallengeApi* | [**joinChallenge**](doc//ChallengeApi.md#joinchallenge) | **PUT** /challenge/{uuid}/join | 
 *ChallengeApi* | [**leaveChallenge**](doc//ChallengeApi.md#leavechallenge) | **PUT** /challenge/{uuid}/leave | 
 *DefaultApi* | [**getServerVersion**](doc//DefaultApi.md#getserverversion) | **GET** /version | 
-*DefaultApi* | [**registerDevice**](doc//DefaultApi.md#registerdevice) | **POST** /register-device | 
+*MobileApi* | [**registerDevice**](doc//MobileApi.md#registerdevice) | **POST** /mobile/register-device | 
 *PlankApi* | [**addPlankEntry**](doc//PlankApi.md#addplankentry) | **POST** /plank/ | 
 *PlankApi* | [**deletePlankEntry**](doc//PlankApi.md#deleteplankentry) | **DELETE** /plank/{uuid} | 
 *PlankApi* | [**getPlankHistoryByUser**](doc//PlankApi.md#getplankhistorybyuser) | **GET** /plank/history | 

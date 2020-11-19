@@ -17,6 +17,7 @@ part 'api/a_list_api.dart';
 part 'api/asset_api.dart';
 part 'api/challenge_api.dart';
 part 'api/default_api.dart';
+part 'api/mobile_api.dart';
 part 'api/plank_api.dart';
 part 'api/spaced_repetition_api.dart';
 part 'api/user_api.dart';

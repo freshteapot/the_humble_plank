@@ -12,6 +12,7 @@ import 'package:openapi/api.dart';
 import 'package:thehumbleplank/credentials_repository.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/learnalist/dialog_error.dart';
+import 'package:thehumbleplank/mobile_repository.dart';
 import 'package:thehumbleplank/plank_repository.dart';
 import 'package:thehumbleplank/challenge_repository.dart';
 import 'package:thehumbleplank/user_repository.dart';
@@ -28,6 +29,7 @@ class PlankModel extends ChangeNotifier {
   final ChallengeRepository challengeRepo;
   final CredentialsRepository credentialsRepo;
   final UserRepository userRepo;
+  final MobileRepository mobileRepo;
 
   Credentials _credentials = Credentials();
   Credentials get credentials => _credentials;
@@ -83,12 +85,13 @@ class PlankModel extends ChangeNotifier {
   bool _showCallToActionForDisplayName;
   bool get showCallToActionForDisplayName => _showCallToActionForDisplayName;
   bool _skipNotification;
-  PlankModel(
-      {@required this.repository,
-      @required this.challengeRepo,
-      @required this.credentialsRepo,
-      @required this.userRepo})
-      : _isLoading = false,
+  PlankModel({
+    @required this.repository,
+    @required this.challengeRepo,
+    @required this.credentialsRepo,
+    @required this.userRepo,
+    @required this.mobileRepo,
+  })  : _isLoading = false,
         _isError = false,
         _loggedIn = false,
         _history = [],
@@ -557,7 +560,14 @@ class PlankModel extends ChangeNotifier {
     if (!loggedIn) {
       return;
     }
-    // TODO SEND token with userID to the backend
+
+    try {
+      await mobileRepo.registerDevice(token);
+    } catch (error) {
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+    }
     return;
   }
 

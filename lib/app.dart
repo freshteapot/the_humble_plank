@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/mobile_repository.dart';
 
 import 'package:thehumbleplank/theapp.dart';
 import 'package:thehumbleplank/plank_repository.dart';
@@ -13,12 +14,14 @@ class App extends StatelessWidget {
   final PlankRepository plankRepo;
   final ChallengeRepository challengeRepo;
   final UserRepository userRepo;
+  final MobileRepository mobileRepo;
 
   App({
     @required this.plankRepo,
     @required this.credentialsRepo,
     @required this.challengeRepo,
     @required this.userRepo,
+    @required this.mobileRepo,
   });
 
   @override
@@ -32,6 +35,7 @@ class App extends StatelessWidget {
                 challengeRepo: challengeRepo,
                 credentialsRepo: credentialsRepo,
                 userRepo: userRepo,
+                mobileRepo: mobileRepo,
               );
 
               m.bootstrap();

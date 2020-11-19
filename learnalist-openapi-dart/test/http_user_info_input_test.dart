@@ -6,12 +6,6 @@ void main() {
     var instance = new HttpUserInfoInput();
 
   group('test HttpUserInfoInput', () {
-    // Does the user want push_notifications.
-    // bool plankPushNotifications (default value: false)
-    test('to test the property `plankPushNotifications`', () async {
-      // TODO
-    });
-
     // This will be used to address you in the app(s) or website.
     // String displayName (default value: "")
     test('to test the property `displayName`', () async {

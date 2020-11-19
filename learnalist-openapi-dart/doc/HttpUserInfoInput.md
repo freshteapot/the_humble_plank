@@ -8,7 +8,6 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**plankPushNotifications** | **bool** | Does the user want push_notifications. | [optional] [default to false]
 **displayName** | **String** | This will be used to address you in the app(s) or website. | [optional] [default to &quot;&quot;]
 **createdVia** | **String** | Let the server know the user was created via the plank app. | [optional] [default to &quot;&quot;]
 

@@ -1,8 +1,6 @@
 part of openapi.api;
 
 class HttpUserInfoInput {
-  /* Does the user want push_notifications. */
-  bool plankPushNotifications = false;
   /* This will be used to address you in the app(s) or website. */
   String displayName = "";
   /* Let the server know the user was created via the plank app. */
@@ -12,20 +10,17 @@ class HttpUserInfoInput {
 
   @override
   String toString() {
-    return 'HttpUserInfoInput[plankPushNotifications=$plankPushNotifications, displayName=$displayName, createdVia=$createdVia, ]';
+    return 'HttpUserInfoInput[displayName=$displayName, createdVia=$createdVia, ]';
   }
 
   HttpUserInfoInput.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
-    plankPushNotifications = json['plank_push_notifications'];
     displayName = json['display_name'];
     createdVia = json['created_via'];
   }
 
   Map<String, dynamic> toJson() {
     Map <String, dynamic> json = {};
-    if (plankPushNotifications != null)
-      json['plank_push_notifications'] = plankPushNotifications;
     if (displayName != null)
       json['display_name'] = displayName;
     if (createdVia != null)

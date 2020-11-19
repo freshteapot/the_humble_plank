@@ -14,5 +14,12 @@ void main() {
       // TODO
     });
 
+    // Register the user and the token, to be able to send push notifications
+    //
+    //Future<HttpResponseMessage> registerDevice(HttpMobileRegisterInput httpMobileRegisterInput) async 
+    test('test registerDevice', () async {
+      // TODO
+    });
+
   });
 }

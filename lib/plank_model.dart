@@ -6,6 +6,7 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:openapi/api.dart';
 import 'package:thehumbleplank/credentials_repository.dart';
@@ -14,7 +15,6 @@ import 'package:thehumbleplank/learnalist/dialog_error.dart';
 import 'package:thehumbleplank/plank_repository.dart';
 import 'package:thehumbleplank/challenge_repository.dart';
 import 'package:thehumbleplank/user_repository.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 const LearnalistBasepath = "https://learnalist.net/api/v1";
 GoogleSignIn _googleSignIn = GoogleSignIn(

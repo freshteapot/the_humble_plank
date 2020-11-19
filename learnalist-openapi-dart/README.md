@@ -83,6 +83,7 @@ Class | Method | HTTP request | Description
 *ChallengeApi* | [**joinChallenge**](doc//ChallengeApi.md#joinchallenge) | **PUT** /challenge/{uuid}/join | 
 *ChallengeApi* | [**leaveChallenge**](doc//ChallengeApi.md#leavechallenge) | **PUT** /challenge/{uuid}/leave | 
 *DefaultApi* | [**getServerVersion**](doc//DefaultApi.md#getserverversion) | **GET** /version | 
+*DefaultApi* | [**registerDevice**](doc//DefaultApi.md#registerdevice) | **POST** /register-device | 
 *PlankApi* | [**addPlankEntry**](doc//PlankApi.md#addplankentry) | **POST** /plank/ | 
 *PlankApi* | [**deletePlankEntry**](doc//PlankApi.md#deleteplankentry) | **DELETE** /plank/{uuid} | 
 *PlankApi* | [**getPlankHistoryByUser**](doc//PlankApi.md#getplankhistorybyuser) | **GET** /plank/history | 
@@ -121,6 +122,7 @@ Class | Method | HTTP request | Description
  - [HttpAssetShareRequestBody](doc//HttpAssetShareRequestBody.md)
  - [HttpAssetUploadRequestBody](doc//HttpAssetUploadRequestBody.md)
  - [HttpAssetUploadResponse](doc//HttpAssetUploadResponse.md)
+ - [HttpMobileRegisterInput](doc//HttpMobileRegisterInput.md)
  - [HttpResponseMessage](doc//HttpResponseMessage.md)
  - [HttpUserInfoInput](doc//HttpUserInfoInput.md)
  - [HttpUserLoginIDPInput](doc//HttpUserLoginIDPInput.md)

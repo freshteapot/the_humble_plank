@@ -42,6 +42,7 @@ part 'model/challenge_short_info_all_of.dart';
 part 'model/http_asset_share_request_body.dart';
 part 'model/http_asset_upload_request_body.dart';
 part 'model/http_asset_upload_response.dart';
+part 'model/http_mobile_register_input.dart';
 part 'model/http_response_message.dart';
 part 'model/http_user_info_input.dart';
 part 'model/http_user_login_idp_input.dart';

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:openapi/api.dart';
 import 'package:provider/provider.dart';
-import 'package:thehumbleplank/learnalist/challenge.dart';
 
+import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/screens/place_challenge_1.dart';
 import 'package:thehumbleplank/screens/place_challenge_2.dart';
@@ -15,8 +15,7 @@ import 'package:thehumbleplank/screens/plank_settings.dart';
 import 'package:thehumbleplank/widget/topbar.dart';
 
 class PlankShellScreen extends StatefulWidget {
-  int startAt = 1;
-  PlankShellScreen({this.startAt});
+  PlankShellScreen();
 
   @override
   _PlankShellScreenState createState() => _PlankShellScreenState();
@@ -30,7 +29,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.startAt;
   }
 
   Widget getChallengeScreen() {
@@ -78,10 +76,11 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
   @override
   Widget build(BuildContext context) {
     // Check if online
+
     bool offline = context.select((PlankModel model) => model.offline);
 
     if (offline) {
-      // TODO
+      // TODO how to handle offline
       print("We are offline, give some indication");
     }
 
@@ -245,8 +244,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       type: BottomNavigationBarType.fixed,
       elevation: 0,
       items: bottomNavItems,
-      currentIndex: _currentIndex, // new
-
+      currentIndex: _currentIndex,
       onTap: (newIndex) {
         if (newIndex == 0) {
           // TODO to load my history or to load challenge history?

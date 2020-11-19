@@ -1,5 +1,8 @@
 # The Humble Plank
 
+# TODO
+- [ ] When building the service to process the events, cheat on startup by querying the api for all the challenge relationships.
+
 ## learnalist-openapi-dart
 This comes from generating dart client library for [learnalist.net](https://github.com/freshteapot/learnalist-api).
 

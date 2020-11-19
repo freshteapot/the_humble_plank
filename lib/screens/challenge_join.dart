@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/utils.dart';
 
 class ChallengeJoinScreen extends StatelessWidget {
   @override
@@ -117,6 +118,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 return;
               }
 
+              await checkAndAskForNotificationPermission(context);
               Navigator.of(context).pop();
             },
             child: Text(

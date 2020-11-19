@@ -171,6 +171,8 @@ class PlankModel extends ChangeNotifier {
     _intervalTime = prefs.getInt("plank.settings.intervalTime");
     _showIntervals = prefs.getBool("plank.settings.showIntervals");
     _showChallenge = prefs.getBool("plank.settings.showChallenge");
+    _appPushNotifications =
+        prefs.getBool("plank.settings.notificationsEnabled");
 
     if (_intervalTime == null) {
       _intervalTime = 0;
@@ -182,6 +184,10 @@ class PlankModel extends ChangeNotifier {
 
     if (_showChallenge == null) {
       _showChallenge = true;
+    }
+
+    if (_appPushNotifications == null) {
+      _appPushNotifications = false;
     }
   }
 
@@ -545,5 +551,24 @@ class PlankModel extends ChangeNotifier {
 
     _googleSignIn.signInSilently();
     print("idp:google enabled and setup");
+  }
+
+  Future<void> sendTokenToServer(String token) async {
+    if (!loggedIn) {
+      return;
+    }
+    // TODO SEND token with userID to the backend
+    return;
+  }
+
+  bool _appPushNotifications = false;
+  bool get appPushNotifications => _appPushNotifications;
+
+  Future<void> setPushNotifications(bool state) async {
+    _appPushNotifications = state;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(
+        "plank.settings.notificationsEnabled", _appPushNotifications);
+    _notifyListeners();
   }
 }

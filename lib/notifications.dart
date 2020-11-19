@@ -29,8 +29,7 @@ class MessageArguments {
 ///
 /// To verify things are working, check out the native platform logs.
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
+  // I wonder if I need this for push notifications?
   await Firebase.initializeApp();
   print("Handling a background message ${message.messageId}");
 }
@@ -52,9 +51,6 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> setupNotifications(
     BuildContext context, PlankModel plankModel) async {
   //WidgetsFlutterBinding.ensureInitialized();
-  print("Is loggedIn ${plankModel.loggedIn}");
-  //print("Is loggedIn ${context.watch<PlankModel>().loggedIn}");
-
   await Firebase.initializeApp();
 
   // Set the background messaging handler early on, as a named top-level function
@@ -116,6 +112,8 @@ Future<void> setupNotifications(
     }
 
     if (notification != null && android != null) {
+      // TODO make sure I am happy with android
+      /*
       await flutterLocalNotificationsPlugin.show(
           notification.hashCode,
           notification.title,
@@ -130,6 +128,7 @@ Future<void> setupNotifications(
               icon: 'launch_background',
             ),
           ));
+      */
     }
   });
 
@@ -137,9 +136,9 @@ Future<void> setupNotifications(
     print('A new onMessageOpenedApp event was published!');
     print(message);
     var data = message.data;
-    if (data["action"] == "challenge:updated") {
+    if (data["action"] == "challenge:record" ||
+        data["action"] == "challenge:joined") {
       String challengeUUID = data["uuid"];
-      print("Lookup $challengeUUID and then goto challenege page");
       await plankModel.notificationChallengeUpdated(
           message.messageId, challengeUUID);
       return;
@@ -147,7 +146,7 @@ Future<void> setupNotifications(
   });
 
   // How to redirect on load
-
+  // This fires if we open it from the notification center.
   FirebaseMessaging.instance
       .getInitialMessage()
       .then((RemoteMessage message) async {
@@ -165,7 +164,8 @@ Future<void> setupNotifications(
       )..show(context);
 
       var data = message.data;
-      if (data["action"] == "challenge:updated") {
+      if (data["action"] == "challenge:record" ||
+          data["action"] == "challenge:joined") {
         String challengeUUID = data["uuid"];
         print("Lookup $challengeUUID and then goto challenege page");
         Flushbar(
@@ -184,9 +184,14 @@ Future<void> setupNotifications(
     }
   });
 
-  // TODO move to this after challenge has made or joined
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
+  // Send this with the userID back to the server
+  String token = await FirebaseMessaging.instance.getToken();
+  print("FCM token $token");
+  await plankModel.sendTokenToServer(token);
+}
+
+Future<NotificationSettings> requestPermission() {
+  return FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: true,
     badge: true,
@@ -195,10 +200,4 @@ Future<void> setupNotifications(
     // This will ensure the popup shows for users
     provisional: false,
   );
-  print(settings);
-
-  String token = await FirebaseMessaging.instance.getToken();
-  print("FCM token $token");
 }
-
-Future<void> redirectToChallengeHistory() {}

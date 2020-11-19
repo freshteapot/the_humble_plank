@@ -4,6 +4,7 @@ import 'package:jiffy/jiffy.dart';
 
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/utils.dart';
 
 class PlankChallenge2 extends StatelessWidget {
   final void Function(Challenge challenge) onCreate;
@@ -57,12 +58,14 @@ class PlankChallenge2 extends StatelessWidget {
             disabledTextColor: Colors.black,
             padding: EdgeInsets.all(8.0),
             splashColor: Colors.blueAccent,
-            onPressed: () {
+            onPressed: () async {
               if (challenge.description.isEmpty) {
                 challenge.description = _defaultTitle;
               }
-              // TODO after add, ask for permission to send notifications.
+
               context.read<PlankModel>().addChallenge(context, challenge);
+              await checkAndAskForNotificationPermission(context);
+
               onCreate(challenge);
             },
             child: Text(

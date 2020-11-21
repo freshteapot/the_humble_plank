@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	EventNotifyChallengeJoined = "challenge:joined"
-	EventNotifyChallengeRecord = "challenge:record"
+	EventNotifyChallengeJoined = "challenge.joined"
+	EventNotifyChallengeRecord = "challenge.newrecord"
 )
 
 func userJoined(challengeUUID string, challengeName string, displayName string) *messaging.Message {
@@ -40,7 +40,7 @@ func recordAdded(challengeUUID string, challengeName string, displayName string)
 			"uuid":   challengeUUID,
 			"who":    displayName,
 			"name":   challengeName,
-			"action": EventNotifyChallengeRecord, //TODO change from "challenge:updated"
+			"action": EventNotifyChallengeRecord,
 		},
 	}
 

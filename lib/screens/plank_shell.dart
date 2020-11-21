@@ -132,8 +132,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
         context.select((PlankModel model) => model.challenges);
 
     List<Plank> history = context.select((PlankModel model) => model.history);
-    bool newHistory = context.select((PlankModel model) => model.newHistory);
-
     // Out the box challenge will cause this to show the correct one
     List<Widget> screens = [
       PlankHistoryScreen(
@@ -152,39 +150,9 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
     BottomNavigationBarItem historyBarItem =
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History');
-    if (newHistory) {
-      historyBarItem = new BottomNavigationBarItem(
-        label: 'History',
-        icon: new Stack(children: <Widget>[
-          new Icon(Icons.history),
-          new Positioned(
-            // draw a red marble
-            top: 0.0,
-            right: 0.0,
-            child: new Icon(Icons.brightness_1,
-                size: 10.0, color: Colors.redAccent),
-          )
-        ]),
-      );
-    }
+
     List<BottomNavigationBarItem> bottomNavItems = [
       historyBarItem,
-      //BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-      /*
-      new BottomNavigationBarItem(
-        label: 'History',
-        icon: new Stack(children: <Widget>[
-          new Icon(Icons.history),
-          new Positioned(
-            // draw a red marble
-            top: 0.0,
-            right: 0.0,
-            child: new Icon(Icons.brightness_1,
-                size: 10.0, color: Colors.redAccent),
-          )
-        ]),
-      ),
-      */
       BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Plank'),
       BottomNavigationBarItem(
           icon: Icon(Icons.emoji_events), label: 'Challenge'),
@@ -231,7 +199,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
         context.select((PlankModel model) => model.notificationAction);
 
     if (showChallenge &&
-        notificationAction == "challenge:updated" &&
+        notificationAction == "challenge.updated" &&
         (lastNotificationId != latestNotificationId)) {
       if (_shownNotificationId != latestNotificationId) {
         _currentIndex = 0;
@@ -249,7 +217,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
         if (newIndex == 0) {
           // TODO to load my history or to load challenge history?
           // TODO how to move signal onto the challenge?
-          context.read<PlankModel>().clearNewHistorySignal();
           if (context.read<PlankModel>().history.length == 0) {
             context.read<PlankModel>().loadHistory();
           }

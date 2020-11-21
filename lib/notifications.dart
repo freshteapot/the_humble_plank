@@ -86,58 +86,31 @@ Future<void> setupNotifications(
 
     // With the above settings set so the popup doesnt appear,
     // It would be possible to set the "history notification"
+    // Hmm what is this?
     var data = message.data;
-    if (data["action"] == "challenge:updated") {
-      plankModel.setNewHistory();
-    }
-
-    if (data["action"] == "challenge:joined") {
-      String who = data["who"];
-      String name = data["name"];
+    if (data["action"] == "challenge.newrecord" ||
+        data["action"] == "challenge.joined" ||
+        data["action"] == "challenge.left") {
       String challengeUUID = data["uuid"];
       Flushbar(
         flushbarPosition: FlushbarPosition.TOP,
         flushbarStyle: FlushbarStyle.GROUNDED,
-        //title: "Loading...",
-        message: "$who has joined $name",
+        message: message.notification.body,
         duration: Duration(seconds: 5),
         blockBackgroundInteraction: true,
         onTap: (flushbar) async {
-          print("Lookup $challengeUUID and then goto challenege page");
           await plankModel.notificationChallengeUpdated(
               message.messageId, challengeUUID);
           flushbar.dismiss(true);
         },
       )..show(context);
     }
-
-    if (notification != null && android != null) {
-      // TODO make sure I am happy with android
-      /*
-      await flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channel.description,
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
-              icon: 'launch_background',
-            ),
-          ));
-      */
-    }
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    print('A new onMessageOpenedApp event was published!');
-    print(message);
     var data = message.data;
-    if (data["action"] == "challenge:record" ||
-        data["action"] == "challenge:joined") {
+    if (data["action"] == "challenge.newrecord" ||
+        data["action"] == "challenge.joined") {
       String challengeUUID = data["uuid"];
       await plankModel.notificationChallengeUpdated(
           message.messageId, challengeUUID);
@@ -151,32 +124,11 @@ Future<void> setupNotifications(
       .getInitialMessage()
       .then((RemoteMessage message) async {
     if (message != null) {
-      print("getInitialMessage $message");
-      print("after");
-
-      Flushbar(
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        title: "Loading...",
-        message: "Something...",
-        duration: Duration(seconds: 5),
-        blockBackgroundInteraction: true,
-      )..show(context);
-
       var data = message.data;
-      if (data["action"] == "challenge:record" ||
-          data["action"] == "challenge:joined") {
+      if (data["action"] == "challenge.newrecord" ||
+          data["action"] == "challenge.joined" ||
+          data["action"] == "challenge.left") {
         String challengeUUID = data["uuid"];
-        print("Lookup $challengeUUID and then goto challenege page");
-        Flushbar(
-          flushbarPosition: FlushbarPosition.TOP,
-          flushbarStyle: FlushbarStyle.GROUNDED,
-          title: "Loading...",
-          message: "Lookup $challengeUUID and then goto challenege page",
-          duration: Duration(seconds: 5),
-          blockBackgroundInteraction: true,
-        )..show(context);
-
         await plankModel.notificationChallengeUpdated(
             message.messageId, challengeUUID);
         return;
@@ -186,7 +138,6 @@ Future<void> setupNotifications(
 
   // Send this with the userID back to the server
   String token = await FirebaseMessaging.instance.getToken();
-  print("FCM token $token");
   await plankModel.sendTokenToServer(token);
 }
 

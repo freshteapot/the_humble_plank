@@ -414,24 +414,11 @@ class PlankModel extends ChangeNotifier {
       String messageId, String uuid) async {
     _skipNotification = true;
     await getChallengeWithHistory(uuid);
-
-    _notificationAction = "challenge:updated";
+    // Not yet needing fine grain actions
+    _notificationAction = "challenge.updated";
     _lastNotificationId = _latestNotificationId;
     _latestNotificationId = messageId;
     _skipNotification = false;
-    _notifyListeners();
-  }
-
-  bool _newHistory = false;
-  bool get newHistory => _newHistory;
-
-  void setNewHistory() {
-    _newHistory = true;
-    _notifyListeners();
-  }
-
-  void clearNewHistorySignal() {
-    _newHistory = false;
     _notifyListeners();
   }
 

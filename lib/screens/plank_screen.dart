@@ -57,7 +57,7 @@ class _PlankScreenState extends State<PlankScreen> {
   Widget build(BuildContext context) {
     bool hasChallenge = widget.currentChallenge.uuid != "";
 
-    double historyHeight = MediaQuery.of(context).size.height / 1.3;
+    double historyHeight = MediaQuery.of(context).size.height / 1.5;
     bool showChallenges = widget.challenges.length > 0;
     //bool showChallenge = widget.currentChallenge.uuid != "";
 
@@ -540,10 +540,14 @@ Widget _challengesView(BuildContext context, List<Challenge> challenges) {
                           if (item.type == 2) {
                             newChallenge = item.data as Challenge;
                           }
-
+                          // TODO Lazy loading the challenges might need to happen
                           await context
                               .read<PlankModel>()
-                              .setChallenge(newChallenge);
+                              .getChallengeWithHistory(newChallenge.uuid);
+
+                          //await context
+                          //    .read<PlankModel>()
+                          //    .setChallenge(newChallenge);
                           Navigator.pop(context);
                         },
                       );

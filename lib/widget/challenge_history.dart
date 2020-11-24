@@ -6,6 +6,8 @@ import 'package:thehumbleplank/utils.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 
 Widget challengeHistoryDataView(BuildContext context, Challenge challenge) {
+  // TODO why is this empty?
+  // This breaks, when I set the challenge without getting the history
   Map<String, String> users = new Map<String, String>();
   challenge.users.forEach((user) {
     users[user.userUuid] = user.name;

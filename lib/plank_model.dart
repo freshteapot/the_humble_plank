@@ -318,8 +318,7 @@ class PlankModel extends ChangeNotifier {
       var index = _challenges.indexWhere((element) => element.uuid == uuid);
       if (index != -1) {
         _challenges.removeAt(index);
-        setChallenge(Challenge(
-            uuid: challenge.uuid, description: challenge.description));
+        setChallenge(Challenge.empty());
       }
 
       return true;

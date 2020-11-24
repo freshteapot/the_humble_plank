@@ -8,7 +8,6 @@ import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/screens/place_challenge_1.dart';
 import 'package:thehumbleplank/screens/place_challenge_2.dart';
-import 'package:thehumbleplank/screens/place_challenge_history.dart';
 import 'package:thehumbleplank/screens/plank_history.dart';
 import 'package:thehumbleplank/screens/plank_screen.dart';
 import 'package:thehumbleplank/screens/plank_settings.dart';
@@ -58,18 +57,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
         _currentIndex = 2;
         _challengeScreenIndex = 0;
       });
-    });
-  }
-
-  Widget historyChallengeScreen() {
-    return PlankChallengeHistory(onPlank: () {
-      setState(() {
-        _currentIndex = 1;
-        _challengeScreenIndex = 0;
-      });
-    }, onLeave: () {
-      _currentIndex = 2;
-      _challengeScreenIndex = 0;
     });
   }
 
@@ -125,7 +112,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     var challengeScreen = [
       getChallengeScreen(),
       createChallengeScreen(),
-      historyChallengeScreen()
+      //historyChallengeScreen()
     ].elementAt(_challengeScreenIndex);
 
     List<Challenge> challenges =
@@ -142,7 +129,8 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       PlankScreen(
         showIntervals: showIntervals,
         intervalTime: intervalTime,
-        challenge: challenge,
+        currentChallenge: challenge,
+        challenges: challenges,
       ),
       challengeScreen,
       PlankSettings(),

@@ -8,14 +8,7 @@ import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/utils.dart';
 import 'package:thehumbleplank/widget/challenge_history.dart';
-
-class HistoryMenu {
-  String name;
-  int type;
-  dynamic data;
-
-  HistoryMenu({this.name, this.type, this.data});
-}
+import 'package:thehumbleplank/widget/challenge_menu.dart';
 
 class PlankHistoryScreen extends StatefulWidget {
   List<Plank> history;
@@ -105,7 +98,7 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
                             //
                           },
                           child: Text(
-                            "Change",
+                            "Pick a Challenge",
                             style: TextStyle(fontSize: 20.0),
                           ),
                         ))
@@ -189,10 +182,10 @@ Widget _streakIndicator() {
 }
 
 Widget _challengesView(BuildContext context, List<Challenge> challenges) {
-  List<HistoryMenu> items = List<HistoryMenu>();
-  items.add(HistoryMenu(name: "All my planks", type: 1));
+  List<ChallengeMenu> items = List<ChallengeMenu>();
+  items.add(ChallengeMenu(name: "All my planks", type: 1));
   items.addAll(challenges.map((challenge) {
-    return HistoryMenu(name: challenge.description, type: 2, data: challenge);
+    return ChallengeMenu(name: challenge.description, type: 2, data: challenge);
   }).toList());
 
   return LayoutBuilder(

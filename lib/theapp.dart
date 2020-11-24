@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:thehumbleplank/screens/plank_history2.dart';
 
 import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/routes.dart';
@@ -33,6 +33,8 @@ class _AppState extends State<TheApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
+      FlutterAppBadger.removeBadge();
+
       PermissionStatus permission = await PermissionHandler()
           .checkPermissionStatus(PermissionGroup.notification);
 
@@ -59,7 +61,6 @@ class _AppState extends State<TheApp> with WidgetsBindingObserver {
         routes: {
           AppRoutes.start: (context) => StartScreen(),
           AppRoutes.login: (context) => LoginScreen(),
-          AppRoutes.plankHistory: (context) => PlankHistoryScreen2(),
           AppRoutes.challengeJoin: (context) => ChallengeJoinScreen(),
         });
   }

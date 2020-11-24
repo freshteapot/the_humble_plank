@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -30,8 +31,14 @@ class MessageArguments {
 /// To verify things are working, check out the native platform logs.
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // I wonder if I need this for push notifications?
+  // TODO seems broken for now
+  // https://github.com/FirebaseExtended/flutterfire/issues/4198
+  // https://github.com/FirebaseExtended/flutterfire/issues/4185
   await Firebase.initializeApp();
   print("Handling a background message ${message.messageId}");
+  var supported = await FlutterAppBadger.isAppBadgeSupported();
+  print("Why cant I update the badge $supported");
+  FlutterAppBadger.updateBadgeCount(1);
 }
 
 /// Create a [AndroidNotificationChannel] for heads up notifications
@@ -50,7 +57,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 Future<void> setupNotifications(
     BuildContext context, PlankModel plankModel) async {
-  //WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   // Set the background messaging handler early on, as a named top-level function
@@ -75,15 +82,7 @@ Future<void> setupNotifications(
 
   // We might not want to use both
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    RemoteNotification notification = message.notification;
-    AndroidNotification android = message.notification?.android;
-
-    // Handle when  the notification is challenge:updated
-    // Get challenge
-    // Set challenge
-    // Update index for the screen
-    // await plankModel.notificationChallengeUpdated(challengeUUID)
-
+    FlutterAppBadger.updateBadgeCount(1);
     // With the above settings set so the popup doesnt appear,
     // It would be possible to set the "history notification"
     // Hmm what is this?
@@ -151,4 +150,8 @@ Future<NotificationSettings> requestPermission() {
     // This will ensure the popup shows for users
     provisional: false,
   );
+}
+
+Future<String> getToken() {
+  return FirebaseMessaging.instance.getToken();
 }

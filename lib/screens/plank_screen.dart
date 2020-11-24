@@ -6,17 +6,21 @@ import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/widget/challenge_menu.dart';
 import 'package:thehumbleplank/widget/plank_screen_call_to_action.dart';
 
 class PlankScreen extends StatefulWidget {
-  final int intervalTime;
-  final bool showIntervals;
-  final Challenge challenge;
+  int intervalTime;
+  bool showIntervals;
+  Challenge currentChallenge;
+  List<Challenge> challenges;
+
   PlankScreen(
       {Key key,
       this.intervalTime: 0,
       this.showIntervals: false,
-      this.challenge})
+      this.currentChallenge,
+      this.challenges})
       : super(key: key);
 
   @override
@@ -51,97 +55,156 @@ class _PlankScreenState extends State<PlankScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool hasChallenge = widget.challenge.uuid != "";
+    bool hasChallenge = widget.currentChallenge.uuid != "";
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          /// Display stop watch time
-          Padding(
-            padding: const EdgeInsets.only(bottom: 0),
-            child: StreamBuilder<int>(
-              stream: _stopWatchTimer.rawTime,
-              initialData: 0,
-              builder: (context, snap) {
-                int value = 0;
-                if (record.beginningTime != null) {
-                  value = record.timerNow;
-                }
+    double historyHeight = MediaQuery.of(context).size.height / 1.3;
+    bool showChallenges = widget.challenges.length > 0;
+    //bool showChallenge = widget.currentChallenge.uuid != "";
 
-                final displayTime = StopWatchTimer.getDisplayTime(value,
-                    milliSecond: _isMilliSecond, hours: _isHours);
-                return Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        displayTime,
-                        style: const TextStyle(
-                            fontSize: 40,
-                            fontFamily: 'Helvetica',
-                            fontWeight: FontWeight.bold),
-                      ),
+    return Align(
+        alignment: Alignment.topCenter,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                  height: historyHeight,
+                  alignment: Alignment.topCenter,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        /// Display stop watch time
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 0),
+                          child: StreamBuilder<int>(
+                            stream: _stopWatchTimer.rawTime,
+                            initialData: 0,
+                            builder: (context, snap) {
+                              int value = 0;
+                              if (record.beginningTime != null) {
+                                value = record.timerNow;
+                              }
+
+                              final displayTime = StopWatchTimer.getDisplayTime(
+                                  value,
+                                  milliSecond: _isMilliSecond,
+                                  hours: _isHours);
+                              return Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Text(
+                                      displayTime,
+                                      style: const TextStyle(
+                                          fontSize: 40,
+                                          fontFamily: 'Helvetica',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+
+                        ...(record.showIntervals
+                            ? extra(_stopWatchTimer, record)
+                            : <Widget>[]),
+
+                        menu(context, state, onTimerStart, onTimerStop,
+                            onTimerSave, onTimerReset),
+
+                        if (hasChallenge) ...[
+                          Dismissible(
+                            // Each Dismissible must contain a Key. Keys allow Flutter to
+                            // uniquely identify widgets.
+                            key: Key("fake"),
+                            // Provide a function that tells the app
+                            // what to do after an item has been swiped away.
+                            onDismissed: (direction) {
+                              // Remove the item from the data source.
+                              context
+                                  .read<PlankModel>()
+                                  .setChallenge(Challenge.empty());
+                            },
+                            direction: DismissDirection.endToStart,
+
+                            background: Container(color: Colors.red),
+                            child: ListTile(
+                                title: Container(
+                                    alignment: Alignment.center,
+                                    child: GestureDetector(
+                                        onTap: () async {
+                                          await showModalBottomSheet(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return WillPopScope(
+                                                    onWillPop: () async {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      return false;
+                                                    },
+                                                    child: Container(
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height /
+                                                            2.0,
+                                                        child: plankScreenCallToAction(
+                                                            context,
+                                                            widget
+                                                                .currentChallenge)));
+                                              });
+                                        },
+                                        child: Text(
+                                          widget.currentChallenge.description,
+                                          style: TextStyle(color: Colors.black),
+                                        )))),
+                          ),
+                        ],
+                      ],
                     ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          ...(record.showIntervals
-              ? extra(_stopWatchTimer, record)
-              : <Widget>[]),
-
-          menu(context, state, onTimerStart, onTimerStop, onTimerSave,
-              onTimerReset),
-
-          if (hasChallenge) ...[
-            Dismissible(
-              // Each Dismissible must contain a Key. Keys allow Flutter to
-              // uniquely identify widgets.
-              key: Key("fake"),
-              // Provide a function that tells the app
-              // what to do after an item has been swiped away.
-              onDismissed: (direction) {
-                // Remove the item from the data source.
-                context.read<PlankModel>().setChallenge(Challenge.empty());
-              },
-              direction: DismissDirection.endToStart,
-
-              background: Container(color: Colors.red),
-              child: ListTile(
-                  title: Container(
-                      alignment: Alignment.center,
-                      child: GestureDetector(
-                          onTap: () async {
-                            await showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return WillPopScope(
-                                      onWillPop: () async {
-                                        Navigator.of(context).pop();
-                                        return false;
-                                      },
-                                      child: Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
+                  )),
+              if (showChallenges) ...[
+                Container(
+                    alignment: Alignment.center,
+                    child: FlatButton(
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      disabledColor: Colors.grey,
+                      disabledTextColor: Colors.black,
+                      padding: EdgeInsets.all(8.0),
+                      splashColor: Colors.blueAccent,
+                      onPressed: () async {
+                        await showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return WillPopScope(
+                                  onWillPop: () async {
+                                    await context
+                                        .read<PlankModel>()
+                                        .setChallenge(Challenge.empty());
+                                    Navigator.of(context).pop();
+                                    return false;
+                                  },
+                                  child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height /
                                               2.0,
-                                          child: plankScreenCallToAction(
-                                              context, widget.challenge)));
-                                });
-                          },
-                          child: Text(
-                            widget.challenge.description,
-                            style: TextStyle(color: Colors.black),
-                          )))),
-            ),
-          ],
-        ],
-      ),
-    );
+                                      child: _challengesView(
+                                          context, widget.challenges)));
+                            });
+                        //
+                      },
+                      child: Text(
+                        "Pick a Challenge",
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                    ))
+              ]
+            ]));
   }
 
   void onTimerStart() {
@@ -431,4 +494,67 @@ Widget menu(BuildContext context, String state, Function onStart,
       ],
     ),
   );
+}
+
+Widget _challengesView(BuildContext context, List<Challenge> challenges) {
+  List<ChallengeMenu> items = List<ChallengeMenu>();
+  items.add(ChallengeMenu(name: "No challenge", type: 1));
+  items.addAll(challenges.map((challenge) {
+    return ChallengeMenu(name: challenge.description, type: 2, data: challenge);
+  }).toList());
+
+  return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints viewportConstraints) {
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: viewportConstraints.maxHeight,
+        ),
+        child: IntrinsicHeight(
+          child: Column(
+            children: <Widget>[
+              Container(
+                // A fixed-height child.
+                //height: MediaQuery.of(context).size.height / 0.5,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                child: const Text('Pick from'),
+              ),
+              Expanded(
+                // A flexible child that will grow to fit the viewport but
+                // still be at least as big as necessary to fit its contents.
+                child: Container(
+                  height: 120.0,
+                  alignment: Alignment.center,
+                  child: ListView.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (context, index) {
+                      return Divider();
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Text('${items[index].name}'),
+                        onTap: () async {
+                          var item = items[index];
+                          var newChallenge = Challenge.empty();
+                          if (item.type == 2) {
+                            newChallenge = item.data as Challenge;
+                          }
+
+                          await context
+                              .read<PlankModel>()
+                              .setChallenge(newChallenge);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  });
 }

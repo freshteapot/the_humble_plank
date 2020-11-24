@@ -43,9 +43,16 @@ String formatTime(int milliseconds) {
   return "$mm:$ss.$t";
 }
 
+Future<bool> getNotificationPermission() async {
+  PermissionStatus permission = await PermissionHandler()
+      .checkPermissionStatus(PermissionGroup.notification);
+  return permission == PermissionStatus.granted ? true : false;
+}
+
 Future<void> checkAndAskForNotificationPermission(BuildContext context) async {
   PermissionStatus permission = await PermissionHandler()
       .checkPermissionStatus(PermissionGroup.notification);
+
   if (permission != PermissionStatus.granted) {
     if (permission == PermissionStatus.unknown) {
       var settings = await requestPermission();
@@ -55,7 +62,6 @@ Future<void> checkAndAskForNotificationPermission(BuildContext context) async {
               : false;
       await context.read<PlankModel>().setPushNotifications(newState);
     }
-
     // TODO This is where we could nag the user should we want to, to enable notifications
   }
 }

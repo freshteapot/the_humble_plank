@@ -16,6 +16,8 @@ import 'package:thehumbleplank/mobile_repository.dart';
 import 'package:thehumbleplank/plank_repository.dart';
 import 'package:thehumbleplank/challenge_repository.dart';
 import 'package:thehumbleplank/user_repository.dart';
+import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/notifications.dart';
 
 const LearnalistBasepath = "https://learnalist.net/api/v1";
 GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -191,6 +193,13 @@ class PlankModel extends ChangeNotifier {
 
     if (_appPushNotifications == null) {
       _appPushNotifications = false;
+    }
+
+    // Double check whats in the preferences
+    bool actual = await getNotificationPermission();
+    if (actual != _appPushNotifications) {
+      await prefs.setBool("plank.settings.notificationsEnabled", actual);
+      _appPushNotifications = actual;
     }
   }
 
@@ -457,6 +466,10 @@ class PlankModel extends ChangeNotifier {
       _credentials.idpGoogle = account;
       _skipNotification = true;
       await _loadState();
+
+      String token = await getToken();
+      sendTokenToServer(token);
+
       _skipNotification = false;
       _bootstrapLogin = true;
       _notifyListeners();
@@ -501,6 +514,10 @@ class PlankModel extends ChangeNotifier {
       await _loadCredentials();
       _loggedIn = credentialsRepo.isLoggedIn();
       await _loadState();
+
+      String token = await getToken();
+      sendTokenToServer(token);
+
       _skipNotification = false;
       _notifyListeners();
     }).catchError((error) async {

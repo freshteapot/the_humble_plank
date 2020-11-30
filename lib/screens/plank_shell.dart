@@ -6,8 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
-import 'package:thehumbleplank/screens/place_challenge_1.dart';
-import 'package:thehumbleplank/screens/place_challenge_2.dart';
+import 'package:thehumbleplank/screens/challenges_overview.dart';
 import 'package:thehumbleplank/screens/plank_history.dart';
 import 'package:thehumbleplank/screens/plank_screen.dart';
 import 'package:thehumbleplank/screens/plank_settings.dart';
@@ -22,7 +21,7 @@ class PlankShellScreen extends StatefulWidget {
 
 class _PlankShellScreenState extends State<PlankShellScreen> {
   int _currentIndex = 1;
-  int _challengeScreenIndex = 0;
+
   bool _showChallenge = true;
   String _shownNotificationId = "";
   @override
@@ -31,33 +30,13 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
   }
 
   Widget getChallengeScreen() {
-    return PlankChallenge1(
+    return ChallengesOverviewScreen(
         title: "Challenge 1",
         onPressed: () {
           setState(() {
             _currentIndex = 1;
-            _challengeScreenIndex = 0;
-          });
-        },
-        onCreate: () {
-          setState(() {
-            _challengeScreenIndex = 1;
-          });
-        },
-        onHistory: () {
-          setState(() {
-            _challengeScreenIndex = 2;
           });
         });
-  }
-
-  Widget createChallengeScreen() {
-    return PlankChallenge2(onCreate: (Challenge challenge) {
-      setState(() {
-        _currentIndex = 2;
-        _challengeScreenIndex = 0;
-      });
-    });
   }
 
   @override
@@ -109,12 +88,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       showChallengeChanged = true;
     }
 
-    var challengeScreen = [
-      getChallengeScreen(),
-      createChallengeScreen(),
-      //historyChallengeScreen()
-    ].elementAt(_challengeScreenIndex);
-
     List<Challenge> challenges =
         context.select((PlankModel model) => model.challenges);
 
@@ -132,7 +105,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
         currentChallenge: challenge,
         challenges: challenges,
       ),
-      challengeScreen,
+      getChallengeScreen(),
       PlankSettings(),
     ];
 
@@ -211,7 +184,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
         }
         setState(() {
           _currentIndex = newIndex;
-          _challengeScreenIndex = 0;
         });
       },
     );

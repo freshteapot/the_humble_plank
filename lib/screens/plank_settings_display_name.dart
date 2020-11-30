@@ -7,15 +7,7 @@ import 'package:thehumbleplank/plank_model.dart';
 class PlankSettingsDisplayNameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(children: <Widget>[
-      Container(
-          alignment: Alignment.bottomCenter,
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-          child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[PlankSettingsDisplayNameForm()]))
-    ]);
+    return PlankSettingsDisplayNameForm();
   }
 }
 
@@ -37,11 +29,11 @@ class _PlankSettingsDisplayNameState
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+    return Column(children: <Widget>[
       Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 30),
+          padding: EdgeInsets.symmetric(vertical: 10),
           child: Text(
             'Display Name',
             style:
@@ -57,7 +49,7 @@ class _PlankSettingsDisplayNameState
       ),
       Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(vertical: 20),
+          padding: EdgeInsets.symmetric(vertical: 50),
           child: FlatButton(
             color: Colors.blue,
             textColor: Colors.white,

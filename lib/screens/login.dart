@@ -274,7 +274,7 @@ class LoginInfo {
 }
 
 LoginInfo defaultValues() {
-  bool dev = true;
+  bool dev = false;
   if (!dev) {
     return LoginInfo(
         username: "", password: "", basePath: "https://learnalist.net/api/v1");

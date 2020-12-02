@@ -46,7 +46,8 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
           });
     } else {
       historyView = RefreshIndicator(
-          child: _dataTableViaFutureBuilder(context, widget.history),
+          //child: _dataTableViaFutureBuilder(context, widget.history),
+          child: _historyListView(context, widget.history),
           onRefresh: () {
             return context.read<PlankModel>().loadHistory();
           });
@@ -153,9 +154,11 @@ Widget _dataTableViaFutureBuilder(BuildContext context, List<Plank> records) {
               _dayCell(record, showStreak),
               DataCell(Text(formatTime(record.timerNow))),
               DataCell(
-                Text(DateFormat("HH:mm:ss").format(
-                    DateTime.fromMillisecondsSinceEpoch(record.beginningTime))),
-              ),
+                  Text(DateFormat("HH:mm:ss").format(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          record.beginningTime))), onTap: () {
+                print("Yo");
+              }),
             ]);
           }).toList()));
 }
@@ -246,4 +249,175 @@ Widget _challengesView(BuildContext context, List<Challenge> challenges) {
       ),
     );
   });
+}
+
+// All the things
+Widget _historyListView(BuildContext context, List<Plank> records) {
+  DateTime streak = DateTime.now().toUtc();
+
+  return ListView.separated(
+    separatorBuilder: (context, index) {
+      return Divider();
+    },
+    itemCount: records.length + 1,
+    itemBuilder: (context, index) {
+      // Fucking ugly
+      if (index == 0) {
+        return _historyListTileHeader(context);
+      }
+
+      var record = records[index - 1];
+
+      var when = DateTime.fromMillisecondsSinceEpoch(record.beginningTime);
+
+      var a = Jiffy(streak).endOf(Units.DAY);
+      var b = Jiffy(when).endOf(Units.DAY);
+      var diff = a.difference(b);
+
+      var showStreak = false;
+      if (diff <= Duration(hours: 24)) {
+        streak = when;
+        showStreak = true;
+      }
+
+      return _historyListTile(context, record, showStreak);
+    },
+  );
+}
+
+Widget _historyListTileHeader(BuildContext context) {
+  TextStyle style =
+      const TextStyle(fontWeight: FontWeight.bold, fontStyle: FontStyle.italic);
+  return ListTile(
+    title: new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Text("Duration", style: style),
+          Text("When", style: style),
+          Text("Who", style: style),
+        ]),
+  );
+}
+
+Widget _historyListTile(BuildContext context, Plank record, bool showStreak) {
+  return ListTile(
+    title: new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          _dayWidget(record, showStreak),
+          Text(formatTime(record.timerNow)),
+          Text(DateFormat("HH:mm:ss").format(
+              DateTime.fromMillisecondsSinceEpoch(record.beginningTime))),
+        ]),
+    onTap: () async {
+      await showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+                onWillPop: () async {
+                  await context
+                      .read<PlankModel>()
+                      .setChallenge(Challenge.empty());
+                  Navigator.of(context).pop();
+                  return false;
+                },
+                child: Container(
+                    height: MediaQuery.of(context).size.height / 2.0,
+                    child: _recordOptionsPopup(context, record)));
+          });
+    },
+  );
+}
+
+Widget _recordOptionsPopup(BuildContext context, Plank record) {
+  return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints viewportConstraints) {
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: viewportConstraints.maxHeight,
+        ),
+        child: IntrinsicHeight(
+          child: Column(
+            children: <Widget>[
+              Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                child: const Text('Things todo'),
+              ),
+              Expanded(
+                // A flexible child that will grow to fit the viewport but
+                // still be at least as big as necessary to fit its contents.
+                child: Container(
+                    height: 120.0,
+                    alignment: Alignment.center,
+                    child: ListView(children: <Widget>[
+                      ListTile(
+                        title: Text('Delete Record'),
+                        trailing: Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        ),
+                        onTap: () async {
+                          await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              // return object of type Dialog
+                              return AlertDialog(
+                                title: new Text("Are you sure?"),
+                                actions: <Widget>[
+                                  // usually buttons at the bottom of the dialog
+                                  new FlatButton(
+                                    child: new Text("Yes, delete"),
+                                    onPressed: () async {
+                                      // TODO delete record
+                                      await context
+                                          .read<PlankModel>()
+                                          .deleteEntryFromHistory(record.uuid);
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  new FlatButton(
+                                    child: new Text("Escape"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          Navigator.pop(context);
+                        },
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: Text('Just close'),
+                        onTap: () async {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ])),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  });
+}
+
+Widget _dayWidget(record, showStreak) {
+  List<Widget> day = [];
+  if (showStreak) {
+    day.add(_streakIndicator());
+  }
+
+  day.add(
+    Text(DateFormat("yyy-MM-dd")
+        .format(DateTime.fromMillisecondsSinceEpoch(record.beginningTime))),
+  );
+
+  return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: day);
 }

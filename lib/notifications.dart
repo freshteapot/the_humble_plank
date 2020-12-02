@@ -57,7 +57,6 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 Future<void> setupNotifications(
     BuildContext context, PlankModel plankModel) async {
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   // Set the background messaging handler early on, as a named top-level function

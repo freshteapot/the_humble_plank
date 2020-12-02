@@ -233,6 +233,34 @@ class PlankModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteEntryFromHistory(String recordUUID) async {
+    try {
+      await repository.deleteEntry(recordUUID);
+      await loadHistory();
+    } catch (error) {
+      _lastError = error;
+      _isLoading = false;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      _notifyListeners();
+    }
+  }
+
+  // Delete from challenge + history
+  Future<void> deleteEntryFromChallenge(
+      String challengeUUID, String recordUUID) async {
+    try {
+      await repository.deleteEntry(recordUUID);
+      await getChallengeWithHistory(challengeUUID);
+    } catch (error) {
+      _lastError = error;
+      _isLoading = false;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      _notifyListeners();
+    }
+  }
+
   Future<void> setShowIntervals(bool newValue) async {
     _showIntervals = newValue;
     SharedPreferences prefs = await SharedPreferences.getInstance();

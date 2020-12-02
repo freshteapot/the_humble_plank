@@ -82,7 +82,7 @@ class _PlankSettingsState extends State<PlankSettings> {
                       activeColor: Colors.green,
                       inactiveTrackColor: Colors.red,
                       onChanged: (bool value) async {
-                        PermissionHandler().openAppSettings();
+                        openAppSettings();
                       }),
                   SwitchListTile(
                       title: const Text('Logout and clear the app'),

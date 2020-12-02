@@ -22,7 +22,7 @@ import 'package:thehumbleplank/notifications.dart';
 const LearnalistBasepath = "https://learnalist.net/api/v1";
 GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: <String>[
-    'email',
+    //'email',
   ],
 );
 

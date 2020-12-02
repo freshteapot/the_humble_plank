@@ -230,11 +230,10 @@ class _PlankScreenState extends State<PlankScreen> {
   }
 
   Future<void> onTimerSave(BuildContext context) async {
-    _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
     // TODO save to local storage first
     await context.read<PlankModel>().addEntry(record);
     record = defaultPlank(widget.showIntervals, widget.intervalTime);
-
+    _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
     beginningTime = null;
     currentTime = null;
 

@@ -118,32 +118,38 @@ Widget _recordOptionsPopup(BuildContext context, Plank record) {
                           await showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              // return object of type Dialog
                               return AlertDialog(
-                                title: Text("Are you sure?"),
-                                actions: <Widget>[
-                                  // usually buttons at the bottom of the dialog
-                                  FlatButton(
-                                    child: Text("Yes, delete"),
-                                    onPressed: () async {
-                                      await context
-                                          .read<PlankModel>()
-                                          .deleteEntryFromHistory(record.uuid);
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  FlatButton(
-                                    child: Text("Escape"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
+                                  title: Text("Are you sure?"),
+                                  content: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      FlatButton(
+                                        child: Text("Yes, delete",
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold)),
+                                        onPressed: () async {
+                                          await context
+                                              .read<PlankModel>()
+                                              .deleteEntryFromHistory(
+                                                  record.uuid);
+                                          Navigator.of(context)
+                                              .pop(); // Dismiss dialog
+                                          Navigator.of(context)
+                                              .pop(); // Second dismiss popup
+                                        },
+                                      ),
+                                      FlatButton(
+                                        child: Text("Escape"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ));
                             },
                           );
-
-                          Navigator.pop(context);
                         },
                       ),
                       Divider(),

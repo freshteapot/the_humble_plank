@@ -33,14 +33,13 @@ class _AppState extends State<TheApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      FlutterAppBadger.removeBadge();
-
-      PermissionStatus permission = await PermissionHandler()
-          .checkPermissionStatus(PermissionGroup.notification);
+      PermissionStatus permission = await Permission.notification.status;
 
       // This can be used for the UI but I dont think I should link it to the server
       if ([PermissionStatus.granted, PermissionStatus.denied]
           .contains(permission)) {
+        // This triggers permissions warning
+        FlutterAppBadger.removeBadge();
         bool newState = permission == PermissionStatus.granted ? true : false;
         if (newState != context.read<PlankModel>().appPushNotifications) {
           // Update notifications and ping the server

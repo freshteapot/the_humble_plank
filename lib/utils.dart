@@ -44,17 +44,15 @@ String formatTime(int milliseconds) {
 }
 
 Future<bool> getNotificationPermission() async {
-  PermissionStatus permission = await PermissionHandler()
-      .checkPermissionStatus(PermissionGroup.notification);
+  PermissionStatus permission = await Permission.notification.status;
   return permission == PermissionStatus.granted ? true : false;
 }
 
 Future<void> checkAndAskForNotificationPermission(BuildContext context) async {
-  PermissionStatus permission = await PermissionHandler()
-      .checkPermissionStatus(PermissionGroup.notification);
+  PermissionStatus permission = await Permission.notification.status;
 
   if (permission != PermissionStatus.granted) {
-    if (permission == PermissionStatus.unknown) {
+    if (permission == PermissionStatus.undetermined) {
       var settings = await requestPermission();
       bool newState =
           settings.authorizationStatus == AuthorizationStatus.authorized

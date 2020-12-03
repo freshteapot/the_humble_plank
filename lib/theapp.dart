@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -38,8 +37,6 @@ class _AppState extends State<TheApp> with WidgetsBindingObserver {
       // This can be used for the UI but I dont think I should link it to the server
       if ([PermissionStatus.granted, PermissionStatus.denied]
           .contains(permission)) {
-        // This triggers permissions warning
-        FlutterAppBadger.removeBadge();
         bool newState = permission == PermissionStatus.granted ? true : false;
         if (newState != context.read<PlankModel>().appPushNotifications) {
           // Update notifications and ping the server

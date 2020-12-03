@@ -4,16 +4,19 @@ import 'package:provider/provider.dart';
 
 import 'package:openapi/api.dart';
 
-import 'package:the_humble_plank/app.dart';
-import 'package:the_humble_plank/plank_repository.dart';
-import 'package:the_humble_plank/credentials_repository.dart';
-import 'package:the_humble_plank/challenge_repository.dart';
-import 'package:the_humble_plank/user_repository.dart';
+import 'package:thehumbleplank/app.dart';
+import 'package:thehumbleplank/mobile_repository.dart';
+import 'package:thehumbleplank/plank_repository.dart';
+import 'package:thehumbleplank/credentials_repository.dart';
+import 'package:thehumbleplank/challenge_repository.dart';
+import 'package:thehumbleplank/user_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   ApiClient apiClient = ApiClient();
 
+  MobileApi mobileApi = MobileApi(apiClient);
   UserApi userApi = UserApi(apiClient);
   PlankApi plankApi = PlankApi(apiClient);
   ChallengeApi challengeApi = ChallengeApi(apiClient);
@@ -33,6 +36,11 @@ Future<void> main() async {
     apiClient: apiClient,
   );
 
+  RemoteMobileRepository mobileRepo = RemoteMobileRepository(
+    mobileApi: mobileApi,
+    apiClient: apiClient,
+  );
+
   ChallengeRepository challengeRepo = ChallengeRepository(
     challengeApi: challengeApi,
     apiClient: apiClient,
@@ -47,6 +55,7 @@ Future<void> main() async {
         credentialsRepo: credentialsRepo,
         challengeRepo: challengeRepo,
         userRepo: userRepo,
+        mobileRepo: mobileRepo,
       ),
     ),
   );

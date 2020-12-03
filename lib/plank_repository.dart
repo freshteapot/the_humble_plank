@@ -8,6 +8,7 @@ import 'package:openapi/api.dart';
 abstract class PlankRepository {
   Future<List<Plank>> history();
   Future<bool> addEntry(Plank record, String challengeUuid);
+  Future<bool> deleteEntry(String uuid);
 }
 
 class RemotePlankRepository implements PlankRepository {
@@ -31,6 +32,19 @@ class RemotePlankRepository implements PlankRepository {
     } catch (error) {
       print(error);
       print((error as ApiException).code);
+      return false;
+    }
+  }
+
+  Future<bool> deleteEntry(String uuid) async {
+    try {
+      var response = await plankApi.deletePlankEntryWithHttpInfo(uuid);
+      if (response.statusCode > 200) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      print(error);
       return false;
     }
   }

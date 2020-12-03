@@ -1,76 +1,52 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:openapi/api.dart';
 import 'package:provider/provider.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
-import 'package:the_humble_plank/screens/place_challenge_1.dart';
-import 'package:the_humble_plank/screens/place_challenge_2.dart';
-import 'package:the_humble_plank/screens/place_challenge_history.dart';
-import 'package:the_humble_plank/screens/plank_history.dart';
-import 'package:the_humble_plank/screens/plank_screen.dart';
-import 'package:the_humble_plank/screens/plank_settings.dart';
-import 'package:the_humble_plank/widget/topbar.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/screens/challenges_overview.dart';
+import 'package:thehumbleplank/screens/plank_history.dart';
+import 'package:thehumbleplank/screens/plank_screen.dart';
+import 'package:thehumbleplank/screens/plank_settings.dart';
+import 'package:thehumbleplank/widget/topbar.dart';
 
 class PlankShellScreen extends StatefulWidget {
+  PlankShellScreen();
+
   @override
   _PlankShellScreenState createState() => _PlankShellScreenState();
 }
 
 class _PlankShellScreenState extends State<PlankShellScreen> {
   int _currentIndex = 1;
-  int _challengeScreenIndex = 0;
+
   bool _showChallenge = true;
+  String _shownNotificationId = "";
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Widget getChallengeScreen() {
-    return PlankChallenge1(
+    return ChallengesOverviewScreen(
         title: "Challenge 1",
         onPressed: () {
           setState(() {
             _currentIndex = 1;
-            _challengeScreenIndex = 0;
-          });
-        },
-        onCreate: () {
-          setState(() {
-            _challengeScreenIndex = 1;
-          });
-        },
-        onHistory: () {
-          setState(() {
-            _challengeScreenIndex = 2;
           });
         });
-  }
-
-  Widget createChallengeScreen() {
-    return PlankChallenge2(onCreate: (Challenge challenge) {
-      setState(() {
-        _currentIndex = 2;
-        _challengeScreenIndex = 0;
-      });
-    });
-  }
-
-  Widget historyChallengeScreen() {
-    return PlankChallengeHistory(onPlank: () {
-      setState(() {
-        _currentIndex = 1;
-        _challengeScreenIndex = 0;
-      });
-    }, onLeave: () {
-      _currentIndex = 2;
-      _challengeScreenIndex = 0;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     // Check if online
+
     bool offline = context.select((PlankModel model) => model.offline);
 
     if (offline) {
+      // TODO how to handle offline
       print("We are offline, give some indication");
     }
 
@@ -112,25 +88,32 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       showChallengeChanged = true;
     }
 
-    var challengeScreen = [
-      getChallengeScreen(),
-      createChallengeScreen(),
-      historyChallengeScreen()
-    ].elementAt(_challengeScreenIndex);
+    List<Challenge> challenges =
+        context.select((PlankModel model) => model.challenges);
 
+    List<Plank> history = context.select((PlankModel model) => model.history);
+    // Out the box challenge will cause this to show the correct one
     List<Widget> screens = [
-      PlankHistoryScreen(),
+      PlankHistoryScreen(
+        challenges: challenges,
+        currentChallenge: challenge,
+        history: history,
+      ),
       PlankScreen(
         showIntervals: showIntervals,
         intervalTime: intervalTime,
-        challenge: challenge,
+        currentChallenge: challenge,
+        challenges: challenges,
       ),
-      challengeScreen,
+      getChallengeScreen(),
       PlankSettings(),
     ];
 
+    BottomNavigationBarItem historyBarItem =
+        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History');
+
     List<BottomNavigationBarItem> bottomNavItems = [
-      BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+      historyBarItem,
       BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Plank'),
       BottomNavigationBarItem(
           icon: Icon(Icons.emoji_events), label: 'Challenge'),
@@ -163,22 +146,44 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     }
     // end of toggling the challenge tab logic
 
+    // TODO if timer is running do not change the page.
+    // TODO make plankModel aware timer has started
+
+    // the challenge should change, if it doesnt then we dont need to rerender.
+    // The logic below might be overkill for reloading.
+    // The logic below is needed to make sure a new notification triggers a rebuild.
+    String latestNotificationId =
+        context.select((PlankModel model) => model.latestNotificationId);
+    String lastNotificationId =
+        context.select((PlankModel model) => model.lastNotificationId);
+    String notificationAction =
+        context.select((PlankModel model) => model.notificationAction);
+
+    if (showChallenge &&
+        notificationAction == "challenge.updated" &&
+        (lastNotificationId != latestNotificationId)) {
+      if (_shownNotificationId != latestNotificationId) {
+        _currentIndex = 0;
+        _shownNotificationId = latestNotificationId;
+      }
+    }
+
     Widget bottomNav = BottomNavigationBar(
       backgroundColor: Colors.white,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
       items: bottomNavItems,
-      currentIndex: _currentIndex, // new
-
+      currentIndex: _currentIndex,
       onTap: (newIndex) {
         if (newIndex == 0) {
+          // TODO to load my history or to load challenge history?
+          // TODO how to move signal onto the challenge?
           if (context.read<PlankModel>().history.length == 0) {
             context.read<PlankModel>().loadHistory();
           }
         }
         setState(() {
           _currentIndex = newIndex;
-          _challengeScreenIndex = 0;
         });
       },
     );

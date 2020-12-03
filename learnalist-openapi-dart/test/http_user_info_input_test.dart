@@ -7,13 +7,13 @@ void main() {
 
   group('test HttpUserInfoInput', () {
     // This will be used to address you in the app(s) or website.
-    // String displayName (default value: null)
+    // String displayName (default value: "")
     test('to test the property `displayName`', () async {
       // TODO
     });
 
     // Let the server know the user was created via the plank app.
-    // String createdVia (default value: null)
+    // String createdVia (default value: "")
     test('to test the property `createdVia`', () async {
       // TODO
     });

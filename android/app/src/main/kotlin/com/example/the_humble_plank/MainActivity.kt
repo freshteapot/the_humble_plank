@@ -1,4 +1,4 @@
-package com.example.the_humble_plank
+package net.freshteapot.thehumbleplank
 
 import io.flutter.embedding.android.FlutterActivity
 

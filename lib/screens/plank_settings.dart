@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
-import 'package:the_humble_plank/screens/plank_settings_display_name.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/screens/plank_settings_display_name.dart';
 
 class PlankSettings extends StatefulWidget {
   PlankSettings();
@@ -15,6 +16,8 @@ class PlankSettings extends StatefulWidget {
 class _PlankSettingsState extends State<PlankSettings> {
   Widget build(BuildContext context) {
     var showChallenge = context.watch<PlankModel>().showChallenge;
+    var pushNotificationsEnabled =
+        context.watch<PlankModel>().appPushNotifications;
 
     return Scaffold(
         body: Container(
@@ -73,6 +76,14 @@ class _PlankSettingsState extends State<PlankSettings> {
                                   });
                                 })
                           ])),
+                  SwitchListTile(
+                      title: const Text('Send notifications'),
+                      value: pushNotificationsEnabled,
+                      activeColor: Colors.green,
+                      inactiveTrackColor: Colors.red,
+                      onChanged: (bool value) async {
+                        openAppSettings();
+                      }),
                   SwitchListTile(
                       title: const Text('Logout and clear the app'),
                       value: false,

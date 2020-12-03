@@ -81,6 +81,8 @@ class ApiClient {
           return HttpAssetUploadRequestBody.fromJson(value);
         case 'HttpAssetUploadResponse':
           return HttpAssetUploadResponse.fromJson(value);
+        case 'HttpMobileRegisterInput':
+          return HttpMobileRegisterInput.fromJson(value);
         case 'HttpResponseMessage':
           return HttpResponseMessage.fromJson(value);
         case 'HttpUserInfoInput':

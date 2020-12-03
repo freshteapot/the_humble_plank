@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/notifications.dart';
 
-import 'package:the_humble_plank/screens/login.dart';
-import 'package:the_humble_plank/screens/plank_shell.dart';
-import 'package:the_humble_plank/plank_model.dart';
+import 'package:thehumbleplank/screens/login.dart';
+import 'package:thehumbleplank/screens/plank_shell.dart';
+import 'package:thehumbleplank/plank_model.dart';
 
-class StartScreen extends StatelessWidget {
+class StartScreen extends StatefulWidget {
+  @override
+  _StartScreenState createState() => _StartScreenState();
+}
+
+class _StartScreenState extends State<StartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    var m = context.read<PlankModel>();
+    setupNotifications(context, m);
+  }
+
   @override
   Widget build(BuildContext context) {
     var bootstrapped = context.select((PlankModel model) => model.bootstrapped);

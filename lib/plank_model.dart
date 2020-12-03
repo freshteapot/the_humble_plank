@@ -6,20 +6,23 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:openapi/api.dart';
-import 'package:the_humble_plank/credentials_repository.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
-import 'package:the_humble_plank/learnalist/dialog_error.dart';
-import 'package:the_humble_plank/plank_repository.dart';
-import 'package:the_humble_plank/challenge_repository.dart';
-import 'package:the_humble_plank/user_repository.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:thehumbleplank/credentials_repository.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/learnalist/dialog_error.dart';
+import 'package:thehumbleplank/mobile_repository.dart';
+import 'package:thehumbleplank/plank_repository.dart';
+import 'package:thehumbleplank/challenge_repository.dart';
+import 'package:thehumbleplank/user_repository.dart';
+import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/notifications.dart';
 
 const LearnalistBasepath = "https://learnalist.net/api/v1";
 GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: <String>[
-    'email',
+    //'email',
   ],
 );
 
@@ -28,6 +31,7 @@ class PlankModel extends ChangeNotifier {
   final ChallengeRepository challengeRepo;
   final CredentialsRepository credentialsRepo;
   final UserRepository userRepo;
+  final MobileRepository mobileRepo;
 
   Credentials _credentials = Credentials();
   Credentials get credentials => _credentials;
@@ -83,12 +87,13 @@ class PlankModel extends ChangeNotifier {
   bool _showCallToActionForDisplayName;
   bool get showCallToActionForDisplayName => _showCallToActionForDisplayName;
   bool _skipNotification;
-  PlankModel(
-      {@required this.repository,
-      @required this.challengeRepo,
-      @required this.credentialsRepo,
-      @required this.userRepo})
-      : _isLoading = false,
+  PlankModel({
+    @required this.repository,
+    @required this.challengeRepo,
+    @required this.credentialsRepo,
+    @required this.userRepo,
+    @required this.mobileRepo,
+  })  : _isLoading = false,
         _isError = false,
         _loggedIn = false,
         _history = [],
@@ -171,6 +176,8 @@ class PlankModel extends ChangeNotifier {
     _intervalTime = prefs.getInt("plank.settings.intervalTime");
     _showIntervals = prefs.getBool("plank.settings.showIntervals");
     _showChallenge = prefs.getBool("plank.settings.showChallenge");
+    _appPushNotifications =
+        prefs.getBool("plank.settings.notificationsEnabled");
 
     if (_intervalTime == null) {
       _intervalTime = 0;
@@ -182,6 +189,17 @@ class PlankModel extends ChangeNotifier {
 
     if (_showChallenge == null) {
       _showChallenge = true;
+    }
+
+    if (_appPushNotifications == null) {
+      _appPushNotifications = false;
+    }
+
+    // Double check whats in the preferences
+    bool actual = await getNotificationPermission();
+    if (actual != _appPushNotifications) {
+      await prefs.setBool("plank.settings.notificationsEnabled", actual);
+      _appPushNotifications = actual;
     }
   }
 
@@ -206,6 +224,34 @@ class PlankModel extends ChangeNotifier {
       await repository.addEntry(record, _challenge.uuid);
       _challenge = Challenge(uuid: "", description: "");
       await loadHistory();
+    } catch (error) {
+      _lastError = error;
+      _isLoading = false;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      _notifyListeners();
+    }
+  }
+
+  Future<void> deleteEntryFromHistory(String recordUUID) async {
+    try {
+      await repository.deleteEntry(recordUUID);
+      await loadHistory();
+    } catch (error) {
+      _lastError = error;
+      _isLoading = false;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+      _notifyListeners();
+    }
+  }
+
+  // Delete from challenge + history
+  Future<void> deleteEntryFromChallenge(
+      String challengeUUID, String recordUUID) async {
+    try {
+      await repository.deleteEntry(recordUUID);
+      await getChallengeWithHistory(challengeUUID);
     } catch (error) {
       _lastError = error;
       _isLoading = false;
@@ -300,8 +346,7 @@ class PlankModel extends ChangeNotifier {
       var index = _challenges.indexWhere((element) => element.uuid == uuid);
       if (index != -1) {
         _challenges.removeAt(index);
-        setChallenge(Challenge(
-            uuid: challenge.uuid, description: challenge.description));
+        setChallenge(Challenge.empty());
       }
 
       return true;
@@ -384,6 +429,36 @@ class PlankModel extends ChangeNotifier {
     _notifyListeners();
   }
 
+// Handle when  the notification is challenge:updated
+  // Get challenge
+  // Set challenge
+  // Update index for the screen
+  // await plankModel.notificationChallengeUpdated(challengeUUID)
+
+  // Start at the plank screen
+
+  String _notificationAction = "";
+  String get notificationAction => _notificationAction;
+
+  String _latestNotificationId = "";
+  String get latestNotificationId => _latestNotificationId;
+
+  String _lastNotificationId = "";
+  String get lastNotificationId => _lastNotificationId;
+
+  Future<void> notificationChallengeUpdated(
+      String messageId, String uuid) async {
+    _skipNotification = true;
+    await getChallengeWithHistory(uuid);
+    // Not yet needing fine grain actions
+    _notificationAction = "challenge.updated";
+    _lastNotificationId = _latestNotificationId;
+    _latestNotificationId = messageId;
+    _skipNotification = false;
+    _notifyListeners();
+  }
+
+  // ----
   Future<void> _handleGoogleSignIn(GoogleSignInAccount account) async {
     _credentials.idpGoogle = account;
     if (_credentials.idpGoogle == null) {
@@ -418,6 +493,10 @@ class PlankModel extends ChangeNotifier {
       _credentials.idpGoogle = account;
       _skipNotification = true;
       await _loadState();
+
+      String token = await getToken();
+      sendTokenToServer(token);
+
       _skipNotification = false;
       _bootstrapLogin = true;
       _notifyListeners();
@@ -462,6 +541,10 @@ class PlankModel extends ChangeNotifier {
       await _loadCredentials();
       _loggedIn = credentialsRepo.isLoggedIn();
       await _loadState();
+
+      String token = await getToken();
+      sendTokenToServer(token);
+
       _skipNotification = false;
       _notifyListeners();
     }).catchError((error) async {
@@ -502,5 +585,31 @@ class PlankModel extends ChangeNotifier {
 
     _googleSignIn.signInSilently();
     print("idp:google enabled and setup");
+  }
+
+  Future<void> sendTokenToServer(String token) async {
+    if (!loggedIn) {
+      return;
+    }
+
+    try {
+      await mobileRepo.registerDevice(token);
+    } catch (error) {
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+    }
+    return;
+  }
+
+  bool _appPushNotifications = false;
+  bool get appPushNotifications => _appPushNotifications;
+
+  Future<void> setPushNotifications(bool state) async {
+    _appPushNotifications = state;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(
+        "plank.settings.notificationsEnabled", _appPushNotifications);
+    _notifyListeners();
   }
 }

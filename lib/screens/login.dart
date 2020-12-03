@@ -5,10 +5,10 @@ import 'package:flushbar/flushbar.dart';
 
 import 'package:openapi/api.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
+import 'package:thehumbleplank/plank_model.dart';
 
-import 'package:the_humble_plank/screens/plank_shell.dart';
-import 'package:the_humble_plank/widget/topbar.dart';
+import 'package:thehumbleplank/screens/plank_shell.dart';
+import 'package:thehumbleplank/widget/topbar.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -84,7 +84,7 @@ class LoginFormState extends State<LoginForm> {
             .loginWithUsername(_loginInput, _serverBasePath);
       } catch (err) {
         if (err is ApiException) {
-          if ((err as ApiException).code == 403) {
+          if (err.code == 403) {
             Flushbar(
               flushbarPosition: FlushbarPosition.TOP,
               flushbarStyle: FlushbarStyle.GROUNDED,
@@ -274,8 +274,12 @@ class LoginInfo {
 }
 
 LoginInfo defaultValues() {
-  return LoginInfo(
-      username: "", password: "", basePath: "https://learnalist.net/api/v1");
+  bool dev = false;
+  if (!dev) {
+    return LoginInfo(
+        username: "", password: "", basePath: "https://learnalist.net/api/v1");
+  }
+
   return LoginInfo(
       username: "iamtest1",
       password: "test123",

@@ -19,6 +19,13 @@ export function formatTime(milliseconds) {
     return `${mm}:${ss}.${t}`;
 }
 */
+import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/notifications.dart';
 
 String _zeroPadded(int number) {
   // Maybe pad left
@@ -34,4 +41,25 @@ String formatTime(int milliseconds) {
   var ss = _zeroPadded((milliseconds / 1000 % 60).floor());
   var t = _lastDigit((milliseconds / 100).floor());
   return "$mm:$ss.$t";
+}
+
+Future<bool> getNotificationPermission() async {
+  PermissionStatus permission = await Permission.notification.status;
+  return permission == PermissionStatus.granted ? true : false;
+}
+
+Future<void> checkAndAskForNotificationPermission(BuildContext context) async {
+  PermissionStatus permission = await Permission.notification.status;
+
+  if (permission != PermissionStatus.granted) {
+    if (permission == PermissionStatus.undetermined) {
+      var settings = await requestPermission();
+      bool newState =
+          settings.authorizationStatus == AuthorizationStatus.authorized
+              ? true
+              : false;
+      await context.read<PlankModel>().setPushNotifications(newState);
+    }
+    // TODO This is where we could nag the user should we want to, to enable notifications
+  }
 }

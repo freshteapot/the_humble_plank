@@ -2,9 +2,9 @@ part of openapi.api;
 
 class HttpUserInfoInput {
   /* This will be used to address you in the app(s) or website. */
-  String displayName = null;
+  String displayName = "";
   /* Let the server know the user was created via the plank app. */
-  String createdVia = null;
+  String createdVia = "";
   //enum createdViaEnum {  plank.app.v1,  };{
   HttpUserInfoInput();
 

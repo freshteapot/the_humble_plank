@@ -2,29 +2,27 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
-import 'package:the_humble_plank/learnalist/challenge.dart';
-import 'package:the_humble_plank/screens/challenge_join.dart';
-import 'package:the_humble_plank/widget/onshare.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/learnalist/challenge.dart';
+import 'package:thehumbleplank/screens/challenge_create.dart';
+import 'package:thehumbleplank/screens/challenge_join.dart';
+import 'package:thehumbleplank/widget/onshare.dart';
 
-class PlankChallenge1 extends StatefulWidget {
+class ChallengesOverviewScreen extends StatefulWidget {
   final String title;
   final VoidCallback onPressed;
-  final VoidCallback onCreate;
-  final VoidCallback onHistory;
 
-  PlankChallenge1({
+  ChallengesOverviewScreen({
     this.title,
     this.onPressed,
-    this.onCreate,
-    this.onHistory,
   });
 
   @override
-  _PlankChallenge1State createState() => _PlankChallenge1State();
+  _ChallengesOverviewScreenState createState() =>
+      _ChallengesOverviewScreenState();
 }
 
-class _PlankChallenge1State extends State<PlankChallenge1> {
+class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
   List<Widget> _items;
   @override
   Widget build(BuildContext context) {
@@ -89,9 +87,22 @@ class _PlankChallenge1State extends State<PlankChallenge1> {
                 disabledTextColor: Colors.black,
                 padding: EdgeInsets.all(8.0),
                 splashColor: Colors.blueAccent,
-                onPressed: () {
-                  // Create or ask for name
-                  widget.onCreate();
+                onPressed: () async {
+                  await showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SingleChildScrollView(
+                            child: Container(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                        .viewInsets
+                                        .bottom),
+                                child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(20.0,
+                                        20.0, 20.0, 0.0), // content padding
+                                    child: ChallengeCreateScreen())));
+                      });
                 },
                 child: Text(
                   "Create a new challenge",
@@ -147,46 +158,6 @@ class _PlankChallenge1State extends State<PlankChallenge1> {
 
   Widget menuRow(BuildContext context, Challenge challenge) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
-            padding: EdgeInsets.all(8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.history,
-                  size: 18,
-                ),
-                Text("History"),
-              ],
-            ),
-            onPressed: () async {
-              await context
-                  .read<PlankModel>()
-                  .getChallengeWithHistory(challenge.uuid);
-              //context.read<PlankModel>().setChallenge(challenge);
-              widget.onHistory();
-            },
-          )),
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.timer, size: 18),
-                Text("plank"),
-              ],
-            ),
-            onPressed: () {
-              context.read<PlankModel>().setChallenge(challenge);
-              widget.onPressed();
-            },
-          )),
       SizedBox(
           width: 60, // specific value
           child: RaisedButton(

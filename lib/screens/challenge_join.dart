@@ -2,20 +2,13 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:the_humble_plank/plank_model.dart';
+import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/utils.dart';
 
 class ChallengeJoinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(children: <Widget>[
-      Container(
-          alignment: Alignment.bottomCenter,
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-          child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[MyCustomForm()]))
-    ]);
+    return MyCustomForm();
   }
 }
 
@@ -43,12 +36,11 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Fill this out in the next step.
-    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+    return Column(children: <Widget>[
       Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 30),
+          padding: EdgeInsets.symmetric(vertical: 10),
           child: Text(
             'Enter challenge uuid or url',
             style:
@@ -64,7 +56,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
       ),
       Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(vertical: 20),
+          padding: EdgeInsets.symmetric(vertical: 50),
           child: FlatButton(
             color: Colors.blue,
             textColor: Colors.white,
@@ -117,6 +109,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 return;
               }
 
+              await checkAndAskForNotificationPermission(context);
               Navigator.of(context).pop();
             },
             child: Text(

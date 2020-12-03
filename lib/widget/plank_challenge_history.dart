@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/api.dart';
-import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:jiffy/jiffy.dart';
 
 import 'package:thehumbleplank/utils.dart';

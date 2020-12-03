@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -29,17 +28,14 @@ class MessageArguments {
 /// call.
 ///
 /// To verify things are working, check out the native platform logs.
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // I wonder if I need this for push notifications?
-  // TODO seems broken for now
-  // https://github.com/FirebaseExtended/flutterfire/issues/4198
-  // https://github.com/FirebaseExtended/flutterfire/issues/4185
-  await Firebase.initializeApp();
-  print("Handling a background message ${message.messageId}");
-  var supported = await FlutterAppBadger.isAppBadgeSupported();
-  print("Why cant I update the badge $supported");
-  FlutterAppBadger.updateBadgeCount(1);
-}
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+// I wonder if I need this for push notifications?
+// TODO seems broken for now
+// https://github.com/FirebaseExtended/flutterfire/issues/4198
+// https://github.com/FirebaseExtended/flutterfire/issues/4185
+//  await Firebase.initializeApp();
+//   print("Handling a background message ${message.messageId}");
+// }
 
 /// Create a [AndroidNotificationChannel] for heads up notifications
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -59,8 +55,9 @@ Future<void> setupNotifications(
     BuildContext context, PlankModel plankModel) async {
   await Firebase.initializeApp();
 
+  // TODO not sure how I want to use this yet
   // Set the background messaging handler early on, as a named top-level function
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   /// Create an Android Notification Channel.
   ///
@@ -81,7 +78,6 @@ Future<void> setupNotifications(
 
   // We might not want to use both
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    FlutterAppBadger.updateBadgeCount(1);
     // With the above settings set so the popup doesnt appear,
     // It would be possible to set the "history notification"
     // Hmm what is this?

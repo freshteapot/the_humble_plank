@@ -535,18 +535,21 @@ Widget _challengesView(BuildContext context, List<Challenge> challenges) {
                         title: Text('${items[index].name}'),
                         onTap: () async {
                           var item = items[index];
-                          var newChallenge = Challenge.empty();
-                          if (item.type == 2) {
-                            newChallenge = item.data as Challenge;
+
+                          if (item.type == 1) {
+                            await context
+                                .read<PlankModel>()
+                                .setChallenge(Challenge.empty());
+                            Navigator.pop(context);
+                            return;
                           }
-                          // TODO Lazy loading the challenges might need to happen
+
+                          // Assumed 2
+                          var newChallenge = Challenge.empty();
+                          newChallenge = item.data as Challenge;
                           await context
                               .read<PlankModel>()
                               .getChallengeWithHistory(newChallenge.uuid);
-
-                          //await context
-                          //    .read<PlankModel>()
-                          //    .setChallenge(newChallenge);
                           Navigator.pop(context);
                         },
                       );

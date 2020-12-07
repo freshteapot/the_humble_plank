@@ -222,11 +222,18 @@ class PlankModel extends ChangeNotifier {
   Future<void> addEntry(Plank record) async {
     try {
       await repository.addEntry(record, _challenge.uuid);
-      _challenge = Challenge(uuid: "", description: "");
+
+      if (_challenge.uuid.isNotEmpty) {
+        _skipNotification = true;
+        await getChallengeWithHistory(_challenge.uuid);
+        _skipNotification = false;
+      }
+
       await loadHistory();
     } catch (error) {
       _lastError = error;
       _isLoading = false;
+      _skipNotification = false;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);
       _notifyListeners();

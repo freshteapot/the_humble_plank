@@ -1,7 +1,5 @@
 # The Humble Plank
 
-# TODO
-- [ ] When building the service to process the events, cheat on startup by querying the api for all the challenge relationships.
 
 ## learnalist-openapi-dart
 This comes from generating dart client library for [learnalist.net](https://github.com/freshteapot/learnalist-api).
@@ -41,6 +39,11 @@ cp ~/git/secrets/ios-thehumbleplank-GoogleService-Info.plist ios/Runner/GoogleSe
 ```
 
 # Development
+
+## Update the icons
+```
+flutter pub run flutter_launcher_icons:main
+```
 
 ## Register users
 - Simple plank app
@@ -92,3 +95,4 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v
 # Reference
 - https://developers.google.com/android/guides/client-auth
 - https://github.com/OpenAPITools/openapi-generator/issues/7589
+- https://github.com/fluttercommunity/flutter_launcher_icons

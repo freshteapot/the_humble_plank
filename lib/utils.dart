@@ -50,16 +50,13 @@ Future<bool> getNotificationPermission() async {
 
 Future<void> checkAndAskForNotificationPermission(BuildContext context) async {
   PermissionStatus permission = await Permission.notification.status;
-
-  if (permission != PermissionStatus.granted) {
-    if (permission == PermissionStatus.undetermined) {
-      var settings = await requestPermission();
-      bool newState =
-          settings.authorizationStatus == AuthorizationStatus.authorized
-              ? true
-              : false;
-      await context.read<PlankModel>().setPushNotifications(newState);
-    }
-    // TODO This is where we could nag the user should we want to, to enable notifications
+  if (permission != PermissionStatus.undetermined) {
+    return;
   }
+
+  var settings = await requestPermission();
+  bool newState = settings.authorizationStatus == AuthorizationStatus.authorized
+      ? true
+      : false;
+  await context.read<PlankModel>().setPushNotifications(newState);
 }

@@ -2,6 +2,7 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:openapi/api.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/learnalist/challenge.dart';
@@ -10,6 +11,7 @@ import 'package:thehumbleplank/screens/challenges_overview.dart';
 import 'package:thehumbleplank/screens/plank_history.dart';
 import 'package:thehumbleplank/screens/plank_screen.dart';
 import 'package:thehumbleplank/screens/plank_settings.dart';
+import 'package:thehumbleplank/utils.dart';
 import 'package:thehumbleplank/widget/topbar.dart';
 
 class PlankShellScreen extends StatefulWidget {
@@ -90,8 +92,10 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
     List<Challenge> challenges =
         context.select((PlankModel model) => model.challenges);
-
     List<Plank> history = context.select((PlankModel model) => model.history);
+
+    _notificationNag(context, challenges.length > 0);
+
     // Out the box challenge will cause this to show the correct one
     List<Widget> screens = [
       PlankHistoryScreen(
@@ -194,4 +198,19 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       body: screens[_currentIndex], // new
     );
   }
+}
+
+Future<void> _notificationNag(BuildContext context, hasChallenges) async {
+  // quit if notifications set?
+  PermissionStatus permission = await Permission.notification.status;
+  if (permission != PermissionStatus.undetermined) {
+    return;
+  }
+
+  if (!hasChallenges) {
+    return;
+  }
+
+  // Could be where we add logic to ask after X times
+  checkAndAskForNotificationPermission(context);
 }

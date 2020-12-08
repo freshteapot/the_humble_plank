@@ -545,8 +545,7 @@ Widget _challengesView(BuildContext context, List<Challenge> challenges) {
                           }
 
                           // Assumed 2
-                          var newChallenge = Challenge.empty();
-                          newChallenge = item.data as Challenge;
+                          Challenge newChallenge = item.data as Challenge;
                           await context
                               .read<PlankModel>()
                               .getChallengeWithHistory(newChallenge.uuid);

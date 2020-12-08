@@ -1,7 +1,5 @@
 # The Humble Plank
 
-# TODO
-- [ ] When building the service to process the events, cheat on startup by querying the api for all the challenge relationships.
 
 ## learnalist-openapi-dart
 This comes from generating dart client library for [learnalist.net](https://github.com/freshteapot/learnalist-api).
@@ -41,6 +39,50 @@ cp ~/git/secrets/ios-thehumbleplank-GoogleService-Info.plist ios/Runner/GoogleSe
 ```
 
 # Development
+
+##
+```
+keytool -genkey -v -keystore ~/git/secrets/the_humble_plank_key.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias the_humble_plank_key
+```
+
+```
+cp ~/git/secrets/android-key.properties android/key.properties
+```
+
+```
+keytool -list -v \
+-alias the_humble_plank_key -keystore ~/git/secrets/the_humble_plank_key.jks
+```
+
+## Create feature icon from play icon
+```
+convert assets/icon/android-play-icon.png -gravity center \
+    -background white \
+    -compress jpeg \
+    -extent 1024x500 assets/icon/android-play-feature-graphic.png
+```
+
+## Update the icons
+```
+flutter pub run flutter_launcher_icons:main
+```
+
+## Deploy android
+
+```
+ANDROID_HOME=/Users/tinkerbell/Library/Android/sdk \
+bundletool build-apks \
+--bundle=build/app/outputs/bundle/release/app-release.aab \
+--output=/tmp/the-humble-app.apks \
+--ks=~/git/secrets/the_humble_plank_key.jks \
+--ks-key-alias=the_humble_plank_key \
+--overwrite \
+--device-spec=/tmp/device-spec.json
+```
+
+```
+bundletool install-apks --apks=/tmp/the-humble-app.apks
+```
 
 ## Register users
 - Simple plank app
@@ -92,3 +134,4 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v
 # Reference
 - https://developers.google.com/android/guides/client-auth
 - https://github.com/OpenAPITools/openapi-generator/issues/7589
+- https://github.com/fluttercommunity/flutter_launcher_icons

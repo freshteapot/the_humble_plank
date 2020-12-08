@@ -1,10 +1,25 @@
 # The Humble Plank
+- A small utility app with the focus around strengthening your core.
+- Data is saved to [learnalist.net](https://learnalist.net/).
 
+## Working theory
+> A happy healthy body, will aid with learning.
 
-## learnalist-openapi-dart
+## Features
+- Record a plank
+- History of your planks
+- Create a challenge / group.
+- Share the challenge with your friends.
+- Record a plank for a challenge and notify others in the group.
+- Able to change your backend (where you store the data)
+- Api is based on openapi spec (TODO add link)
+
+## Development
+
+### learnalist-openapi-dart
 This comes from generating dart client library for [learnalist.net](https://github.com/freshteapot/learnalist-api).
 
-### To update
+#### To update
 - Clone http://github.com/freshteapot/learnalist-api/
 - Generate openapi for dart
 ```
@@ -24,7 +39,7 @@ In   HttpAssetUploadRequestBody.fromJson
         : MultipartFile.fromString("file", json['file']);
 ```
 
-# Getting secrets
+## Getting secrets
 ```
 mkdir -p ~/git/secrets/thehumbleplank/android/app
 ```
@@ -38,9 +53,7 @@ cp ~/git/secrets/thehumbleplank/android/app/google-services.json android/app/goo
 cp ~/git/secrets/ios-thehumbleplank-GoogleService-Info.plist ios/Runner/GoogleService-Info.plist
 ```
 
-# Development
-
-##
+### Sign the app for android
 ```
 keytool -genkey -v -keystore ~/git/secrets/the_humble_plank_key.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias the_humble_plank_key
 ```
@@ -54,7 +67,7 @@ keytool -list -v \
 -alias the_humble_plank_key -keystore ~/git/secrets/the_humble_plank_key.jks
 ```
 
-## Create feature icon from play icon
+### Create feature icon from play icon
 ```
 convert assets/icon/android-play-icon.png -gravity center \
     -background white \
@@ -62,12 +75,13 @@ convert assets/icon/android-play-icon.png -gravity center \
     -extent 1024x500 assets/icon/android-play-feature-graphic.png
 ```
 
-## Update the icons
+### Update the icons
 ```
 flutter pub run flutter_launcher_icons:main
 ```
 
-## Deploy android
+### Deploy android
+- Need to use x86_64 in your emulator (changeable after the fact)
 
 ```
 ANDROID_HOME=/Users/tinkerbell/Library/Android/sdk \
@@ -84,7 +98,7 @@ bundletool build-apks \
 bundletool install-apks --apks=/tmp/the-humble-app.apks
 ```
 
-## Register users
+### Register users
 - Simple plank app
 
 ```sh
@@ -112,7 +126,7 @@ curl -XPOST 'http://127.0.0.1:1234/api/v1/user/register' -d'
 
 ```
 
-## Delete user
+### Delete user
 ```sh
 response=$(curl -s -XPOST 'http://127.0.0.1:1234/api/v1/user/login' -d'
 {
@@ -132,6 +146,7 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v
 
 
 # Reference
+- https://github.com/freshteapot/learnalist-api
 - https://developers.google.com/android/guides/client-auth
 - https://github.com/OpenAPITools/openapi-generator/issues/7589
 - https://github.com/fluttercommunity/flutter_launcher_icons

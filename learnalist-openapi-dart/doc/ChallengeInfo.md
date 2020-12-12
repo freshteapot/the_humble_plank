@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **kind** | **String** |  | [default to null]
 **description** | **String** |  | [default to null]
 **created** | [**DateTime**](DateTime.md) | Set to UTC | [optional] [default to null]
+**createdBy** | **String** | User who created the challenge | [default to null]
 **uuid** | **String** |  | [default to null]
 **users** | [**List&lt;ChallengeInfoAllOfUsers&gt;**](ChallengeInfoAllOfUsers.md) | List of users | [default to []]
 **records** | [**List&lt;ChallengePlankRecord&gt;**](ChallengePlankRecord.md) | List of records, specific to the kind | [default to []]

@@ -22,6 +22,12 @@ void main() {
       // TODO
     });
 
+    // User who created the challenge
+    // String createdBy (default value: null)
+    test('to test the property `createdBy`', () async {
+      // TODO
+    });
+
     // String uuid (default value: null)
     test('to test the property `uuid`', () async {
       // TODO

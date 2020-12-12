@@ -8,6 +8,8 @@ class ChallengeInfo {
   String description = null;
   /* Set to UTC */
   DateTime created = null;
+  /* User who created the challenge */
+  String createdBy = null;
   
   String uuid = null;
   /* List of users */
@@ -18,7 +20,7 @@ class ChallengeInfo {
 
   @override
   String toString() {
-    return 'ChallengeInfo[kind=$kind, description=$description, created=$created, uuid=$uuid, users=$users, records=$records, ]';
+    return 'ChallengeInfo[kind=$kind, description=$description, created=$created, createdBy=$createdBy, uuid=$uuid, users=$users, records=$records, ]';
   }
 
   ChallengeInfo.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class ChallengeInfo {
     created = (json['created'] == null) ?
       null :
       DateTime.parse(json['created']);
+    createdBy = json['created_by'];
     uuid = json['uuid'];
     users = (json['users'] == null) ?
       null :
@@ -45,6 +48,8 @@ class ChallengeInfo {
       json['description'] = description;
     if (created != null)
       json['created'] = created == null ? null : created.toUtc().toIso8601String();
+    if (createdBy != null)
+      json['created_by'] = createdBy;
     if (uuid != null)
       json['uuid'] = uuid;
     if (users != null)

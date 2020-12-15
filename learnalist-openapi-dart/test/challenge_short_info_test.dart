@@ -6,12 +6,13 @@ void main() {
     var instance = new ChallengeShortInfo();
 
   group('test ChallengeShortInfo', () {
-    // ChallengeKind kind (default value: null)
+    // Look at ChallengeKind for supported kinds
+    // String kind (default value: "")
     test('to test the property `kind`', () async {
       // TODO
     });
 
-    // String description (default value: null)
+    // String description (default value: "")
     test('to test the property `description`', () async {
       // TODO
     });

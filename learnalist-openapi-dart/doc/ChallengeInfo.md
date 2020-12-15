@@ -8,8 +8,8 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**kind** | [**ChallengeKind**](ChallengeKind.md) |  | [default to null]
-**description** | **String** |  | [default to null]
+**kind** | **String** | Look at ChallengeKind for supported kinds | [default to &quot;&quot;]
+**description** | **String** |  | [default to &quot;&quot;]
 **created** | [**DateTime**](DateTime.md) | Set to UTC | [optional] [default to null]
 **createdBy** | **String** | User who created the challenge | [default to null]
 **uuid** | **String** |  | [default to null]

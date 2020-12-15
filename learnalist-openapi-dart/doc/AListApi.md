@@ -193,7 +193,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearerAuth').setAccessToken(yourTokenGeneratorFunction);
 
 var api_instance = AListApi();
-var labels = labels_example; // String | Filter your lists by one or many labels. \"seperated by ,\".
+var labels = labels_example; // String | Filter your lists by one or many labels. \"separated by ,\".
 var listType = listType_example; // String | Filter your lists by type v1, v2 etc
 
 try { 
@@ -208,7 +208,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **labels** | **String**| Filter your lists by one or many labels. \&quot;seperated by ,\&quot;. | [optional] [default to null]
+ **labels** | **String**| Filter your lists by one or many labels. \&quot;separated by ,\&quot;. | [optional] [default to null]
  **listType** | **String**| Filter your lists by type v1, v2 etc | [optional] [default to null]
 
 ### Return type

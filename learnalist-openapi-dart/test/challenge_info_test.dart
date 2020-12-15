@@ -6,7 +6,7 @@ void main() {
     var instance = new ChallengeInfo();
 
   group('test ChallengeInfo', () {
-    // String kind (default value: null)
+    // ChallengeKind kind (default value: null)
     test('to test the property `kind`', () async {
       // TODO
     });
@@ -19,6 +19,12 @@ void main() {
     // Set to UTC
     // DateTime created (default value: null)
     test('to test the property `created`', () async {
+      // TODO
+    });
+
+    // User who created the challenge
+    // String createdBy (default value: null)
+    test('to test the property `createdBy`', () async {
       // TODO
     });
 

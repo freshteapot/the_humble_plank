@@ -9,6 +9,7 @@ import 'package:openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **created** | [**DateTime**](DateTime.md) | Set to UTC | [optional] [default to null]
+**createdBy** | **String** | User who created the challenge | [optional] [default to null]
 **uuid** | **String** |  | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

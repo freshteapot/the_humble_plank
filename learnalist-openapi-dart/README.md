@@ -115,6 +115,7 @@ Class | Method | HTTP request | Description
  - [ChallengeInfoAllOf](doc//ChallengeInfoAllOf.md)
  - [ChallengeInfoAllOfUsers](doc//ChallengeInfoAllOfUsers.md)
  - [ChallengeInput](doc//ChallengeInput.md)
+ - [ChallengeKind](doc//ChallengeKind.md)
  - [ChallengePlankRecord](doc//ChallengePlankRecord.md)
  - [ChallengePlankRecordAllOf](doc//ChallengePlankRecordAllOf.md)
  - [ChallengeShortInfo](doc//ChallengeShortInfo.md)

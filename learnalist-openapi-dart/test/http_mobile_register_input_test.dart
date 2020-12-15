@@ -12,6 +12,12 @@ void main() {
       // TODO
     });
 
+    // A unique identifier to allow the system to link a user with an app and use the correct token.
+    // String appIdentifier (default value: "")
+    test('to test the property `appIdentifier`', () async {
+      // TODO
+    });
+
 
   });
 

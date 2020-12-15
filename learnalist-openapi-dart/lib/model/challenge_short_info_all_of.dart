@@ -3,13 +3,15 @@ part of openapi.api;
 class ChallengeShortInfoAllOf {
   /* Set to UTC */
   DateTime created = null;
+  /* User who created the challenge */
+  String createdBy = null;
   
   String uuid = null;
   ChallengeShortInfoAllOf();
 
   @override
   String toString() {
-    return 'ChallengeShortInfoAllOf[created=$created, uuid=$uuid, ]';
+    return 'ChallengeShortInfoAllOf[created=$created, createdBy=$createdBy, uuid=$uuid, ]';
   }
 
   ChallengeShortInfoAllOf.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class ChallengeShortInfoAllOf {
     created = (json['created'] == null) ?
       null :
       DateTime.parse(json['created']);
+    createdBy = json['created_by'];
     uuid = json['uuid'];
   }
 
@@ -24,6 +27,8 @@ class ChallengeShortInfoAllOf {
     Map <String, dynamic> json = {};
     if (created != null)
       json['created'] = created == null ? null : created.toUtc().toIso8601String();
+    if (createdBy != null)
+      json['created_by'] = createdBy;
     if (uuid != null)
       json['uuid'] = uuid;
     return json;

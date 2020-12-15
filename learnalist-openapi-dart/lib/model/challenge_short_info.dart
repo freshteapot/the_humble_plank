@@ -2,28 +2,33 @@ part of openapi.api;
 
 class ChallengeShortInfo {
   
-  String kind = null;
+  ChallengeKind kind = null;
   //enum kindEnum {  plank-group,  };{
   
   String description = null;
   /* Set to UTC */
   DateTime created = null;
+  /* User who created the challenge */
+  String createdBy = null;
   
   String uuid = null;
   ChallengeShortInfo();
 
   @override
   String toString() {
-    return 'ChallengeShortInfo[kind=$kind, description=$description, created=$created, uuid=$uuid, ]';
+    return 'ChallengeShortInfo[kind=$kind, description=$description, created=$created, createdBy=$createdBy, uuid=$uuid, ]';
   }
 
   ChallengeShortInfo.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
-    kind = json['kind'];
+    kind = (json['kind'] == null) ?
+      null :
+      ChallengeKind.fromJson(json['kind']);
     description = json['description'];
     created = (json['created'] == null) ?
       null :
       DateTime.parse(json['created']);
+    createdBy = json['created_by'];
     uuid = json['uuid'];
   }
 
@@ -35,6 +40,8 @@ class ChallengeShortInfo {
       json['description'] = description;
     if (created != null)
       json['created'] = created == null ? null : created.toUtc().toIso8601String();
+    if (createdBy != null)
+      json['created_by'] = createdBy;
     if (uuid != null)
       json['uuid'] = uuid;
     return json;

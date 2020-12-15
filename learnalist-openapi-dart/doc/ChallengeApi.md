@@ -173,7 +173,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getChallengesByUser**
-> List<ChallengeShortInfo> getChallengesByUser(userUUID)
+> List<ChallengeShortInfo> getChallengesByUser(userUUID, kind)
 
 
 
@@ -194,9 +194,10 @@ import 'package:openapi/api.dart';
 
 var api_instance = ChallengeApi();
 var userUUID = userUUID_example; // String | userUUID to get challenges
+var kind = ; // ChallengeKind | Filter challenges by a single kind
 
 try { 
-    var result = api_instance.getChallengesByUser(userUUID);
+    var result = api_instance.getChallengesByUser(userUUID, kind);
     print(result);
 } catch (e) {
     print("Exception when calling ChallengeApi->getChallengesByUser: $e\n");
@@ -208,6 +209,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **userUUID** | **String**| userUUID to get challenges | [default to null]
+ **kind** | [**ChallengeKind**](.md)| Filter challenges by a single kind | [optional] [default to null]
 
 ### Return type
 

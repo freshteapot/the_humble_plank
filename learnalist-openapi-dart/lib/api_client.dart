@@ -67,6 +67,8 @@ class ApiClient {
           return ChallengeInfoAllOfUsers.fromJson(value);
         case 'ChallengeInput':
           return ChallengeInput.fromJson(value);
+        case 'ChallengeKind':
+          return new ChallengeKindTypeTransformer().decode(value);
         case 'ChallengePlankRecord':
           return ChallengePlankRecord.fromJson(value);
         case 'ChallengePlankRecordAllOf':

@@ -3,22 +3,28 @@ part of openapi.api;
 class HttpMobileRegisterInput {
   /* FCM token linked to the device */
   String token = "";
+  /* A unique identifier to allow the system to link a user with an app and use the correct token. */
+  String appIdentifier = "";
+  //enum appIdentifierEnum {  plank:v1,  remind:v1,  };{
   HttpMobileRegisterInput();
 
   @override
   String toString() {
-    return 'HttpMobileRegisterInput[token=$token, ]';
+    return 'HttpMobileRegisterInput[token=$token, appIdentifier=$appIdentifier, ]';
   }
 
   HttpMobileRegisterInput.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
     token = json['token'];
+    appIdentifier = json['app_identifier'];
   }
 
   Map<String, dynamic> toJson() {
     Map <String, dynamic> json = {};
     if (token != null)
       json['token'] = token;
+    if (appIdentifier != null)
+      json['app_identifier'] = appIdentifier;
     return json;
   }
 

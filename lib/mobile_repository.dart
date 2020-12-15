@@ -18,6 +18,7 @@ class RemoteMobileRepository implements MobileRepository {
   Future<bool> registerDevice(String token) async {
     var input = HttpMobileRegisterInput();
     input.token = token;
+    input.appIdentifier = "plank:v1";
     Response response = await mobileApi.registerDeviceWithHttpInfo(input);
     if (response.statusCode != 200) {
       return false;

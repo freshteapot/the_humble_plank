@@ -1,11 +1,10 @@
 part of openapi.api;
 
 class ChallengeShortInfo {
+  /* Look at ChallengeKind for supported kinds */
+  String kind = "";
   
-  ChallengeKind kind = null;
-  //enum kindEnum {  plank-group,  };{
-  
-  String description = null;
+  String description = "";
   /* Set to UTC */
   DateTime created = null;
   /* User who created the challenge */
@@ -21,9 +20,7 @@ class ChallengeShortInfo {
 
   ChallengeShortInfo.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
-    kind = (json['kind'] == null) ?
-      null :
-      ChallengeKind.fromJson(json['kind']);
+    kind = json['kind'];
     description = json['description'];
     created = (json['created'] == null) ?
       null :

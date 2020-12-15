@@ -1,11 +1,10 @@
 part of openapi.api;
 
 class ChallengeInput {
+  /* Look at ChallengeKind for supported kinds */
+  String kind = "";
   
-  ChallengeKind kind = null;
-  //enum kindEnum {  plank-group,  };{
-  
-  String description = null;
+  String description = "";
   ChallengeInput();
 
   @override
@@ -15,9 +14,7 @@ class ChallengeInput {
 
   ChallengeInput.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
-    kind = (json['kind'] == null) ?
-      null :
-      ChallengeKind.fromJson(json['kind']);
+    kind = json['kind'];
     description = json['description'];
   }
 

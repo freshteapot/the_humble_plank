@@ -6,7 +6,7 @@ void main() {
     var instance = new ChallengeShortInfo();
 
   group('test ChallengeShortInfo', () {
-    // String kind (default value: null)
+    // ChallengeKind kind (default value: null)
     test('to test the property `kind`', () async {
       // TODO
     });

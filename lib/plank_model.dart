@@ -300,7 +300,7 @@ class PlankModel extends ChangeNotifier {
     bool success = true;
     try {
       ChallengeInput input = ChallengeInput();
-      input.kind = "plank-group";
+      input.kind = ChallengeKind.plankGroup_;
       input.description = challenge.description;
 
       ChallengeShortInfo response = await challengeRepo.createChallenge(input);

@@ -183,7 +183,7 @@ class ChallengeApi {
   ///  with HTTP info returned
   ///
   /// Get all challenges for a given user
-  Future<Response> getChallengesByUserWithHttpInfo(String userUUID) async {
+  Future<Response> getChallengesByUserWithHttpInfo(String userUUID, { ChallengeKind kind }) async {
     Object postBody;
 
     // verify required params are set
@@ -198,6 +198,9 @@ class ChallengeApi {
     List<QueryParam> queryParams = [];
     Map<String, String> headerParams = {};
     Map<String, String> formParams = {};
+    if(kind != null) {
+      queryParams.addAll(_convertParametersForCollectionFormat("", "kind", kind));
+    }
 
     List<String> contentTypes = [];
 
@@ -227,8 +230,8 @@ class ChallengeApi {
   /// 
   ///
   /// Get all challenges for a given user
-  Future<List<ChallengeShortInfo>> getChallengesByUser(String userUUID) async {
-    Response response = await getChallengesByUserWithHttpInfo(userUUID);
+  Future<List<ChallengeShortInfo>> getChallengesByUser(String userUUID, { ChallengeKind kind }) async {
+    Response response = await getChallengesByUserWithHttpInfo(userUUID,  kind: kind );
     if(response.statusCode >= 400) {
       throw ApiException(response.statusCode, _decodeBodyBytes(response));
     } else if(response.body != null) {

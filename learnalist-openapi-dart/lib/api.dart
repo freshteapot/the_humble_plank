@@ -36,6 +36,7 @@ part 'model/challenge_info.dart';
 part 'model/challenge_info_all_of.dart';
 part 'model/challenge_info_all_of_users.dart';
 part 'model/challenge_input.dart';
+part 'model/challenge_kind.dart';
 part 'model/challenge_plank_record.dart';
 part 'model/challenge_plank_record_all_of.dart';
 part 'model/challenge_short_info.dart';

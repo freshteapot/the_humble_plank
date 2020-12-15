@@ -20,7 +20,8 @@ class ChallengeRepository extends ChangeNotifier {
   }
 
   Future<List<ChallengeShortInfo>> getChallengesByUser(String userUUID) async {
-    return await challengeApi.getChallengesByUser(userUUID);
+    return await challengeApi.getChallengesByUser(userUUID,
+        kind: ChallengeKind.plankGroup_);
   }
 
   Future<bool> joinChallenge(String uuid) async {

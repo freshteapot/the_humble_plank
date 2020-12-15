@@ -2,7 +2,7 @@ part of openapi.api;
 
 class ChallengeInfo {
   
-  String kind = null;
+  ChallengeKind kind = null;
   //enum kindEnum {  plank-group,  };{
   
   String description = null;
@@ -25,7 +25,9 @@ class ChallengeInfo {
 
   ChallengeInfo.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
-    kind = json['kind'];
+    kind = (json['kind'] == null) ?
+      null :
+      ChallengeKind.fromJson(json['kind']);
     description = json['description'];
     created = (json['created'] == null) ?
       null :

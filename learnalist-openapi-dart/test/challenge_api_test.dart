@@ -30,7 +30,7 @@ void main() {
 
     // Get all challenges for a given user
     //
-    //Future<List<ChallengeShortInfo>> getChallengesByUser(String userUUID) async 
+    //Future<List<ChallengeShortInfo>> getChallengesByUser(String userUUID, { ChallengeKind kind }) async 
     test('test getChallengesByUser', () async {
       // TODO
     });

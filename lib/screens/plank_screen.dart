@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:wakelock/wakelock.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+
 import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
-
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
 import 'package:thehumbleplank/widget/plank_screen_call_to_action.dart';
@@ -45,12 +45,14 @@ class _PlankScreenState extends State<PlankScreen> {
     super.initState();
     _stopWatchTimer.rawTime.listen((value) => _onChange(value));
     record = defaultPlank(widget.showIntervals, widget.intervalTime);
+    Wakelock.disable();
   }
 
   @override
   void dispose() async {
     super.dispose();
     await _stopWatchTimer.dispose();
+    Wakelock.disable();
   }
 
   @override
@@ -209,6 +211,7 @@ class _PlankScreenState extends State<PlankScreen> {
 
   void onTimerStart() {
     setState(() {
+      Wakelock.enable();
       state = "plank_active";
     });
 
@@ -223,6 +226,7 @@ class _PlankScreenState extends State<PlankScreen> {
 
   void onTimerStop() {
     setState(() {
+      Wakelock.disable();
       state = "plank_summary";
     });
 
@@ -238,6 +242,7 @@ class _PlankScreenState extends State<PlankScreen> {
     currentTime = null;
 
     setState(() {
+      Wakelock.disable();
       state = "plank_start";
     });
   }
@@ -253,6 +258,7 @@ class _PlankScreenState extends State<PlankScreen> {
     context.read<PlankModel>().setChallenge(Challenge.empty());
 
     setState(() {
+      Wakelock.disable();
       state = "plank_start";
     });
   }

@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:openapi/api.dart';
 import 'package:thehumbleplank/credentials_repository.dart';
+import 'package:thehumbleplank/env.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/learnalist/dialog_error.dart';
 import 'package:thehumbleplank/mobile_repository.dart';
@@ -19,7 +20,8 @@ import 'package:thehumbleplank/user_repository.dart';
 import 'package:thehumbleplank/utils.dart';
 import 'package:thehumbleplank/notifications.dart';
 
-const LearnalistBasepath = "https://learnalist.net/api/v1";
+LearnalistEnv learnalistEnv = LearnalistEnv.defaultValues();
+
 GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: <String>[
     'email',
@@ -486,13 +488,14 @@ class PlankModel extends ChangeNotifier {
 
     try {
       var session =
-          await credentialsRepo.loginWithIdp(input, LearnalistBasepath);
+          await credentialsRepo.loginWithIdp(input, learnalistEnv.basePath);
 
       var newCredentials = Credentials();
       newCredentials.login = session;
       newCredentials.loginType = CredentialsLoginTypeGoogle;
 
-      await credentialsRepo.saveCredentials(newCredentials, LearnalistBasepath);
+      await credentialsRepo.saveCredentials(
+          newCredentials, learnalistEnv.basePath);
       await _loadCredentials();
 
       _loggedIn = credentialsRepo.isLoggedIn();
@@ -510,7 +513,8 @@ class PlankModel extends ChangeNotifier {
     } catch (error) {
       _skipNotification = false;
       var newCredentials = Credentials.defaultValues();
-      await credentialsRepo.saveCredentials(newCredentials, LearnalistBasepath);
+      await credentialsRepo.saveCredentials(
+          newCredentials, learnalistEnv.basePath);
       _lastError = error;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);
@@ -575,7 +579,8 @@ class PlankModel extends ChangeNotifier {
     } catch (error) {
       _skipNotification = false;
       var newCredentials = Credentials.defaultValues();
-      await credentialsRepo.saveCredentials(newCredentials, LearnalistBasepath);
+      await credentialsRepo.saveCredentials(
+          newCredentials, learnalistEnv.basePath);
       _lastError = error;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);

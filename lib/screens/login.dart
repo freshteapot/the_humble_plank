@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flushbar/flushbar.dart';
 
 import 'package:openapi/api.dart';
+import 'package:thehumbleplank/env.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
 
@@ -274,14 +275,7 @@ class LoginInfo {
 }
 
 LoginInfo defaultValues() {
-  bool dev = true;
-  if (!dev) {
-    return LoginInfo(
-        username: "", password: "", basePath: "https://learnalist.net/api/v1");
-  }
-
+  var env = LearnalistEnv.defaultValues();
   return LoginInfo(
-      username: "iamtest1",
-      password: "test123",
-      basePath: "http://192.168.0.10:1234/api/v1");
+      username: env.username, password: env.password, basePath: env.basePath);
 }

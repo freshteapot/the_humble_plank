@@ -244,7 +244,7 @@ class UserApi {
   ///  with HTTP info returned
   ///
   /// Register a new user with username and password
-  Future<Response> registerUserWithUsernameAndPasswordWithHttpInfo(HttpUserRegisterInput httpUserRegisterInput) async {
+  Future<Response> registerUserWithUsernameAndPasswordWithHttpInfo(HttpUserRegisterInput httpUserRegisterInput, { String xUserRegister }) async {
     Object postBody = httpUserRegisterInput;
 
     // verify required params are set
@@ -259,6 +259,7 @@ class UserApi {
     List<QueryParam> queryParams = [];
     Map<String, String> headerParams = {};
     Map<String, String> formParams = {};
+    headerParams["x-user-register"] = xUserRegister;
 
     List<String> contentTypes = ["application/json"];
 
@@ -288,8 +289,8 @@ class UserApi {
   /// 
   ///
   /// Register a new user with username and password
-  Future<HttpUserRegisterResponse> registerUserWithUsernameAndPassword(HttpUserRegisterInput httpUserRegisterInput) async {
-    Response response = await registerUserWithUsernameAndPasswordWithHttpInfo(httpUserRegisterInput);
+  Future<HttpUserRegisterResponse> registerUserWithUsernameAndPassword(HttpUserRegisterInput httpUserRegisterInput, { String xUserRegister }) async {
+    Response response = await registerUserWithUsernameAndPasswordWithHttpInfo(httpUserRegisterInput,  xUserRegister: xUserRegister );
     if(response.statusCode >= 400) {
       throw ApiException(response.statusCode, _decodeBodyBytes(response));
     } else if(response.body != null) {

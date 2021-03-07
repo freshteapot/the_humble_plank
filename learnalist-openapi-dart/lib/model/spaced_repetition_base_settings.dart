@@ -7,11 +7,13 @@ class SpacedRepetitionBaseSettings {
   DateTime whenNext = null;
   /* Set to UTC */
   DateTime created = null;
+  /* Usually a reference to something meaningful to the creator of it */
+  String extId = null;
   SpacedRepetitionBaseSettings();
 
   @override
   String toString() {
-    return 'SpacedRepetitionBaseSettings[level=$level, whenNext=$whenNext, created=$created, ]';
+    return 'SpacedRepetitionBaseSettings[level=$level, whenNext=$whenNext, created=$created, extId=$extId, ]';
   }
 
   SpacedRepetitionBaseSettings.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class SpacedRepetitionBaseSettings {
     created = (json['created'] == null) ?
       null :
       DateTime.parse(json['created']);
+    extId = json['ext_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -33,6 +36,8 @@ class SpacedRepetitionBaseSettings {
       json['when_next'] = whenNext == null ? null : whenNext.toUtc().toIso8601String();
     if (created != null)
       json['created'] = created == null ? null : created.toUtc().toIso8601String();
+    if (extId != null)
+      json['ext_id'] = extId;
     return json;
   }
 

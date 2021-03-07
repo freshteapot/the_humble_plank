@@ -72,6 +72,7 @@ Class | Method | HTTP request | Description
 *AListApi* | [**getListByUuid**](doc//AListApi.md#getlistbyuuid) | **GET** /alist/{uuid} | 
 *AListApi* | [**getListsByMe**](doc//AListApi.md#getlistsbyme) | **GET** /alist/by/me | 
 *AListApi* | [**updateListByUuid**](doc//AListApi.md#updatelistbyuuid) | **PUT** /alist/{uuid} | 
+*AppSettingsApi* | [**setRemindV1**](doc//AppSettingsApi.md#setremindv1) | **PUT** /app-settings/remind_v1 | 
 *AssetApi* | [**addUserAsset**](doc//AssetApi.md#adduserasset) | **POST** /assets/upload | 
 *AssetApi* | [**deleteAsset**](doc//AssetApi.md#deleteasset) | **DELETE** /assets/{uuid} | 
 *AssetApi* | [**getAsset**](doc//AssetApi.md#getasset) | **GET** /assets/{uuid} | 
@@ -87,10 +88,16 @@ Class | Method | HTTP request | Description
 *PlankApi* | [**addPlankEntry**](doc//PlankApi.md#addplankentry) | **POST** /plank/ | 
 *PlankApi* | [**deletePlankEntry**](doc//PlankApi.md#deleteplankentry) | **DELETE** /plank/{uuid} | 
 *PlankApi* | [**getPlankHistoryByUser**](doc//PlankApi.md#getplankhistorybyuser) | **GET** /plank/history | 
+*RemindApi* | [**deleteRemindDailySettingsByAppIdentifier**](doc//RemindApi.md#deletereminddailysettingsbyappidentifier) | **DELETE** /remind/daily/{app_identifier} | 
+*RemindApi* | [**getRemindDailySettingsByAppIdentifier**](doc//RemindApi.md#getreminddailysettingsbyappidentifier) | **GET** /remind/daily/{app_identifier} | 
+*RemindApi* | [**setRemindDailySetting**](doc//RemindApi.md#setreminddailysetting) | **PUT** /remind/daily/ | 
 *SpacedRepetitionApi* | [**addSpacedRepetitionEntry**](doc//SpacedRepetitionApi.md#addspacedrepetitionentry) | **POST** /spaced-repetition/ | 
 *SpacedRepetitionApi* | [**deleteSpacedRepetitionEntry**](doc//SpacedRepetitionApi.md#deletespacedrepetitionentry) | **DELETE** /spaced-repetition/{uuid} | 
 *SpacedRepetitionApi* | [**getNextSpacedRepetitionEntry**](doc//SpacedRepetitionApi.md#getnextspacedrepetitionentry) | **GET** /spaced-repetition/next | 
 *SpacedRepetitionApi* | [**getSpacedRepetitionEntries**](doc//SpacedRepetitionApi.md#getspacedrepetitionentries) | **GET** /spaced-repetition/all | 
+*SpacedRepetitionApi* | [**spacedRepetitionAddListToOvertime**](doc//SpacedRepetitionApi.md#spacedrepetitionaddlisttoovertime) | **POST** /spaced-repetition/overtime | 
+*SpacedRepetitionApi* | [**spacedRepetitionOvertimeIsActive**](doc//SpacedRepetitionApi.md#spacedrepetitionovertimeisactive) | **GET** /spaced-repetition/overtime/active/{uuid} | 
+*SpacedRepetitionApi* | [**spacedRepetitionRemoveListFromOvertime**](doc//SpacedRepetitionApi.md#spacedrepetitionremovelistfromovertime) | **DELETE** /spaced-repetition/overtime | 
 *SpacedRepetitionApi* | [**updateSpacedRepetitionEntry**](doc//SpacedRepetitionApi.md#updatespacedrepetitionentry) | **POST** /spaced-repetition/viewed | 
 *UserApi* | [**deleteUser**](doc//UserApi.md#deleteuser) | **DELETE** /user/{uuid} | 
 *UserApi* | [**loginWithIdpIdToken**](doc//UserApi.md#loginwithidpidtoken) | **POST** /user/login/idp | 
@@ -111,6 +118,8 @@ Class | Method | HTTP request | Description
  - [AlistInteract](doc//AlistInteract.md)
  - [AlistItemV2](doc//AlistItemV2.md)
  - [AnyType](doc//AnyType.md)
+ - [AppSettingsRemindV1](doc//AppSettingsRemindV1.md)
+ - [AppSettingsRemindV1SpacedRepetition](doc//AppSettingsRemindV1SpacedRepetition.md)
  - [ChallengeInfo](doc//ChallengeInfo.md)
  - [ChallengeInfoAllOf](doc//ChallengeInfoAllOf.md)
  - [ChallengeInfoAllOfUsers](doc//ChallengeInfoAllOfUsers.md)
@@ -132,13 +141,24 @@ Class | Method | HTTP request | Description
  - [HttpUserRegisterInput](doc//HttpUserRegisterInput.md)
  - [HttpUserRegisterResponse](doc//HttpUserRegisterResponse.md)
  - [Kind](doc//Kind.md)
+ - [MobileDeviceInfo](doc//MobileDeviceInfo.md)
+ - [MobileDeviceInfoAllOf](doc//MobileDeviceInfoAllOf.md)
+ - [MobilePlankAppV1Settings](doc//MobilePlankAppV1Settings.md)
  - [Plank](doc//Plank.md)
+ - [RemindDailySettings](doc//RemindDailySettings.md)
+ - [RemindMedium](doc//RemindMedium.md)
  - [SpacedRepetitionBase](doc//SpacedRepetitionBase.md)
  - [SpacedRepetitionBaseNew](doc//SpacedRepetitionBaseNew.md)
  - [SpacedRepetitionBaseSettings](doc//SpacedRepetitionBaseSettings.md)
  - [SpacedRepetitionBaseSettingsShow](doc//SpacedRepetitionBaseSettingsShow.md)
  - [SpacedRepetitionDataV2](doc//SpacedRepetitionDataV2.md)
  - [SpacedRepetitionEntryViewed](doc//SpacedRepetitionEntryViewed.md)
+ - [SpacedRepetitionOvertimeInfo](doc//SpacedRepetitionOvertimeInfo.md)
+ - [SpacedRepetitionOvertimeInputBase](doc//SpacedRepetitionOvertimeInputBase.md)
+ - [SpacedRepetitionOvertimeInputV1](doc//SpacedRepetitionOvertimeInputV1.md)
+ - [SpacedRepetitionOvertimeInputV2](doc//SpacedRepetitionOvertimeInputV2.md)
+ - [SpacedRepetitionOvertimeInputV2AllOf](doc//SpacedRepetitionOvertimeInputV2AllOf.md)
+ - [SpacedRepetitionOvertimeInputV2AllOfSettings](doc//SpacedRepetitionOvertimeInputV2AllOfSettings.md)
  - [SpacedRepetitionSettingsV2](doc//SpacedRepetitionSettingsV2.md)
  - [SpacedRepetitionV1](doc//SpacedRepetitionV1.md)
  - [SpacedRepetitionV1New](doc//SpacedRepetitionV1New.md)

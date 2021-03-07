@@ -59,6 +59,10 @@ class ApiClient {
           return AlistItemV2.fromJson(value);
         case 'AnyType':
           return AnyType.fromJson(value);
+        case 'AppSettingsRemindV1':
+          return AppSettingsRemindV1.fromJson(value);
+        case 'AppSettingsRemindV1SpacedRepetition':
+          return AppSettingsRemindV1SpacedRepetition.fromJson(value);
         case 'ChallengeInfo':
           return ChallengeInfo.fromJson(value);
         case 'ChallengeInfoAllOf':
@@ -101,8 +105,18 @@ class ApiClient {
           return HttpUserRegisterResponse.fromJson(value);
         case 'Kind':
           return Kind.fromJson(value);
+        case 'MobileDeviceInfo':
+          return MobileDeviceInfo.fromJson(value);
+        case 'MobileDeviceInfoAllOf':
+          return MobileDeviceInfoAllOf.fromJson(value);
+        case 'MobilePlankAppV1Settings':
+          return MobilePlankAppV1Settings.fromJson(value);
         case 'Plank':
           return Plank.fromJson(value);
+        case 'RemindDailySettings':
+          return RemindDailySettings.fromJson(value);
+        case 'RemindMedium':
+          return new RemindMediumTypeTransformer().decode(value);
         case 'SpacedRepetitionBase':
           return SpacedRepetitionBase.fromJson(value);
         case 'SpacedRepetitionBaseNew':
@@ -115,6 +129,18 @@ class ApiClient {
           return SpacedRepetitionDataV2.fromJson(value);
         case 'SpacedRepetitionEntryViewed':
           return SpacedRepetitionEntryViewed.fromJson(value);
+        case 'SpacedRepetitionOvertimeInfo':
+          return SpacedRepetitionOvertimeInfo.fromJson(value);
+        case 'SpacedRepetitionOvertimeInputBase':
+          return SpacedRepetitionOvertimeInputBase.fromJson(value);
+        case 'SpacedRepetitionOvertimeInputV1':
+          return SpacedRepetitionOvertimeInputV1.fromJson(value);
+        case 'SpacedRepetitionOvertimeInputV2':
+          return SpacedRepetitionOvertimeInputV2.fromJson(value);
+        case 'SpacedRepetitionOvertimeInputV2AllOf':
+          return SpacedRepetitionOvertimeInputV2AllOf.fromJson(value);
+        case 'SpacedRepetitionOvertimeInputV2AllOfSettings':
+          return SpacedRepetitionOvertimeInputV2AllOfSettings.fromJson(value);
         case 'SpacedRepetitionSettingsV2':
           return SpacedRepetitionSettingsV2.fromJson(value);
         case 'SpacedRepetitionV1':

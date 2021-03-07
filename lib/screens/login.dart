@@ -227,6 +227,30 @@ class LoginFormState extends State<LoginForm> {
                   ),
                 ],
               )),
+          Container(
+              margin: const EdgeInsets.only(top: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FlatButton(
+                    focusNode: _submitFocus,
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                    disabledColor: Colors.grey,
+                    disabledTextColor: Colors.black,
+                    padding: EdgeInsets.all(8.0),
+                    splashColor: Colors.blueAccent,
+                    onPressed: () async {
+                      await context.read<PlankModel>().loginWithApple();
+                      _redirectAfterLogin(context);
+                    },
+                    child: Text(
+                      "Login with apple",
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                  ),
+                ],
+              )),
         ],
       ),
     );

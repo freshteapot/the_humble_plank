@@ -12,7 +12,7 @@ class LearnalistEnv {
   });
 
   factory LearnalistEnv.defaultValues() {
-    bool dev = true;
+    bool dev = false;
     if (!dev) {
       return LearnalistEnv(
           username: "",

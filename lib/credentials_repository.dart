@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 const CredentialsLoginTypeGoogle = "google";
+const CredentialsLoginTypeApple = "apple";
 const CredentialsLoginTypeUsername = "username";
 const CredentialsLoginTypeNone = "na";
 
@@ -14,14 +15,17 @@ class Credentials {
   String serverBasePath;
 
   GoogleSignInAccount idpGoogle;
+  String idpApple;
   String loginType;
 
   bool idpGoogleEnabled() => loginType == CredentialsLoginTypeGoogle;
+  bool idpAppleEnabled() => loginType == CredentialsLoginTypeApple;
 
   Credentials()
       : login = HttpUserLoginResponse(),
         serverBasePath = "",
         idpGoogle = null,
+        idpApple = "",
         loginType = CredentialsLoginTypeNone;
 
   factory Credentials.defaultValues() {
@@ -31,6 +35,7 @@ class Credentials {
     _credentials.serverBasePath = "";
     _credentials.loginType = CredentialsLoginTypeNone;
     _credentials.idpGoogle = null;
+    _credentials.idpApple = "";
     return _credentials;
   }
 }
@@ -82,6 +87,9 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     ok = await prefs.setString("login_type", newCredentials.loginType);
     print("Saving login_type $ok");
 
+    ok = await prefs.setString("idp_apple", newCredentials.idpApple);
+    print("Savign idp:apple info $ok");
+
     this
         .apiClient
         .getAuthentication<HttpBearerAuth>('bearerAuth')
@@ -121,6 +129,10 @@ class RemoteCredentialsRepository implements CredentialsRepository {
       credentials.loginType = prefs.getString("login_type");
     }
 
+    if (credentials.loginType == CredentialsLoginTypeApple) {
+      credentials.idpApple = prefs.getString("idp_apple");
+    }
+
     apiClient.basePath = credentials.serverBasePath;
 
     apiClient
@@ -137,9 +149,23 @@ class RemoteCredentialsRepository implements CredentialsRepository {
   }
 
   bool isLoggedIn() {
-    if (_credentials.idpGoogle != null) {
-      return true;
+    switch (_credentials.loginType) {
+      case CredentialsLoginTypeGoogle:
+        break;
+      case CredentialsLoginTypeApple:
+        break;
+      case CredentialsLoginTypeUsername:
+        break;
+      case CredentialsLoginTypeNone:
+        return false;
+      default:
+        return false;
     }
+
+    // TODO check for idpApple
+    //if (_credentials.idpGoogle != null) {
+    //  return true;
+    //}
 
     return _credentials.login.token != "" ? true : false;
   }
@@ -161,5 +187,13 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     print("idToken: ${a.idToken}");
     print("accessToken: ${a.accessToken}");
     print("serverAuthCode: ${a.serverAuthCode}");
+  }
+
+  Future<void> _debugApple() async {
+    if (_credentials.idpApple == "") {
+      return;
+    }
+    print("Not sure what I want to do here");
+    print(_credentials.idpApple);
   }
 }

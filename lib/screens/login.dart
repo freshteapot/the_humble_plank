@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flushbar/flushbar.dart';
 
 import 'package:openapi/api.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:thehumbleplank/env.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
@@ -43,6 +44,7 @@ class LoginFormState extends State<LoginForm> {
   FocusNode _submitFocus;
   HttpUserLoginRequest _loginInput = HttpUserLoginRequest();
   String _serverBasePath;
+  bool _showLoginWithApple = false;
 
   @override
   void initState() {
@@ -50,6 +52,9 @@ class LoginFormState extends State<LoginForm> {
     _usernameFocus = FocusNode();
     _passwordFocus = FocusNode();
     _submitFocus = FocusNode();
+    SignInWithApple.isAvailable().then((available) => setState(() {
+          _showLoginWithApple = available;
+        }));
   }
 
   @override
@@ -227,33 +232,37 @@ class LoginFormState extends State<LoginForm> {
                   ),
                 ],
               )),
-          Container(
-              margin: const EdgeInsets.only(top: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  FlatButton(
-                    focusNode: _submitFocus,
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    disabledColor: Colors.grey,
-                    disabledTextColor: Colors.black,
-                    padding: EdgeInsets.all(8.0),
-                    splashColor: Colors.blueAccent,
-                    onPressed: () async {
-                      await context.read<PlankModel>().loginWithApple();
-                      _redirectAfterLogin(context);
-                    },
-                    child: Text(
-                      "Login with apple",
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                  ),
-                ],
-              )),
+          if (_showLoginWithApple) ...[loginWithApple()]
         ],
       ),
     );
+  }
+
+  Widget loginWithApple() {
+    return Container(
+        margin: const EdgeInsets.only(top: 20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            FlatButton(
+              focusNode: _submitFocus,
+              color: Colors.blue,
+              textColor: Colors.white,
+              disabledColor: Colors.grey,
+              disabledTextColor: Colors.black,
+              padding: EdgeInsets.all(8.0),
+              splashColor: Colors.blueAccent,
+              onPressed: () async {
+                await context.read<PlankModel>().loginWithApple();
+                _redirectAfterLogin(context);
+              },
+              child: Text(
+                "Login with apple",
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ),
+          ],
+        ));
   }
 }
 

@@ -24,9 +24,7 @@ import 'package:thehumbleplank/notifications.dart';
 LearnalistEnv learnalistEnv = LearnalistEnv.defaultValues();
 
 GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: <String>[
-    'email', // TODO remove this scope
-  ],
+  scopes: <String>[],
 );
 
 class PlankModel extends ChangeNotifier {
@@ -157,8 +155,6 @@ class PlankModel extends ChangeNotifier {
     }
 
     if (_credentials.idpAppleEnabled()) {
-      // This gets reloaded needs protection
-      // The listener will update credentials.idpGoogle
       await _bootstrapAppleSignIn();
     }
 
@@ -375,10 +371,6 @@ class PlankModel extends ChangeNotifier {
   }
 
   Future<void> loadChallenges() async {
-    //_challenges = [
-    //  Challenge(uuid: "fake-123", description: "Daily plank"),
-    //  Challenge(uuid: "fake-456", description: "Group plank"),
-    //];
     if (!_loggedIn) {
       return;
     }
@@ -445,7 +437,7 @@ class PlankModel extends ChangeNotifier {
     _notifyListeners();
   }
 
-// Handle when  the notification is challenge:updated
+  // Handle when  the notification is challenge:updated
   // Get challenge
   // Set challenge
   // Update index for the screen
@@ -483,8 +475,6 @@ class PlankModel extends ChangeNotifier {
       _notifyListeners();
       return;
     }
-
-    print("idp:google Trying to login");
 
     HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
 
@@ -528,20 +518,6 @@ class PlankModel extends ChangeNotifier {
   }
 
   Future<void> _handleAppleSignIn(AuthorizationCredentialAppleID auth) async {
-    // Come back to
-
-    //if (_credentials.idpApple == "") {
-    //  _loggedIn = false;
-    //  _bootstrapLogin = false;
-    //  _notifyListeners();
-    //  return;
-    //}
-
-    print("idp:apple Trying to login");
-    print("userIdentifier ${auth.userIdentifier}");
-    print(auth.identityToken);
-    print(auth.authorizationCode);
-
     HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
 
     input.idp = CredentialsLoginTypeApple;
@@ -574,7 +550,6 @@ class PlankModel extends ChangeNotifier {
       _notifyListeners();
     } catch (error) {
       _skipNotification = false;
-      // We could unset first
       var newCredentials = Credentials.defaultValues();
       await credentialsRepo.saveCredentials(
           newCredentials, learnalistEnv.basePath);
@@ -664,19 +639,7 @@ class PlankModel extends ChangeNotifier {
 
   Future<void> loginWithApple() async {
     try {
-      print("TODO");
-      //_handleAppleSignIn()
       _skipNotification = true;
-
-      //final a = await SignInWithApple.getCredentialState(
-      //    "000948.758b71a4b8b7466fb8d1a7f0daff1141.2208");
-      //print("getCredentialState $a");
-      //if (a == CredentialState.authorized) {
-      //  print("Still logged in");
-      //  return;
-      //}
-
-      // SignInWithApple.getCredentialState(userIdentifier)
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [],
       );
@@ -697,13 +660,11 @@ class PlankModel extends ChangeNotifier {
 
   Future<void> _bootstrapAppleSignIn() async {
     if (!_credentials.idpAppleEnabled()) {
-      print("idp:apple not enabled");
       return;
     }
 
     final state =
         await SignInWithApple.getCredentialState(_credentials.idpApple);
-    print("getCredentialState $state");
     if (state != CredentialState.authorized) {
       await credentialsRepo.unloadCredentials();
       await _loadCredentials();

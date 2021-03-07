@@ -208,7 +208,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **registerUserWithUsernameAndPassword**
-> HttpUserRegisterResponse registerUserWithUsernameAndPassword(httpUserRegisterInput)
+> HttpUserRegisterResponse registerUserWithUsernameAndPassword(httpUserRegisterInput, xUserRegister)
 
 
 
@@ -229,9 +229,10 @@ import 'package:openapi/api.dart';
 
 var api_instance = UserApi();
 var httpUserRegisterInput = HttpUserRegisterInput(); // HttpUserRegisterInput | Username and password
+var xUserRegister = xUserRegister_example; // String | Restrict access to this endpoint, if you add the header and it matches the key, you are in.
 
 try { 
-    var result = api_instance.registerUserWithUsernameAndPassword(httpUserRegisterInput);
+    var result = api_instance.registerUserWithUsernameAndPassword(httpUserRegisterInput, xUserRegister);
     print(result);
 } catch (e) {
     print("Exception when calling UserApi->registerUserWithUsernameAndPassword: $e\n");
@@ -243,6 +244,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **httpUserRegisterInput** | [**HttpUserRegisterInput**](HttpUserRegisterInput.md)| Username and password | 
+ **xUserRegister** | **String**| Restrict access to this endpoint, if you add the header and it matches the key, you are in. | [optional] [default to null]
 
 ### Return type
 

@@ -5,7 +5,7 @@ class HttpMobileRegisterInput {
   String token = "";
   /* A unique identifier to allow the system to link a user with an app and use the correct token. */
   String appIdentifier = "";
-  //enum appIdentifierEnum {  plank:v1,  remind:v1,  };{
+  //enum appIdentifierEnum {  plank_v1,  remind_v1,  };{
   HttpMobileRegisterInput();
 
   @override

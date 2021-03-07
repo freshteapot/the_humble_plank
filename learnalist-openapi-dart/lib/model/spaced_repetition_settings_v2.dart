@@ -9,11 +9,13 @@ class SpacedRepetitionSettingsV2 {
   DateTime whenNext = null;
   /* Set to UTC */
   DateTime created = null;
+  /* Usually a reference to something meaningful to the creator of it */
+  String extId = null;
   SpacedRepetitionSettingsV2();
 
   @override
   String toString() {
-    return 'SpacedRepetitionSettingsV2[show_=$show_, level=$level, whenNext=$whenNext, created=$created, ]';
+    return 'SpacedRepetitionSettingsV2[show_=$show_, level=$level, whenNext=$whenNext, created=$created, extId=$extId, ]';
   }
 
   SpacedRepetitionSettingsV2.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class SpacedRepetitionSettingsV2 {
     created = (json['created'] == null) ?
       null :
       DateTime.parse(json['created']);
+    extId = json['ext_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -38,6 +41,8 @@ class SpacedRepetitionSettingsV2 {
       json['when_next'] = whenNext == null ? null : whenNext.toUtc().toIso8601String();
     if (created != null)
       json['created'] = created == null ? null : created.toUtc().toIso8601String();
+    if (extId != null)
+      json['ext_id'] = extId;
     return json;
   }
 

@@ -6,20 +6,20 @@ class HttpUserLoginIDPInput {
   //enum idpEnum {  google,  };{
   /* We will verify this to confirm your identity and create an account linked to your id. */
   String idToken = null;
-  /* We might use this to lookup your basic info. */
-  String accessToken = null;
+  /* Code from the server, part of a possible handshake */
+  String code = null;
   HttpUserLoginIDPInput();
 
   @override
   String toString() {
-    return 'HttpUserLoginIDPInput[idp=$idp, idToken=$idToken, accessToken=$accessToken, ]';
+    return 'HttpUserLoginIDPInput[idp=$idp, idToken=$idToken, code=$code, ]';
   }
 
   HttpUserLoginIDPInput.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
     idp = json['idp'];
     idToken = json['id_token'];
-    accessToken = json['access_token'];
+    code = json['code'];
   }
 
   Map<String, dynamic> toJson() {
@@ -28,8 +28,8 @@ class HttpUserLoginIDPInput {
       json['idp'] = idp;
     if (idToken != null)
       json['id_token'] = idToken;
-    if (accessToken != null)
-      json['access_token'] = accessToken;
+    if (code != null)
+      json['code'] = code;
     return json;
   }
 

@@ -40,6 +40,8 @@ String parameterToString(dynamic value) {
     return value.toUtc().toIso8601String();
   } else if (value is ChallengeKind) {
     return ChallengeKindTypeTransformer().encode(value).toString();
+  } else if (value is RemindMedium) {
+    return RemindMediumTypeTransformer().encode(value).toString();
   } else {
     return value.toString();
   }

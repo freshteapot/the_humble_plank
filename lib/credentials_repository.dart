@@ -162,11 +162,6 @@ class RemoteCredentialsRepository implements CredentialsRepository {
         return false;
     }
 
-    // TODO check for idpApple
-    //if (_credentials.idpGoogle != null) {
-    //  return true;
-    //}
-
     return _credentials.login.token != "" ? true : false;
   }
 
@@ -187,13 +182,5 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     print("idToken: ${a.idToken}");
     print("accessToken: ${a.accessToken}");
     print("serverAuthCode: ${a.serverAuthCode}");
-  }
-
-  Future<void> _debugApple() async {
-    if (_credentials.idpApple == "") {
-      return;
-    }
-    print("Not sure what I want to do here");
-    print(_credentials.idpApple);
   }
 }

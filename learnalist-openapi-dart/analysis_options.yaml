@@ -1,4 +1,6 @@
 analyzer:
+  exclude:
+    - "**/*.dart"
   errors:
     todo: ignore
     unused_local_variable: ignore

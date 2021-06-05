@@ -214,6 +214,7 @@ class PlankModel extends ChangeNotifier {
     }
 
     try {
+      // TODO is it possible to get the challenge from here? I dont think so.
       var loadedEntries = await repository.history();
       _history = loadedEntries;
       _notifyListeners();

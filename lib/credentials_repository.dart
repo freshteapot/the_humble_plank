@@ -88,7 +88,7 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     print("Saving login_type $ok");
 
     ok = await prefs.setString("idp_apple", newCredentials.idpApple);
-    print("Savign idp:apple info $ok");
+    print("Saving idp:apple info $ok");
 
     this
         .apiClient

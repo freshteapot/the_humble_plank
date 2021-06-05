@@ -7,9 +7,9 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'package:openapi/api.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:thehumbleplank/credentials_repository.dart';
 import 'package:thehumbleplank/env.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';

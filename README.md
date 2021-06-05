@@ -141,6 +141,13 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v
 
 
 
+#
+> error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
+
+```
+cd ios
+pod install
+```
 
 
 

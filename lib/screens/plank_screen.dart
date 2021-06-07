@@ -7,7 +7,6 @@ import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
-import 'package:thehumbleplank/widget/plank_screen_call_to_action.dart';
 
 class PlankScreen extends StatefulWidget {
   int intervalTime;
@@ -120,51 +119,26 @@ class _PlankScreenState extends State<PlankScreen> {
 
                         if (hasChallenge) ...[
                           Dismissible(
-                            // Each Dismissible must contain a Key. Keys allow Flutter to
-                            // uniquely identify widgets.
-                            key: Key("fake"),
-                            // Provide a function that tells the app
-                            // what to do after an item has been swiped away.
-                            onDismissed: (direction) {
-                              // Remove the item from the data source.
-                              context
-                                  .read<PlankModel>()
-                                  .setChallenge(Challenge.empty());
-                            },
-                            direction: DismissDirection.endToStart,
-
-                            background: Container(color: Colors.red),
-                            child: ListTile(
-                                title: Container(
-                                    alignment: Alignment.center,
-                                    child: GestureDetector(
-                                        onTap: () async {
-                                          await showModalBottomSheet(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return WillPopScope(
-                                                    onWillPop: () async {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      return false;
-                                                    },
-                                                    child: Container(
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height /
-                                                            2.0,
-                                                        child: plankScreenCallToAction(
-                                                            context,
-                                                            widget
-                                                                .currentChallenge)));
-                                              });
-                                        },
-                                        child: Text(
-                                          widget.currentChallenge.description,
-                                          style: TextStyle(color: Colors.black),
-                                        )))),
-                          ),
+                              // Each Dismissible must contain a Key. Keys allow Flutter to
+                              // uniquely identify widgets.
+                              key: Key("fake"),
+                              // Provide a function that tells the app
+                              // what to do after an item has been swiped away.
+                              onDismissed: (direction) {
+                                // Remove the item from the data source.
+                                context
+                                    .read<PlankModel>()
+                                    .setChallenge(Challenge.empty());
+                              },
+                              direction: DismissDirection.endToStart,
+                              background: Container(color: Colors.red),
+                              child: ListTile(
+                                  title: Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        widget.currentChallenge.description,
+                                        style: TextStyle(color: Colors.black),
+                                      )))),
                         ],
                       ],
                     ),
@@ -183,22 +157,12 @@ class _PlankScreenState extends State<PlankScreen> {
                         await showModalBottomSheet(
                             context: context,
                             builder: (BuildContext context) {
-                              return WillPopScope(
-                                  onWillPop: () async {
-                                    await context
-                                        .read<PlankModel>()
-                                        .setChallenge(Challenge.empty());
-                                    Navigator.of(context).pop();
-                                    return false;
-                                  },
-                                  child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              2.0,
-                                      child: _challengesView(
-                                          context, widget.challenges)));
+                              return Container(
+                                  height:
+                                      MediaQuery.of(context).size.height / 2.0,
+                                  child: _challengesView(
+                                      context, widget.challenges));
                             });
-                        //
                       },
                       child: Text(
                         "Pick a Challenge",
@@ -254,8 +218,6 @@ class _PlankScreenState extends State<PlankScreen> {
 
     beginningTime = null;
     currentTime = null;
-
-    context.read<PlankModel>().setChallenge(Challenge.empty());
 
     setState(() {
       Wakelock.disable();

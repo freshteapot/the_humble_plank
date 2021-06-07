@@ -59,6 +59,9 @@ class PlankModel extends ChangeNotifier {
   bool _showChallenge;
   bool get showChallenge => _showChallenge;
 
+  String _currentChallengeUUID;
+  String get currentChallengeUUID => _currentChallengeUUID;
+
   Challenge _challenge;
   Challenge get challenge => _challenge;
 
@@ -174,6 +177,9 @@ class PlankModel extends ChangeNotifier {
     await loadSettings();
     await loadHistory();
     await loadChallenges();
+    await loadCurrentChallenge();
+    // if currentChallengeUUID
+    // getChallengeWithHistory
   }
 
   Future<void> loadSettings() async {
@@ -181,6 +187,9 @@ class PlankModel extends ChangeNotifier {
     _intervalTime = prefs.getInt("plank.settings.intervalTime");
     _showIntervals = prefs.getBool("plank.settings.showIntervals");
     _showChallenge = prefs.getBool("plank.settings.showChallenge");
+    _currentChallengeUUID =
+        prefs.getString("plank.settings.currentChallengeUUID");
+
     _appPushNotifications =
         prefs.getBool("plank.settings.notificationsEnabled");
 
@@ -194,6 +203,10 @@ class PlankModel extends ChangeNotifier {
 
     if (_showChallenge == null) {
       _showChallenge = true;
+    }
+
+    if (_currentChallengeUUID == null) {
+      _currentChallengeUUID = "";
     }
 
     if (_appPushNotifications == null) {
@@ -299,6 +312,10 @@ class PlankModel extends ChangeNotifier {
 
   Future<void> setChallenge(Challenge newValue) async {
     _challenge = newValue;
+    _currentChallengeUUID = newValue.uuid;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        "plank.settings.currentChallengeUUID", _currentChallengeUUID);
     _notifyListeners();
   }
 
@@ -395,6 +412,19 @@ class PlankModel extends ChangeNotifier {
     return;
   }
 
+  Future<void> loadCurrentChallenge() async {
+    if (!_loggedIn) {
+      return;
+    }
+
+    if (currentChallengeUUID == "") {
+      return;
+    }
+
+    await getChallengeWithHistory(currentChallengeUUID);
+    return;
+  }
+
   Future<void> getChallengeWithHistory(String uuid) async {
     try {
       var challenge = await challengeRepo.getChallenge(uuid);
@@ -405,6 +435,7 @@ class PlankModel extends ChangeNotifier {
         records: challenge.records,
       ));
     } catch (error) {
+      // TODO possibly can error because the challenge is removed
       _lastError = error;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);

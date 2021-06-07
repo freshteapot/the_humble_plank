@@ -26,7 +26,7 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     Widget historyView;
-    double historyHeight = MediaQuery.of(context).size.height / 1.3;
+    double historyHeight = MediaQuery.of(context).size.height / 1.4;
     bool showChallenges = widget.challenges.length > 0;
     bool showChallenge = widget.currentChallenge.uuid != "";
 

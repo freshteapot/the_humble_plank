@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/notify_me.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
@@ -8,8 +9,6 @@ import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
-
-import '../utils.dart';
 
 class PlankScreen extends StatefulWidget {
   int intervalTime;
@@ -148,13 +147,8 @@ class _PlankScreenState extends State<PlankScreen> {
               if (showChallenges) ...[
                 Container(
                     alignment: Alignment.center,
-                    child: FlatButton(
-                      color: Colors.blue,
-                      textColor: Colors.white,
-                      disabledColor: Colors.grey,
-                      disabledTextColor: Colors.black,
-                      padding: EdgeInsets.all(8.0),
-                      splashColor: Colors.blueAccent,
+                    child: TextButton(
+                      style: primaryButtonStyle(),
                       onPressed: () async {
                         await showModalBottomSheet(
                             context: context,
@@ -353,13 +347,12 @@ Widget menu(BuildContext context, String state, Function onStart,
     Function onStop, Function onSave, Function onReset) {
   Widget start = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.blue,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.blueAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.green),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.green, width: 1)),
+        ),
         onPressed: () {
           onStart();
         },
@@ -371,13 +364,12 @@ Widget menu(BuildContext context, String state, Function onStart,
 
   Widget stop = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.red,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.redAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.red),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.red, width: 1)),
+        ),
         onPressed: () {
           onStop();
         },
@@ -389,31 +381,29 @@ Widget menu(BuildContext context, String state, Function onStart,
 
   Widget reset = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.red,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.redAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.red),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.red, width: 1)),
+        ),
         onPressed: () {
           onReset(context);
         },
         child: Text(
-          'Discard',
+          "Discard",
           style: TextStyle(fontSize: 20.0),
         ),
       ));
 
   Widget save = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.green,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.greenAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.green),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.green, width: 1)),
+        ),
         onPressed: () {
           onSave(context);
         },

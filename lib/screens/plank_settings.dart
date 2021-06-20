@@ -7,103 +7,102 @@ import 'package:thehumbleplank/notifications.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/screens/plank_settings_display_name.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/notify_me.dart';
 
-class PlankSettings extends StatefulWidget {
-  PlankSettings();
-
+class PlankSettings extends StatelessWidget {
   @override
-  _PlankSettingsState createState() => _PlankSettingsState();
-}
-
-class _PlankSettingsState extends State<PlankSettings> {
   Widget build(BuildContext context) {
     var showChallenge = context.watch<PlankModel>().showChallenge;
-    var pushNotificationsEnabled =
-        context.watch<PlankModel>().appPushNotifications;
 
-    return Scaffold(
-        body: Container(
-            margin: const EdgeInsets.only(left: 30.0, right: 30.0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                      child: FlatButton(
-                    color: Colors.grey,
-                    textColor: Colors.white,
-                    disabledColor: Colors.grey,
-                    disabledTextColor: Colors.black,
-                    padding: EdgeInsets.all(8.0),
-                    splashColor: Colors.blueGrey,
-                    onPressed: () async {
-                      await showModalBottomSheet(
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return SingleChildScrollView(
-                                child: Container(
-                                    padding: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                            .viewInsets
-                                            .bottom),
-                                    child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(20.0,
-                                            20.0, 20.0, 0.0), // content padding
-                                        child:
-                                            PlankSettingsDisplayNameScreen())));
-                          });
-                    },
-                    child: Text(
-                      "Change your display name",
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                  )),
-                  ...intervalWidget(context),
-                  Padding(
-                      padding: const EdgeInsets.only(
-                          top: 10, left: 0, right: 0, bottom: 10),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SwitchListTile(
-                                title: const Text('Challenge screen'),
-                                value: showChallenge,
-                                activeColor: Colors.green,
-                                onChanged: (bool value) {
-                                  setState(() {
-                                    context
-                                        .read<PlankModel>()
-                                        .setShowChallenge(value);
+    return FutureBuilder<PermissionStatus>(
+        future: Permission.notification.status,
+        builder: (context, AsyncSnapshot<PermissionStatus> snapshot) {
+          if (snapshot.hasData) {
+            PermissionStatus permission = snapshot.data;
+            return Scaffold(
+                body: Container(
+                    margin: const EdgeInsets.only(left: 30.0, right: 30.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          ListTile(
+                              title: TextButton(
+                            style: primaryButtonStyle(),
+                            onPressed: () async {
+                              await showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SingleChildScrollView(
+                                        child: Container(
+                                            padding: EdgeInsets.only(
+                                                bottom: MediaQuery.of(context)
+                                                    .viewInsets
+                                                    .bottom),
+                                            child: Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        20.0,
+                                                        20.0,
+                                                        20.0,
+                                                        0.0), // content padding
+                                                child:
+                                                    PlankSettingsDisplayNameScreen())));
                                   });
-                                })
-                          ])),
-                  SwitchListTile(
-                      title: const Text('Notifications'),
-                      value: pushNotificationsEnabled,
-                      activeColor: Colors.green,
-                      inactiveTrackColor: Colors.red,
-                      onChanged: (bool value) async {
-                        var settings = await getNotificationSettings();
-                        if (settings.authorizationStatus !=
-                            AuthorizationStatus.notDetermined) {
-                          openAppSettings();
-                          return;
-                        }
+                            },
+                            child: Text(
+                              "Change your display name",
+                              style: TextStyle(fontSize: 20.0),
+                            ),
+                          )),
+                          ...intervalWidget(context),
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 10, left: 0, right: 0, bottom: 10),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    SwitchListTile(
+                                        title: const Text('Challenge screen'),
+                                        value: showChallenge,
+                                        activeColor: Colors.green,
+                                        onChanged: (bool value) {
+                                          context
+                                              .read<PlankModel>()
+                                              .setShowChallenge(value);
+                                        })
+                                  ])),
+                          SwitchListTile(
+                              title: const Text('Notifications'),
+                              value: permission.isGranted,
+                              activeColor: Colors.green,
+                              inactiveTrackColor: Colors.red,
+                              onChanged: (bool value) async {
+                                var settings = await getNotificationSettings();
+                                if (settings.authorizationStatus !=
+                                    AuthorizationStatus.notDetermined) {
+                                  openAppSettings();
+                                  return;
+                                }
 
-                        notifyMeWhyEnable(context);
-                      }),
-                  SwitchListTile(
-                      title: const Text('Logout and clear the app'),
-                      value: false,
-                      activeColor: Colors.red,
-                      inactiveTrackColor: Colors.red,
-                      onChanged: (bool value) async {
-                        await context.read<PlankModel>().logout();
-                        Phoenix.rebirth(context);
-                      }),
-                ])));
+                                notifyMeWhyEnable(context);
+                              }),
+                          SwitchListTile(
+                              title: const Text('Logout and clear the app'),
+                              value: false,
+                              activeColor: Colors.red,
+                              inactiveTrackColor: Colors.red,
+                              onChanged: (bool value) async {
+                                await context.read<PlankModel>().logout();
+                                Phoenix.rebirth(context);
+                              }),
+                        ])));
+          } else {
+            return CircularProgressIndicator();
+          }
+        });
   }
 }
 
@@ -132,11 +131,12 @@ List<Widget> intervalWidget(BuildContext context) {
     intervalText = "${intervalTime.toInt()} seconds";
   }
 
+  print("intervalTime $intervalTime");
   return [
     SwitchListTile(
       title: const Text('Intervals'),
       value: showIntervals,
-      activeColor: Colors.grey,
+      activeColor: intervalTime > 0 ? Colors.green : Colors.grey,
       onChanged: (bool value) {
         if (!value) {
           context.read<PlankModel>().setShowIntervals(false);
@@ -159,8 +159,8 @@ List<Widget> intervalWidget(BuildContext context) {
         inactiveTrackColor: Colors.grey[200],
         activeTickMarkColor: Colors.transparent,
         inactiveTickMarkColor: Colors.transparent,
-        activeTrackColor: Colors.grey,
-        thumbColor: Colors.grey,
+        activeTrackColor: intervalTime > 0 ? Colors.green : Colors.grey,
+        thumbColor: intervalTime > 0 ? Colors.green : Colors.grey,
         overlayColor: Colors.transparent,
         thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
         overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0),

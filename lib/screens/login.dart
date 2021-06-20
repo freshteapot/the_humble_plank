@@ -10,6 +10,7 @@ import 'package:openapi/api.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:thehumbleplank/env.dart';
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/topbar.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -50,7 +51,7 @@ class LoginScreen extends StatelessWidget {
 
     return Container(
         margin: const EdgeInsets.only(top: 20.0),
-        child: OutlinedButton(
+        child: TextButton(
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all(Colors.black38),
               shape: MaterialStateProperty.all<OutlinedBorder>(
@@ -87,7 +88,7 @@ class LoginScreen extends StatelessWidget {
 
     return Container(
         margin: const EdgeInsets.only(top: 20.0),
-        child: OutlinedButton(
+        child: TextButton(
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all(Colors.black),
               shape: MaterialStateProperty.all<OutlinedBorder>(
@@ -276,11 +277,7 @@ class LoginFormState extends State<LoginForm> {
                 children: <Widget>[
                   TextButton(
                     focusNode: _submitFocus,
-                    style: ButtonStyle(
-                        foregroundColor:
-                            MaterialStateProperty.all(Colors.white),
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue)),
+                    style: primaryButtonStyle(),
                     onPressed: () {
                       validateform(context);
                     },

@@ -4,7 +4,24 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/utils.dart';
+
+ButtonStyle _cancelActionButtonStyle() {
+  return primaryButtonStyle().copyWith(
+    foregroundColor: MaterialStateProperty.all(Colors.red),
+    side: MaterialStateProperty.all<BorderSide>(
+        BorderSide(color: Colors.red, width: 1)),
+  );
+}
+
+ButtonStyle _doActionButtonStyle() {
+  return primaryButtonStyle().copyWith(
+    foregroundColor: MaterialStateProperty.all(Colors.green),
+    side: MaterialStateProperty.all<BorderSide>(
+        BorderSide(color: Colors.green, width: 1)),
+  );
+}
 
 Future<String> notifyMeBecauseICreatedAChallenge(BuildContext context) async {
   final String title = "Challenge setup";
@@ -15,6 +32,7 @@ Future<String> notifyMeBecauseICreatedAChallenge(BuildContext context) async {
   // set up the buttons
   Widget noButton = TextButton(
     child: Text("Not now"),
+    style: _cancelActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -24,6 +42,7 @@ Future<String> notifyMeBecauseICreatedAChallenge(BuildContext context) async {
 
   Widget yesButton = TextButton(
     child: Text("Yes"),
+    style: _doActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -54,6 +73,7 @@ Future<String> notifyMeBecauseIJoinedAChallenge(BuildContext context) async {
   // set up the buttons
   Widget noButton = TextButton(
     child: Text("Not now"),
+    style: _cancelActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -63,6 +83,7 @@ Future<String> notifyMeBecauseIJoinedAChallenge(BuildContext context) async {
 
   Widget yesButton = TextButton(
     child: Text("Yes"),
+    style: _doActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -94,6 +115,7 @@ Future<String> notifyMeBecauseIHaveAddedToAChallenge(
   // set up the buttons
   Widget noButton = TextButton(
     child: Text("Not now"),
+    style: _cancelActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -103,6 +125,7 @@ Future<String> notifyMeBecauseIHaveAddedToAChallenge(
 
   Widget yesButton = TextButton(
     child: Text("Yes"),
+    style: _doActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -132,6 +155,7 @@ Future<String> notifyMeBecauseIHaveChallenges(BuildContext context) async {
   // set up the buttons
   Widget noButton = TextButton(
     child: Text("Not now"),
+    style: _cancelActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -141,6 +165,7 @@ Future<String> notifyMeBecauseIHaveChallenges(BuildContext context) async {
 
   Widget yesButton = TextButton(
     child: Text("Yes"),
+    style: _doActionButtonStyle(),
     onPressed: () async {
       await context.read<PlankModel>().setShownChallengeNotification(true);
       Navigator.of(context).pop();
@@ -170,6 +195,7 @@ Future<String> notifyMeWhyEnable(BuildContext context) async {
   String pressed = "-1";
   Widget cancelButton = TextButton(
     child: Text("No"),
+    style: _cancelActionButtonStyle(),
     onPressed: () async {
       Navigator.of(context).pop();
       pressed = "0";
@@ -178,6 +204,7 @@ Future<String> notifyMeWhyEnable(BuildContext context) async {
 
   Widget yesButton = TextButton(
     child: Text("Enable"),
+    style: _doActionButtonStyle(),
     onPressed: () async {
       Navigator.of(context).pop();
 

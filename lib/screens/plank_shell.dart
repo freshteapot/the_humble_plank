@@ -33,8 +33,8 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     Challenge challenge = context.read<PlankModel>().challenge;
     bool showChallenge = context.read<PlankModel>().showChallenge;
 
-    bool showChallengeNotification =
-        context.read<PlankModel>().showChallengeNotification;
+    bool challengeNotificationShown =
+        context.read<PlankModel>().challengeNotificationShown;
     bool appPushNotificationsShown =
         context.read<PlankModel>().appPushNotificationsShown;
 
@@ -43,7 +43,7 @@ initState
 
 challenge=${challenge.toJson()}
 showChallenge=$showChallenge
-showChallengeNotification=$showChallengeNotification
+challengeNotificationShown=$challengeNotificationShown
 appPushNotificationsShown=$appPushNotificationsShown
     """);
     loaded = 1;
@@ -101,8 +101,8 @@ appPushNotificationsShown=$appPushNotificationsShown
     Challenge challenge = context.select((PlankModel model) => model.challenge);
     bool showChallenge =
         context.select((PlankModel model) => model.showChallenge);
-    bool showChallengeNotification =
-        context.select((PlankModel model) => model.showChallengeNotification);
+    bool challengeNotificationShown =
+        context.select((PlankModel model) => model.challengeNotificationShown);
 
     bool showIntervals =
         context.select((PlankModel model) => model.showIntervals);
@@ -126,7 +126,7 @@ appPushNotificationsShown=$appPushNotificationsShown
 loggedIn=$loggedIn
 challenge=${challenge.toJson()}
 showChallenge=$showChallenge
-showChallengeNotification=$showChallengeNotification
+challengeNotificationShown=$challengeNotificationShown
 showIntervals=$showIntervals
 intervalTime=$intervalTime
 challenges=${challenges.length}
@@ -143,12 +143,8 @@ appPushNotificationsShown=$appPushNotificationsShown
 
     if (_currentIndex == 1 &&
         challenges.length > 0 &&
-        !showChallengeNotification) {
+        !challengeNotificationShown) {
       loaded = 1;
-      print("""
-          Will show nag screen:
-            appPushNotificationsShown=$appPushNotificationsShown
-          """);
       _notificationNag(context);
     }
 
@@ -224,6 +220,7 @@ appPushNotificationsShown=$appPushNotificationsShown
 
     Widget bottomNav = BottomNavigationBar(
       backgroundColor: Colors.white,
+      selectedItemColor: Colors.black,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
       items: bottomNavItems,

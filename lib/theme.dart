@@ -29,3 +29,17 @@ class AppTheme {
     );
   }
 }
+
+ButtonStyle primaryButtonStyle() {
+  return ButtonStyle(
+    padding: MaterialStateProperty.all(EdgeInsets.all(8)),
+    backgroundColor: MaterialStateProperty.all(Color(0xfff4f4f4)),
+    foregroundColor: MaterialStateProperty.all(Color(0xff333333)),
+    shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+    )),
+    overlayColor: MaterialStateProperty.all(Color(0xfff4f4f4)),
+    side: MaterialStateProperty.all<BorderSide>(
+        BorderSide(color: Colors.black, width: 1)),
+  );
+}

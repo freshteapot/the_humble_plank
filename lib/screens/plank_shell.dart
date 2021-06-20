@@ -2,7 +2,6 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:openapi/api.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/learnalist/challenge.dart';
@@ -23,12 +22,32 @@ class PlankShellScreen extends StatefulWidget {
 
 class _PlankShellScreenState extends State<PlankShellScreen> {
   int _currentIndex = 1;
+  int loaded = 0;
 
   bool _showChallenge = true;
   String _shownNotificationId = "";
   @override
   void initState() {
     super.initState();
+    /*
+    Challenge challenge = context.read<PlankModel>().challenge;
+    bool showChallenge = context.read<PlankModel>().showChallenge;
+
+    bool showChallengeNotification =
+        context.read<PlankModel>().showChallengeNotification;
+    bool appPushNotificationsShown =
+        context.read<PlankModel>().appPushNotificationsShown;
+
+    print("""
+initState
+
+challenge=${challenge.toJson()}
+showChallenge=$showChallenge
+showChallengeNotification=$showChallengeNotification
+appPushNotificationsShown=$appPushNotificationsShown
+    """);
+    loaded = 1;
+    */
   }
 
   Widget getChallengeScreen() {
@@ -43,7 +62,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if online
+    print("Why do I load twice? $_currentIndex, loaded=$loaded");
 
     bool offline = context.select((PlankModel model) => model.offline);
 
@@ -54,6 +73,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
     // Check if 403
     bool loggedIn = context.select((PlankModel model) => model.loggedIn);
+
     if (!loggedIn) {
       Widget body = Container(
           color: Colors.white,
@@ -64,7 +84,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
             title: "You are no longer logged.",
             message: "You need to log in again.",
             blockBackgroundInteraction: true,
-            mainButton: FlatButton(
+            mainButton: TextButton(
               onPressed: () {
                 context.read<PlankModel>().logout();
                 Phoenix.rebirth(context);
@@ -81,20 +101,56 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     Challenge challenge = context.select((PlankModel model) => model.challenge);
     bool showChallenge =
         context.select((PlankModel model) => model.showChallenge);
+    bool showChallengeNotification =
+        context.select((PlankModel model) => model.showChallengeNotification);
+
     bool showIntervals =
         context.select((PlankModel model) => model.showIntervals);
     int intervalTime = context.select((PlankModel model) => model.intervalTime);
-
-    bool showChallengeChanged = false;
-    if (_showChallenge != showChallenge) {
-      showChallengeChanged = true;
-    }
 
     List<Challenge> challenges =
         context.select((PlankModel model) => model.challenges);
     List<Plank> history = context.select((PlankModel model) => model.history);
 
-    _notificationNag(context, challenges.length > 0);
+    String latestNotificationId =
+        context.select((PlankModel model) => model.latestNotificationId);
+    String lastNotificationId =
+        context.select((PlankModel model) => model.lastNotificationId);
+    String notificationAction =
+        context.select((PlankModel model) => model.notificationAction);
+
+    bool appPushNotificationsShown =
+        context.select((PlankModel model) => model.appPushNotificationsShown);
+
+    print("""
+loggedIn=$loggedIn
+challenge=${challenge.toJson()}
+showChallenge=$showChallenge
+showChallengeNotification=$showChallengeNotification
+showIntervals=$showIntervals
+intervalTime=$intervalTime
+challenges=${challenges.length}
+history=${history.length}
+latestNotificationId=$latestNotificationId
+lastNotificationId=$lastNotificationId
+notificationAction=$notificationAction
+appPushNotificationsShown=$appPushNotificationsShown
+    """);
+    bool showChallengeChanged = false;
+    if (_showChallenge != showChallenge) {
+      showChallengeChanged = true;
+    }
+
+    if (_currentIndex == 1 &&
+        challenges.length > 0 &&
+        !showChallengeNotification) {
+      loaded = 1;
+      print("""
+          Will show nag screen:
+            appPushNotificationsShown=$appPushNotificationsShown
+          """);
+      _notificationNag(context);
+    }
 
     // Out the box challenge will cause this to show the correct one
     List<Widget> screens = [
@@ -156,12 +212,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     // the challenge should change, if it doesnt then we dont need to rerender.
     // The logic below might be overkill for reloading.
     // The logic below is needed to make sure a new notification triggers a rebuild.
-    String latestNotificationId =
-        context.select((PlankModel model) => model.latestNotificationId);
-    String lastNotificationId =
-        context.select((PlankModel model) => model.lastNotificationId);
-    String notificationAction =
-        context.select((PlankModel model) => model.notificationAction);
 
     if (showChallenge &&
         notificationAction == "challenge.updated" &&
@@ -200,17 +250,46 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
   }
 }
 
-Future<void> _notificationNag(BuildContext context, hasChallenges) async {
-  // quit if notifications set?
-  PermissionStatus permission = await Permission.notification.status;
-  if (permission != PermissionStatus.undetermined) {
-    return;
-  }
+Future<void> _notificationNag(BuildContext context) async {
+  await Future.delayed(Duration(seconds: 1));
+  return showAlertDialog(context);
+}
 
-  if (!hasChallenges) {
-    return;
-  }
+showAlertDialog(BuildContext context) {
+  // set up the buttons
+  Widget cancelButton = TextButton(
+    child: Text("Cancel"),
+    onPressed: () async {
+      await context.read<PlankModel>().setShownChallengeNotification(true);
+      Navigator.of(context).pop();
+    },
+  );
+  Widget continueButton = TextButton(
+    child: Text("Continue"),
+    onPressed: () async {
+      await context.read<PlankModel>().setShownChallengeNotification(true);
+      Navigator.of(context).pop();
+      await Future.delayed(Duration(seconds: 1));
+      checkAndAskForNotificationPermission(context);
+    },
+  );
 
-  // Could be where we add logic to ask after X times
-  checkAndAskForNotificationPermission(context);
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: Text("You have challenges!"),
+    content: Text(
+        "Would you like to enable notifications for when your friends plank?"),
+    actions: [
+      cancelButton,
+      continueButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }

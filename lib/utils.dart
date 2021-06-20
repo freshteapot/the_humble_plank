@@ -45,18 +45,27 @@ String formatTime(int milliseconds) {
 
 Future<bool> getNotificationPermission() async {
   PermissionStatus permission = await Permission.notification.status;
-  return permission == PermissionStatus.granted ? true : false;
+  return permission.isGranted;
 }
 
 Future<void> checkAndAskForNotificationPermission(BuildContext context) async {
-  PermissionStatus permission = await Permission.notification.status;
-  if (permission != PermissionStatus.undetermined) {
-    return;
-  }
+  // TODO royally confused at what is needed here?
+  // It almost seems like I can drop the whole permission thing.
+  //
 
-  var settings = await requestPermission();
-  bool newState = settings.authorizationStatus == AuthorizationStatus.authorized
-      ? true
-      : false;
-  await context.read<PlankModel>().setPushNotifications(newState);
+  //if (permission.isPermanentlyDenied) {
+  //  return;
+  //}
+  PermissionStatus permission = await Permission.notification.status;
+  print(permission);
+  // This does not seem to trigger request
+  await Permission.notification.request();
+  permission = await Permission.notification.status;
+  print(permission);
+
+  //var settings = await requestPermission();
+  //bool newState = settings.authorizationStatus == AuthorizationStatus.authorized
+  //    ? true
+  //    : false;
+  //await context.read<PlankModel>().setPushNotifications(newState);
 }

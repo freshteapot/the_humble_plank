@@ -24,27 +24,28 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences:
-  share: ^0.6.5+3
-  provider: ^4.3.2+2
-  stop_watch_timer: ^0.6.0+1
-  flutter_phoenix: ^0.1.0
-  jiffy: ^3.0.1
+  share: ^2.0.4
+  provider: ^5.0.0
+  stop_watch_timer: ^1.3.0
+  flutter_phoenix: ^1.0.0
+  jiffy: ^4.1.0
   flushbar: ^1.10.4
-  google_sign_in: ^4.5.6
+  google_sign_in: ^5.0.4
   openapi:
     path: ./learnalist-openapi-dart
-  firebase_messaging: 8.0.0-dev.9
-  flutter_local_notifications: ^3.0.1+3
-  permission_handler: ^5.0.1+1
-  wakelock: ^0.4.0
-  sign_in_with_apple: ^2.5.4
+  firebase_messaging: ^10.0.2
+  flutter_local_notifications: ^6.0.0
+  permission_handler: ^8.1.1
+  wakelock: ^0.5.2
+  sign_in_with_apple: ^3.0.0
+  flutter_svg: ^0.22.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
 
 dev_dependencies:
-  flutter_launcher_icons: "^0.8.0"
+  flutter_launcher_icons: ^0.9.0
   flutter_test:
     sdk: flutter
 
@@ -57,6 +58,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - images/login/
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

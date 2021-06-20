@@ -59,6 +59,8 @@ class PlankModel extends ChangeNotifier {
   bool _showChallenge;
   bool get showChallenge => _showChallenge;
 
+  bool _showChallengeNotification;
+  bool get showChallengeNotification => _showChallengeNotification;
   String _currentChallengeUUID;
   String get currentChallengeUUID => _currentChallengeUUID;
 
@@ -104,6 +106,7 @@ class PlankModel extends ChangeNotifier {
         _challenges = [],
         _challenge = Challenge.empty(),
         _showChallenge = false,
+        _showChallengeNotification = false,
         _offline = false,
         _showIntervals = false,
         _intervalTime = 0,
@@ -115,6 +118,8 @@ class PlankModel extends ChangeNotifier {
         _skipNotification = false;
 
   _notifyListeners() {
+    print(
+        "_notifyListeners _bootstrapping=$_bootstrapping, _skipNotification=$_skipNotification");
     if (_bootstrapping) {
       return;
     }
@@ -187,11 +192,14 @@ class PlankModel extends ChangeNotifier {
     _intervalTime = prefs.getInt("plank.settings.intervalTime");
     _showIntervals = prefs.getBool("plank.settings.showIntervals");
     _showChallenge = prefs.getBool("plank.settings.showChallenge");
+    _showChallengeNotification =
+        prefs.getBool("plank.settings.showChallengeNotification");
     _currentChallengeUUID =
         prefs.getString("plank.settings.currentChallengeUUID");
-
     _appPushNotifications =
         prefs.getBool("plank.settings.notificationsEnabled");
+    _appPushNotificationsShown =
+        prefs.getBool("plank.settings.notificationsShown");
 
     if (_intervalTime == null) {
       _intervalTime = 0;
@@ -205,12 +213,20 @@ class PlankModel extends ChangeNotifier {
       _showChallenge = true;
     }
 
+    if (_showChallengeNotification == null) {
+      _showChallengeNotification = false;
+    }
+
     if (_currentChallengeUUID == null) {
       _currentChallengeUUID = "";
     }
 
     if (_appPushNotifications == null) {
       _appPushNotifications = false;
+    }
+
+    if (_appPushNotificationsShown == null) {
+      _appPushNotificationsShown = false;
     }
 
     // Double check whats in the preferences
@@ -307,6 +323,14 @@ class PlankModel extends ChangeNotifier {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("plank.settings.showChallenge", _showChallenge);
+    _notifyListeners();
+  }
+
+  Future<void> setShownChallengeNotification(bool newValue) async {
+    _showChallengeNotification = newValue;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(
+        "plank.settings.showChallengeNotification", _showChallenge);
     _notifyListeners();
   }
 
@@ -626,6 +650,7 @@ class PlankModel extends ChangeNotifier {
       String token = await getToken();
       sendTokenToServer(token);
 
+      _bootstrapLogin = true;
       _skipNotification = false;
       _notifyListeners();
     }).catchError((error) async {
@@ -722,11 +747,20 @@ class PlankModel extends ChangeNotifier {
   bool _appPushNotifications = false;
   bool get appPushNotifications => _appPushNotifications;
 
+  bool _appPushNotificationsShown = false;
+  bool get appPushNotificationsShown => _appPushNotificationsShown;
+
   Future<void> setPushNotifications(bool state) async {
     _appPushNotifications = state;
+    _appPushNotificationsShown = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(
-        "plank.settings.notificationsEnabled", _appPushNotifications);
+
+    await Future.wait([
+      prefs.setBool("plank.settings.notificationsShown", true),
+      prefs.setBool(
+          "plank.settings.notificationsEnabled", _appPushNotifications)
+    ]);
+
     _notifyListeners();
   }
 }

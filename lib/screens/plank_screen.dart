@@ -8,6 +8,8 @@ import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
 
+import '../utils.dart';
+
 class PlankScreen extends StatefulWidget {
   int intervalTime;
   bool showIntervals;
@@ -60,7 +62,6 @@ class _PlankScreenState extends State<PlankScreen> {
 
     double historyHeight = MediaQuery.of(context).size.height / 1.5;
     bool showChallenges = widget.challenges.length > 0;
-    //bool showChallenge = widget.currentChallenge.uuid != "";
 
     return Align(
         alignment: Alignment.topCenter,
@@ -198,8 +199,16 @@ class _PlankScreenState extends State<PlankScreen> {
   }
 
   Future<void> onTimerSave(BuildContext context) async {
+    // TODO what if this fails?
     // TODO save to local storage first
+
     await context.read<PlankModel>().addEntry(record);
+
+    // TODO If challenge, trigger nag screen?
+    if (widget.currentChallenge.uuid != "") {
+      await checkAndAskForNotificationPermission(context);
+    }
+
     record = defaultPlank(widget.showIntervals, widget.intervalTime);
     _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
     beginningTime = null;

@@ -5,6 +5,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 
 class ChallengeCreateScreen extends StatelessWidget {
   final Challenge challenge = Challenge.empty();
@@ -13,6 +14,9 @@ class ChallengeCreateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool showChallengeNotification =
+        context.select((PlankModel model) => model.showChallengeNotification);
+
     return Column(children: <Widget>[
       Container(
           alignment: Alignment.bottomCenter,
@@ -53,7 +57,9 @@ class ChallengeCreateScreen extends StatelessWidget {
               }
 
               context.read<PlankModel>().addChallenge(context, challenge);
-              await checkAndAskForNotificationPermission(context);
+              if (!showChallengeNotification) {
+                await notifyMeBecauseICreatedAChallenge(context);
+              }
 
               Navigator.of(context).pop();
             },

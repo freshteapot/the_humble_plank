@@ -1,6 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/notifications.dart';
 
 import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/routes.dart';
@@ -35,7 +37,16 @@ class _AppState extends State<TheApp> with WidgetsBindingObserver {
       // This is all here for the settings screen, perhaps I delete it?
       // Perhaps I change settings screen to click to enable notifications and handle it there?
 
+      var settings = await getNotificationSettings();
+      bool notificationCenter =
+          settings.notificationCenter == AppleNotificationSetting.enabled
+              ? true
+              : false;
+
       PermissionStatus permission = await Permission.notification.status;
+      print(
+          "notificationCenter is $notificationCenter and permission is ${permission.isGranted} AuthorizationStatus = ${settings.authorizationStatus}");
+
       bool newState = permission.isGranted;
       if (newState != context.read<PlankModel>().appPushNotifications) {
         await context.read<PlankModel>().setPushNotifications(newState);

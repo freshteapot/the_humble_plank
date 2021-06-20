@@ -10,7 +10,7 @@ import 'package:thehumbleplank/screens/challenges_overview.dart';
 import 'package:thehumbleplank/screens/plank_history.dart';
 import 'package:thehumbleplank/screens/plank_screen.dart';
 import 'package:thehumbleplank/screens/plank_settings.dart';
-import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 import 'package:thehumbleplank/widget/topbar.dart';
 
 class PlankShellScreen extends StatefulWidget {
@@ -251,45 +251,8 @@ appPushNotificationsShown=$appPushNotificationsShown
 }
 
 Future<void> _notificationNag(BuildContext context) async {
+  // TODO this breaks if PermissionStatus.permanentlyDenied
   await Future.delayed(Duration(seconds: 1));
-  return showAlertDialog(context);
-}
-
-showAlertDialog(BuildContext context) {
-  // set up the buttons
-  Widget cancelButton = TextButton(
-    child: Text("Cancel"),
-    onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
-      Navigator.of(context).pop();
-    },
-  );
-  Widget continueButton = TextButton(
-    child: Text("Continue"),
-    onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
-      Navigator.of(context).pop();
-      await Future.delayed(Duration(seconds: 1));
-      checkAndAskForNotificationPermission(context);
-    },
-  );
-
-  // set up the AlertDialog
-  AlertDialog alert = AlertDialog(
-    title: Text("You have challenges!"),
-    content: Text(
-        "Would you like to enable notifications for when your friends plank?"),
-    actions: [
-      cancelButton,
-      continueButton,
-    ],
-  );
-
-  // show the dialog
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
+  await notifyMeBecauseIHaveChallenges(context);
+  return;
 }

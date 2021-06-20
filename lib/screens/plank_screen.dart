@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -206,7 +207,8 @@ class _PlankScreenState extends State<PlankScreen> {
 
     // TODO If challenge, trigger nag screen?
     if (widget.currentChallenge.uuid != "") {
-      await checkAndAskForNotificationPermission(context);
+      var response = await notifyMeBecauseIHaveAddedToAChallenge(context);
+      print("response is $response");
     }
 
     record = defaultPlank(widget.showIntervals, widget.intervalTime);

@@ -42,7 +42,7 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget loginWithGoogle(BuildContext context) {
-    final String assetName = 'images/login/google.svg';
+    final String assetName = 'assets/login/google.svg';
     final Widget svgIcon = SvgPicture.asset(
       assetName,
       semanticsLabel: 'Google logo',
@@ -79,7 +79,7 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget loginWithApple(BuildContext context) {
-    final String assetName = 'images/login/apple.svg';
+    final String assetName = 'assets/login/apple.svg';
     final Widget svgIcon = SvgPicture.asset(
       assetName,
       semanticsLabel: 'Apple logo',

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
-import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 
 class ChallengeJoinScreen extends StatelessWidget {
   @override
@@ -36,6 +36,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
+    bool showChallengeNotification =
+        context.select((PlankModel model) => model.showChallengeNotification);
+
     return Column(children: <Widget>[
       Align(
         alignment: Alignment.centerLeft,
@@ -108,8 +111,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 )..show(context);
                 return;
               }
-
-              await checkAndAskForNotificationPermission(context);
+              if (!showChallengeNotification) {
+                await notifyMeBecauseIJoinedAChallenge(context);
+              }
               Navigator.of(context).pop();
             },
             child: Text(

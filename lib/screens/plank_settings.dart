@@ -1,10 +1,13 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/notifications.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/screens/plank_settings_display_name.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 
 class PlankSettings extends StatefulWidget {
   PlankSettings();
@@ -77,12 +80,19 @@ class _PlankSettingsState extends State<PlankSettings> {
                                 })
                           ])),
                   SwitchListTile(
-                      title: const Text('Send notifications'),
+                      title: const Text('Notifications'),
                       value: pushNotificationsEnabled,
                       activeColor: Colors.green,
                       inactiveTrackColor: Colors.red,
                       onChanged: (bool value) async {
-                        openAppSettings();
+                        var settings = await getNotificationSettings();
+                        if (settings.authorizationStatus !=
+                            AuthorizationStatus.notDetermined) {
+                          openAppSettings();
+                          return;
+                        }
+
+                        notifyMeWhyEnable(context);
                       }),
                   SwitchListTile(
                       title: const Text('Logout and clear the app'),

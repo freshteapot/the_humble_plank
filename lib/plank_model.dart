@@ -105,7 +105,7 @@ class PlankModel extends ChangeNotifier {
         _history = [],
         _challenges = [],
         _challenge = Challenge.empty(),
-        _showChallenge = false,
+        _showChallenge = true,
         _challengeNotificationShown = false,
         _offline = false,
         _showIntervals = false,
@@ -765,8 +765,10 @@ class PlankModel extends ChangeNotifier {
 
   Future<void> setPushNotifications(bool state) async {
     _appPushNotifications = state;
-    _challengeNotificationShown = _appPushNotifications;
     _appPushNotificationsShown = _appPushNotifications;
+    // TODO Consider forcing this to true
+    // The reason being, we dont trigger the nag screens
+    _challengeNotificationShown = _appPushNotifications;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

@@ -22,7 +22,6 @@ class PlankShellScreen extends StatefulWidget {
 
 class _PlankShellScreenState extends State<PlankShellScreen> {
   int _currentIndex = 1;
-  int loaded = 0;
 
   bool _showChallenge = true;
   String _shownNotificationId = "";
@@ -46,7 +45,6 @@ showChallenge=$showChallenge
 challengeNotificationShown=$challengeNotificationShown
 appPushNotificationsShown=$appPushNotificationsShown
     """);
-    loaded = 1;
     */
   }
 
@@ -62,7 +60,7 @@ appPushNotificationsShown=$appPushNotificationsShown
 
   @override
   Widget build(BuildContext context) {
-    print("Why do I load twice? $_currentIndex, loaded=$loaded");
+    print("Why do I load twice? $_currentIndex");
 
     bool offline = context.select((PlankModel model) => model.offline);
 
@@ -144,7 +142,6 @@ appPushNotificationsShown=$appPushNotificationsShown
     if (_currentIndex == 1 &&
         challenges.length > 0 &&
         !challengeNotificationShown) {
-      loaded = 1;
       _notificationNag(context);
     }
 

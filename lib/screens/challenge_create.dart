@@ -52,7 +52,8 @@ class ChallengeCreateScreen extends StatelessWidget {
                 challenge.description = _defaultTitle;
               }
 
-              context.read<PlankModel>().addChallenge(context, challenge);
+              // TODO we do not handle if it fails
+              await context.read<PlankModel>().addChallenge(context, challenge);
               if (!challengeNotificationShown) {
                 await notifyMeBecauseICreatedAChallenge(context);
               }

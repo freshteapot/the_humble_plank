@@ -37,8 +37,14 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
-    bool challengeNotificationShown =
-        context.select((PlankModel model) => model.challengeNotificationShown);
+    bool challengeNotificationShownOnJoin = context
+        .select((PlankModel model) => model.challengeNotificationShownOnJoin);
+
+    bool appPushNotifications =
+        context.select((PlankModel model) => model.appPushNotifications);
+
+    bool showNotificationNag =
+        !appPushNotifications && !challengeNotificationShownOnJoin;
 
     return Column(children: <Widget>[
       Align(
@@ -107,7 +113,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 )..show(context);
                 return;
               }
-              if (!challengeNotificationShown) {
+              if (showNotificationNag) {
                 await notifyMeBecauseIJoinedAChallenge(context);
               }
               Navigator.of(context).pop();

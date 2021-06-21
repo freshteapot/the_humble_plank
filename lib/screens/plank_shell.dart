@@ -96,11 +96,18 @@ appPushNotificationsShown=$appPushNotificationsShown
       return body;
     }
 
+    bool appPushNotifications =
+        context.select((PlankModel model) => model.appPushNotifications);
+
     Challenge challenge = context.select((PlankModel model) => model.challenge);
     bool showChallenge =
         context.select((PlankModel model) => model.showChallenge);
-    bool challengeNotificationShown =
-        context.select((PlankModel model) => model.challengeNotificationShown);
+
+    bool challengeNotificationShownWithChallenges = context.select(
+        (PlankModel model) => model.challengeNotificationShownWithChallenges);
+
+    bool challengeNotificationShownOnPlank = context
+        .select((PlankModel model) => model.challengeNotificationShownOnPlank);
 
     bool showIntervals =
         context.select((PlankModel model) => model.showIntervals);
@@ -120,11 +127,16 @@ appPushNotificationsShown=$appPushNotificationsShown
     bool appPushNotificationsShown =
         context.select((PlankModel model) => model.appPushNotificationsShown);
 
+    bool showNotificationNagWithChallenges =
+        !appPushNotifications && !challengeNotificationShownWithChallenges;
+    bool showNotificationNagOnPlank =
+        !appPushNotifications && !challengeNotificationShownOnPlank;
+
     print("""
 loggedIn=$loggedIn
 challenge=${challenge.toJson()}
 showChallenge=$showChallenge
-challengeNotificationShown=$challengeNotificationShown
+challengeNotificationShownWithChallenges=$challengeNotificationShownWithChallenges
 showIntervals=$showIntervals
 intervalTime=$intervalTime
 challenges=${challenges.length}
@@ -133,7 +145,9 @@ latestNotificationId=$latestNotificationId
 lastNotificationId=$lastNotificationId
 notificationAction=$notificationAction
 appPushNotificationsShown=$appPushNotificationsShown
+showNotificationNagWithChallenges=$showNotificationNagWithChallenges
     """);
+
     bool showChallengeChanged = false;
     if (_showChallenge != showChallenge) {
       showChallengeChanged = true;
@@ -141,7 +155,7 @@ appPushNotificationsShown=$appPushNotificationsShown
 
     if (_currentIndex == 1 &&
         challenges.length > 0 &&
-        !challengeNotificationShown) {
+        showNotificationNagWithChallenges) {
       _notificationNag(context);
     }
 
@@ -157,7 +171,7 @@ appPushNotificationsShown=$appPushNotificationsShown
         intervalTime: intervalTime,
         currentChallenge: challenge,
         challenges: challenges,
-        challengeNotificationShown: challengeNotificationShown,
+        showNotificationNagOnPlank: showNotificationNagOnPlank,
       ),
       getChallengeScreen(),
       PlankSettings(),

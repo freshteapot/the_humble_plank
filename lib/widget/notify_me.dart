@@ -34,7 +34,9 @@ Future<String> notifyMeBecauseICreatedAChallenge(BuildContext context) async {
     child: Text("Not now"),
     style: _cancelActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("onCreate", true);
       Navigator.of(context).pop();
       pressed = "0";
     },
@@ -44,7 +46,9 @@ Future<String> notifyMeBecauseICreatedAChallenge(BuildContext context) async {
     child: Text("Yes"),
     style: _doActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("onCreate", true);
       Navigator.of(context).pop();
 
       PermissionStatus permission = await Permission.notification.status;
@@ -75,7 +79,9 @@ Future<String> notifyMeBecauseIJoinedAChallenge(BuildContext context) async {
     child: Text("Not now"),
     style: _cancelActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("onJoin", true);
       Navigator.of(context).pop();
       pressed = "0";
     },
@@ -85,7 +91,9 @@ Future<String> notifyMeBecauseIJoinedAChallenge(BuildContext context) async {
     child: Text("Yes"),
     style: _doActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("onJoin", true);
       Navigator.of(context).pop();
 
       PermissionStatus permission = await Permission.notification.status;
@@ -117,7 +125,9 @@ Future<String> notifyMeBecauseIHaveAddedToAChallenge(
     child: Text("Not now"),
     style: _cancelActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("onPlank", true);
       Navigator.of(context).pop();
       pressed = "0";
     },
@@ -127,7 +137,9 @@ Future<String> notifyMeBecauseIHaveAddedToAChallenge(
     child: Text("Yes"),
     style: _doActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("onPlank", true);
       Navigator.of(context).pop();
 
       PermissionStatus permission = await Permission.notification.status;
@@ -157,7 +169,9 @@ Future<String> notifyMeBecauseIHaveChallenges(BuildContext context) async {
     child: Text("Not now"),
     style: _cancelActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("withChallenges", true);
       Navigator.of(context).pop();
       pressed = "0";
     },
@@ -167,7 +181,9 @@ Future<String> notifyMeBecauseIHaveChallenges(BuildContext context) async {
     child: Text("Yes"),
     style: _doActionButtonStyle(),
     onPressed: () async {
-      await context.read<PlankModel>().setShownChallengeNotification(true);
+      await context
+          .read<PlankModel>()
+          .setShownChallengeNotification("withChallenges", true);
       Navigator.of(context).pop();
 
       PermissionStatus permission = await Permission.notification.status;

@@ -15,8 +15,14 @@ class ChallengeCreateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool challengeNotificationShown =
-        context.select((PlankModel model) => model.challengeNotificationShown);
+    bool challengeNotificationShownOnCreate = context
+        .select((PlankModel model) => model.challengeNotificationShownOnCreate);
+
+    bool appPushNotifications =
+        context.select((PlankModel model) => model.appPushNotifications);
+
+    bool showNotificationNag =
+        !appPushNotifications && !challengeNotificationShownOnCreate;
 
     return Column(children: <Widget>[
       Container(
@@ -54,7 +60,7 @@ class ChallengeCreateScreen extends StatelessWidget {
 
               // TODO we do not handle if it fails
               await context.read<PlankModel>().addChallenge(context, challenge);
-              if (!challengeNotificationShown) {
+              if (showNotificationNag) {
                 await notifyMeBecauseICreatedAChallenge(context);
               }
 

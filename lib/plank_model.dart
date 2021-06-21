@@ -59,8 +59,22 @@ class PlankModel extends ChangeNotifier {
   bool _showChallenge;
   bool get showChallenge => _showChallenge;
 
-  bool _challengeNotificationShown;
-  bool get challengeNotificationShown => _challengeNotificationShown;
+  bool _challengeNotificationShownOnCreate;
+  bool get challengeNotificationShownOnCreate =>
+      _challengeNotificationShownOnCreate;
+
+  bool _challengeNotificationShownOnJoin;
+  bool get challengeNotificationShownOnJoin =>
+      _challengeNotificationShownOnJoin;
+
+  bool _challengeNotificationShownOnPlank;
+  bool get challengeNotificationShownOnPlank =>
+      _challengeNotificationShownOnPlank;
+
+  bool _challengeNotificationShownWithChallenges;
+  bool get challengeNotificationShownWithChallenges =>
+      _challengeNotificationShownWithChallenges;
+
   String _currentChallengeUUID;
   String get currentChallengeUUID => _currentChallengeUUID;
 
@@ -106,7 +120,10 @@ class PlankModel extends ChangeNotifier {
         _challenges = [],
         _challenge = Challenge.empty(),
         _showChallenge = true,
-        _challengeNotificationShown = false,
+        _challengeNotificationShownOnCreate = false,
+        _challengeNotificationShownOnJoin = false,
+        _challengeNotificationShownOnPlank = false,
+        _challengeNotificationShownWithChallenges = false,
         _offline = false,
         _showIntervals = false,
         _intervalTime = 0,
@@ -192,8 +209,16 @@ class PlankModel extends ChangeNotifier {
     _intervalTime = prefs.getInt("plank.settings.intervalTime");
     _showIntervals = prefs.getBool("plank.settings.showIntervals");
     _showChallenge = prefs.getBool("plank.settings.showChallenge");
-    _challengeNotificationShown =
-        prefs.getBool("plank.settings.challengeNotificationShown");
+
+    _challengeNotificationShownOnCreate =
+        prefs.getBool("plank.settings.challengeNotificationShown.onCreate");
+    _challengeNotificationShownOnJoin =
+        prefs.getBool("plank.settings.challengeNotificationShown.onJoin");
+    _challengeNotificationShownOnPlank =
+        prefs.getBool("plank.settings.challengeNotificationShown.onPlank");
+    _challengeNotificationShownWithChallenges = prefs
+        .getBool("plank.settings.challengeNotificationShown.withChallenges");
+
     _currentChallengeUUID =
         prefs.getString("plank.settings.currentChallengeUUID");
     _appPushNotifications =
@@ -213,8 +238,20 @@ class PlankModel extends ChangeNotifier {
       _showChallenge = true;
     }
 
-    if (_challengeNotificationShown == null) {
-      _challengeNotificationShown = false;
+    if (_challengeNotificationShownOnCreate == null) {
+      _challengeNotificationShownOnCreate = false;
+    }
+
+    if (_challengeNotificationShownOnJoin == null) {
+      _challengeNotificationShownOnJoin = false;
+    }
+
+    if (_challengeNotificationShownOnPlank == null) {
+      _challengeNotificationShownOnPlank = false;
+    }
+
+    if (_challengeNotificationShownWithChallenges == null) {
+      _challengeNotificationShownWithChallenges = false;
     }
 
     if (_currentChallengeUUID == null) {
@@ -237,12 +274,6 @@ class PlankModel extends ChangeNotifier {
     }
 
     if (_appPushNotifications) {
-      // I believe this is protecting, for if we open the app after update
-      if (!_challengeNotificationShown) {
-        await prefs.setBool("plank.settings.challengeNotificationShown", true);
-        _challengeNotificationShown = true;
-      }
-
       if (!_appPushNotificationsShown) {
         await prefs.setBool("plank.settings.notificationsShown", true);
         _appPushNotificationsShown = true;
@@ -339,11 +370,38 @@ class PlankModel extends ChangeNotifier {
     _notifyListeners();
   }
 
-  Future<void> setShownChallengeNotification(bool newValue) async {
-    _challengeNotificationShown = newValue;
+  Future<void> setShownChallengeNotification(
+      String action, bool newValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool("plank.settings.challengeNotificationShown",
-        _challengeNotificationShown);
+
+    switch (action) {
+      case "onCreate":
+        _challengeNotificationShownOnCreate = newValue;
+        await prefs.setBool(
+            "plank.settings.challengeNotificationShown.onCreate",
+            _challengeNotificationShownOnCreate);
+        break;
+      case "onJoin":
+        _challengeNotificationShownOnJoin = newValue;
+        await prefs.setBool("plank.settings.challengeNotificationShown.onJoin",
+            _challengeNotificationShownOnJoin);
+        break;
+      case "onPlank":
+        _challengeNotificationShownOnPlank = newValue;
+        await prefs.setBool("plank.settings.challengeNotificationShown.onPlank",
+            _challengeNotificationShownOnPlank);
+        break;
+      case "withChallenges":
+        _challengeNotificationShownWithChallenges = newValue;
+        await prefs.setBool(
+            "plank.settings.challengeNotificationShown.withChallenges",
+            _challengeNotificationShownWithChallenges);
+        break;
+      default:
+        print("setShownChallengeNotification action, not supported");
+        return;
+    }
+
     _notifyListeners();
   }
 
@@ -766,9 +824,6 @@ class PlankModel extends ChangeNotifier {
   Future<void> setPushNotifications(bool state) async {
     _appPushNotifications = state;
     _appPushNotificationsShown = _appPushNotifications;
-    // TODO Consider forcing this to true
-    // The reason being, we dont trigger the nag screens
-    _challengeNotificationShown = _appPushNotifications;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -777,9 +832,25 @@ class PlankModel extends ChangeNotifier {
           "plank.settings.notificationsShown", _appPushNotificationsShown),
       prefs.setBool(
           "plank.settings.notificationsEnabled", _appPushNotifications),
-      prefs.setBool("plank.settings.challengeNotificationShown",
-          _challengeNotificationShown)
     ]);
+
+    if (!_appPushNotifications) {
+      _challengeNotificationShownOnCreate = false;
+      _challengeNotificationShownOnJoin = false;
+      _challengeNotificationShownOnPlank = false;
+      _challengeNotificationShownWithChallenges = false;
+
+      await Future.wait([
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.onCreate", false),
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.onJoin", false),
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.onPlank", false),
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.withChallenges", false),
+      ]);
+    }
 
     _notifyListeners();
   }

@@ -15,7 +15,7 @@ class PlankScreen extends StatefulWidget {
   bool showIntervals;
   Challenge currentChallenge;
   List<Challenge> challenges;
-  bool challengeNotificationShown;
+  bool showNotificationNagOnPlank;
   // TODO add
 
   PlankScreen(
@@ -24,7 +24,7 @@ class PlankScreen extends StatefulWidget {
       this.showIntervals: false,
       this.currentChallenge,
       this.challenges,
-      this.challengeNotificationShown: false})
+      this.showNotificationNagOnPlank: false})
       : super(key: key);
 
   @override
@@ -202,8 +202,8 @@ class _PlankScreenState extends State<PlankScreen> {
 
     await context.read<PlankModel>().addEntry(record);
 
-    if (!widget.challengeNotificationShown &&
-        widget.currentChallenge.uuid != "") {
+    if (widget.currentChallenge.uuid != "" &&
+        widget.showNotificationNagOnPlank) {
       await notifyMeBecauseIHaveAddedToAChallenge(context);
     }
 

@@ -157,6 +157,7 @@ appPushNotificationsShown=$appPushNotificationsShown
         intervalTime: intervalTime,
         currentChallenge: challenge,
         challenges: challenges,
+        challengeNotificationShown: challengeNotificationShown,
       ),
       getChallengeScreen(),
       PlankSettings(),

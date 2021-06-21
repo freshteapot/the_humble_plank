@@ -15,13 +15,16 @@ class PlankScreen extends StatefulWidget {
   bool showIntervals;
   Challenge currentChallenge;
   List<Challenge> challenges;
+  bool challengeNotificationShown;
+  // TODO add
 
   PlankScreen(
       {Key key,
       this.intervalTime: 0,
       this.showIntervals: false,
       this.currentChallenge,
-      this.challenges})
+      this.challenges,
+      this.challengeNotificationShown: false})
       : super(key: key);
 
   @override
@@ -199,10 +202,9 @@ class _PlankScreenState extends State<PlankScreen> {
 
     await context.read<PlankModel>().addEntry(record);
 
-    // TODO If challenge, trigger nag screen?
-    if (widget.currentChallenge.uuid != "") {
-      var response = await notifyMeBecauseIHaveAddedToAChallenge(context);
-      print("response is $response");
+    if (!widget.challengeNotificationShown &&
+        widget.currentChallenge.uuid != "") {
+      await notifyMeBecauseIHaveAddedToAChallenge(context);
     }
 
     record = defaultPlank(widget.showIntervals, widget.intervalTime);

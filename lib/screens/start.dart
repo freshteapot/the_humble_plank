@@ -25,8 +25,10 @@ class _StartScreenState extends State<StartScreen> {
     var bootstrapped = context.select((PlankModel model) => model.bootstrapped);
 
     if (!bootstrapped) {
-      // TODO this could be a logo
-      Widget body = SizedBox.shrink();
+      Widget body = Container(
+          margin: const EdgeInsets.only(left: 30.0, right: 30.0),
+          child:
+              Center(child: Image(image: AssetImage('assets/icon/icon.png'))));
       return Scaffold(backgroundColor: Colors.white, body: body);
     }
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
@@ -16,30 +14,25 @@ import 'package:thehumbleplank/widget/topbar.dart';
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-        future: SignInWithApple.isAvailable(),
-        builder: (context, AsyncSnapshot<bool> snapshot) {
-          if (snapshot.hasData) {
-            bool showAppleLogin = snapshot.data;
-            LoginInfo loginInfo = defaultValues();
+    var canSignInWithApple =
+        context.select((PlankModel model) => model.canSignInWithApple);
+    LoginInfo loginInfo = defaultValues();
+    Widget body =
+        Center(child: Image(image: AssetImage('assets/icon/icon.png')));
 
-            var options = <Widget>[
-              loginWithGoogle(context),
-              if (showAppleLogin) ...[loginWithApple(context)],
-              if (loginInfo.env == "dev") ...[LoginForm(loginInfo: loginInfo)],
-            ];
+    var options = <Widget>[
+      body,
+      loginWithGoogle(context),
+      if (canSignInWithApple) ...[loginWithApple(context)],
+      if (loginInfo.env == "dev") ...[LoginForm(loginInfo: loginInfo)],
+    ];
 
-            return Scaffold(
-                appBar: topBar(),
-                body: Container(
-                    margin: const EdgeInsets.only(
-                        top: 100.0, bottom: 30.0, left: 30.0, right: 30.0),
-                    child: SingleChildScrollView(
-                        child: Column(children: options))));
-          } else {
-            return CircularProgressIndicator();
-          }
-        });
+    return Scaffold(
+        appBar: topBar(),
+        body: Container(
+            margin: const EdgeInsets.only(
+                top: 0.0, bottom: 20.0, left: 30.0, right: 30.0),
+            child: SingleChildScrollView(child: Column(children: options))));
   }
 
   Widget loginWithGoogle(BuildContext context) {

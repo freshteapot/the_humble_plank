@@ -107,6 +107,10 @@ class PlankModel extends ChangeNotifier {
   bool _showCallToActionForDisplayName;
   bool get showCallToActionForDisplayName => _showCallToActionForDisplayName;
   bool _skipNotification;
+
+  bool _canSignInWithApple;
+  bool get canSignInWithApple => _canSignInWithApple;
+
   PlankModel({
     @required this.repository,
     @required this.challengeRepo,
@@ -132,7 +136,8 @@ class PlankModel extends ChangeNotifier {
         _bootstrapLogin = false,
         _displayName = "",
         _showCallToActionForDisplayName = true,
-        _skipNotification = false;
+        _skipNotification = false,
+        _canSignInWithApple = false;
 
   _notifyListeners() {
     print(
@@ -190,8 +195,6 @@ class PlankModel extends ChangeNotifier {
     _bootstrapping = false;
     _bootstrapped = true;
     _bootstrapLogin = _loggedIn;
-    print(
-        "bootstrap $_loggedIn 2 ${_credentials.login.token} $_bootstrapLogin");
     _notifyListeners();
   }
 
@@ -279,6 +282,8 @@ class PlankModel extends ChangeNotifier {
         _appPushNotificationsShown = true;
       }
     }
+
+    _canSignInWithApple = await SignInWithApple.isAvailable();
   }
 
   Future<void> loadHistory() async {

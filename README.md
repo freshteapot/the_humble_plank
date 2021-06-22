@@ -14,6 +14,19 @@
 - Able to change your backend (where you store the data)
 - Api is based on openapi spec (TODO add link)
 
+## Build ipa
+- increment build or major version
+- create ipa
+```sh
+flutter build ipa
+```
+- open ipa, validate and distribute
+```sh
+open  build/ios/archive/Humble\ Plank.xcarchive
+```
+- upload it
+- Goto https://appstoreconnect.apple.com/login
+
 ## Development
 
 ### learnalist-openapi-dart
@@ -141,6 +154,13 @@ curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v
 
 
 
+#
+> error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
+
+```
+cd ios
+pod install
+```
 
 
 

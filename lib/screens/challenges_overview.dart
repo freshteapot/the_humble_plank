@@ -6,6 +6,7 @@ import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/screens/challenge_create.dart';
 import 'package:thehumbleplank/screens/challenge_join.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/onshare.dart';
 
 class ChallengesOverviewScreen extends StatefulWidget {
@@ -47,13 +48,8 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
           ),
           Container(
               alignment: Alignment.center,
-              child: FlatButton(
-                color: Colors.blue,
-                textColor: Colors.white,
-                disabledColor: Colors.grey,
-                disabledTextColor: Colors.black,
-                padding: EdgeInsets.all(8.0),
-                splashColor: Colors.blueAccent,
+              child: TextButton(
+                style: primaryButtonStyle(),
                 onPressed: () async {
                   // Create or ask for name
 
@@ -80,13 +76,8 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
               )),
           Container(
               alignment: Alignment.center,
-              child: FlatButton(
-                color: Colors.blue,
-                textColor: Colors.white,
-                disabledColor: Colors.grey,
-                disabledTextColor: Colors.black,
-                padding: EdgeInsets.all(8.0),
-                splashColor: Colors.blueAccent,
+              child: TextButton(
+                style: primaryButtonStyle(),
                 onPressed: () async {
                   await showModalBottomSheet(
                       isScrollControlled: true,

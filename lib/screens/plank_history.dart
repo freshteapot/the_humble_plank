@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/plank_challenge_history.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
 import 'package:thehumbleplank/widget/plank_history.dart';
@@ -26,7 +27,7 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     Widget historyView;
-    double historyHeight = MediaQuery.of(context).size.height / 1.3;
+    double historyHeight = MediaQuery.of(context).size.height / 1.4;
     bool showChallenges = widget.challenges.length > 0;
     bool showChallenge = widget.currentChallenge.uuid != "";
 
@@ -67,13 +68,8 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
                   if (showChallenges) ...[
                     Container(
                         alignment: Alignment.center,
-                        child: FlatButton(
-                          color: Colors.blue,
-                          textColor: Colors.white,
-                          disabledColor: Colors.grey,
-                          disabledTextColor: Colors.black,
-                          padding: EdgeInsets.all(8.0),
-                          splashColor: Colors.blueAccent,
+                        child: TextButton(
+                          style: primaryButtonStyle(),
                           onPressed: () async {
                             await showModalBottomSheet(
                                 context: context,

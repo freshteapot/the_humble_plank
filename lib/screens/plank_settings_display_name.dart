@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
+import 'package:thehumbleplank/theme.dart';
 
 class PlankSettingsDisplayNameScreen extends StatelessWidget {
   @override
@@ -50,13 +51,8 @@ class _PlankSettingsDisplayNameState
       Container(
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: 50),
-          child: FlatButton(
-            color: Colors.blue,
-            textColor: Colors.white,
-            disabledColor: Colors.grey,
-            disabledTextColor: Colors.black,
-            padding: EdgeInsets.all(8.0),
-            splashColor: Colors.blueAccent,
+          child: TextButton(
+            style: primaryButtonStyle(),
             onPressed: () async {
               FocusScopeNode currentFocus = FocusScope.of(context);
 

@@ -21,6 +21,7 @@ class _StartScreenState extends State<StartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("StartScreen");
     var bootstrapped = context.select((PlankModel model) => model.bootstrapped);
 
     if (!bootstrapped) {
@@ -64,7 +65,7 @@ void _redirectToMain(BuildContext context) {
       PageRouteBuilder(
         pageBuilder: (_, animation, ___) => FadeTransition(
             opacity: animation.drive(curveTween), child: PlankShellScreen()),
-        transitionDuration: Duration(seconds: 2),
+        transitionDuration: Duration(milliseconds: 500),
       ),
     );
   });

@@ -7,7 +7,7 @@ class PlankHistory {
   PlankHistory();
 
   PlankHistory.loadJson(String jsonString) {
-    records = List<Plank>();
+    records = <Plank>[];
     List decoded = jsonDecode(jsonString);
     for (var rawRecord in decoded) {
       records.add(Plank.fromJson(rawRecord));

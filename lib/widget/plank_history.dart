@@ -28,10 +28,10 @@ Widget plankHistoryView(BuildContext context, List<Plank> records) {
 
       var a = Jiffy(streak).endOf(Units.DAY);
       var b = Jiffy(when).endOf(Units.DAY);
-      var diff = a.difference(b);
+      var diff = a.diff(b, Units.HOUR);
 
       var showStreak = false;
-      if (diff <= Duration(hours: 24)) {
+      if (diff <= Duration(hours: 24).inHours) {
         streak = when;
         showStreak = true;
       }

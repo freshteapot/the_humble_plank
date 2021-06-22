@@ -78,6 +78,8 @@ class PlankModel extends ChangeNotifier {
   String _currentChallengeUUID;
   String get currentChallengeUUID => _currentChallengeUUID;
 
+  String _previousChallengeUUID;
+  String get previousChallengeUUID => _previousChallengeUUID;
   Challenge _challenge;
   Challenge get challenge => _challenge;
 
@@ -123,6 +125,7 @@ class PlankModel extends ChangeNotifier {
         _history = [],
         _challenges = [],
         _challenge = Challenge.empty(),
+        _currentChallengeUUID = "",
         _showChallenge = true,
         _challengeNotificationShownOnCreate = false,
         _challengeNotificationShownOnJoin = false,
@@ -224,6 +227,10 @@ class PlankModel extends ChangeNotifier {
 
     _currentChallengeUUID =
         prefs.getString("plank.settings.currentChallengeUUID");
+
+    _previousChallengeUUID =
+        prefs.getString("plank.settings.previousChallengeUUID");
+
     _appPushNotifications =
         prefs.getBool("plank.settings.notificationsEnabled");
     _appPushNotificationsShown =
@@ -259,6 +266,10 @@ class PlankModel extends ChangeNotifier {
 
     if (_currentChallengeUUID == null) {
       _currentChallengeUUID = "";
+    }
+
+    if (_previousChallengeUUID == null) {
+      _previousChallengeUUID = "";
     }
 
     if (_appPushNotifications == null) {
@@ -411,11 +422,21 @@ class PlankModel extends ChangeNotifier {
   }
 
   Future<void> setChallenge(Challenge newValue) async {
+    if (_currentChallengeUUID.isNotEmpty) {
+      _previousChallengeUUID = _currentChallengeUUID;
+    }
+
     _challenge = newValue;
     _currentChallengeUUID = newValue.uuid;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        "plank.settings.currentChallengeUUID", _currentChallengeUUID);
+
+    await Future.wait([
+      prefs.setString(
+          "plank.settings.currentChallengeUUID", _currentChallengeUUID),
+      prefs.setString(
+          "plank.settings.previousChallengeUUID", _previousChallengeUUID),
+    ]);
+
     _notifyListeners();
   }
 

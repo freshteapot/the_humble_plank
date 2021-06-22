@@ -115,6 +115,11 @@ appPushNotificationsShown=$appPushNotificationsShown
 
     List<Challenge> challenges =
         context.select((PlankModel model) => model.challenges);
+    String currentChallengeUUID =
+        context.select((PlankModel model) => model.currentChallengeUUID);
+
+    String previousChallengeUUID =
+        context.select((PlankModel model) => model.previousChallengeUUID);
     List<Plank> history = context.select((PlankModel model) => model.history);
 
     String latestNotificationId =
@@ -162,15 +167,19 @@ showNotificationNagWithChallenges=$showNotificationNagWithChallenges
     // Out the box challenge will cause this to show the correct one
     List<Widget> screens = [
       PlankHistoryScreen(
+        history: history,
         challenges: challenges,
         currentChallenge: challenge,
-        history: history,
+        currentChallengeUUID: currentChallengeUUID,
+        previousChallengeUUID: previousChallengeUUID,
       ),
       PlankScreen(
         showIntervals: showIntervals,
         intervalTime: intervalTime,
-        currentChallenge: challenge,
         challenges: challenges,
+        currentChallenge: challenge,
+        currentChallengeUUID: currentChallengeUUID,
+        previousChallengeUUID: previousChallengeUUID,
         showNotificationNagOnPlank: showNotificationNagOnPlank,
       ),
       getChallengeScreen(),

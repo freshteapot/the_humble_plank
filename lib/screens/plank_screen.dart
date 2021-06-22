@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/notify_me.dart';
+import 'package:thehumbleplank/widget/plank_pick_challenge.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -13,19 +14,24 @@ import 'package:thehumbleplank/widget/challenge_menu.dart';
 class PlankScreen extends StatefulWidget {
   int intervalTime;
   bool showIntervals;
-  Challenge currentChallenge;
   List<Challenge> challenges;
+  Challenge currentChallenge;
+  String currentChallengeUUID;
+  String previousChallengeUUID;
+
   bool showNotificationNagOnPlank;
   // TODO add
 
-  PlankScreen(
-      {Key key,
-      this.intervalTime: 0,
-      this.showIntervals: false,
-      this.currentChallenge,
-      this.challenges,
-      this.showNotificationNagOnPlank: false})
-      : super(key: key);
+  PlankScreen({
+    Key key,
+    this.intervalTime: 0,
+    this.showIntervals: false,
+    this.challenges,
+    this.currentChallenge,
+    this.currentChallengeUUID,
+    this.previousChallengeUUID,
+    this.showNotificationNagOnPlank: false,
+  }) : super(key: key);
 
   @override
   _PlankScreenState createState() => _PlankScreenState();
@@ -159,8 +165,34 @@ class _PlankScreenState extends State<PlankScreen> {
                               return Container(
                                   height:
                                       MediaQuery.of(context).size.height / 2.0,
-                                  child: _challengesView(
-                                      context, widget.challenges));
+                                  //child: _challengesView(
+                                  //    context, widget.challenges));
+
+                                  child: PlankPickChallenge(
+                                    challenges: widget.challenges,
+                                    currentChallengeUUID:
+                                        widget.currentChallengeUUID,
+                                    previousChallengeUUID:
+                                        widget.previousChallengeUUID,
+                                    onTap: (ChallengeMenu item) async {
+                                      if (item.type == 1) {
+                                        await context
+                                            .read<PlankModel>()
+                                            .setChallenge(Challenge.empty());
+                                        Navigator.pop(context);
+                                        return;
+                                      }
+
+                                      // Assumed 2
+                                      Challenge newChallenge =
+                                          item.data as Challenge;
+                                      await context
+                                          .read<PlankModel>()
+                                          .getChallengeWithHistory(
+                                              newChallenge.uuid);
+                                      Navigator.pop(context);
+                                    },
+                                  ));
                             });
                       },
                       child: Text(
@@ -464,73 +496,4 @@ Widget menu(BuildContext context, String state, Function onStart,
       ],
     ),
   );
-}
-
-Widget _challengesView(BuildContext context, List<Challenge> challenges) {
-  List<ChallengeMenu> items = List<ChallengeMenu>();
-  items.add(ChallengeMenu(name: "No challenge", type: 1));
-  items.addAll(challenges.map((challenge) {
-    return ChallengeMenu(name: challenge.description, type: 2, data: challenge);
-  }).toList());
-
-  return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints viewportConstraints) {
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: viewportConstraints.maxHeight,
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            children: <Widget>[
-              Container(
-                // A fixed-height child.
-                //height: MediaQuery.of(context).size.height / 0.5,
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                child: const Text('Pick from'),
-              ),
-              Expanded(
-                // A flexible child that will grow to fit the viewport but
-                // still be at least as big as necessary to fit its contents.
-                child: Container(
-                  height: 120.0,
-                  alignment: Alignment.center,
-                  child: ListView.separated(
-                    itemCount: items.length,
-                    separatorBuilder: (context, index) {
-                      return Divider();
-                    },
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Text('${items[index].name}'),
-                        onTap: () async {
-                          var item = items[index];
-
-                          if (item.type == 1) {
-                            await context
-                                .read<PlankModel>()
-                                .setChallenge(Challenge.empty());
-                            Navigator.pop(context);
-                            return;
-                          }
-
-                          // Assumed 2
-                          Challenge newChallenge = item.data as Challenge;
-                          await context
-                              .read<PlankModel>()
-                              .getChallengeWithHistory(newChallenge.uuid);
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  });
 }

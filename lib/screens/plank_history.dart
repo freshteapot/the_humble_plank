@@ -8,15 +8,20 @@ import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/plank_challenge_history.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
 import 'package:thehumbleplank/widget/plank_history.dart';
+import 'package:thehumbleplank/widget/plank_pick_challenge.dart';
 
 class PlankHistoryScreen extends StatefulWidget {
   List<Plank> history;
   List<Challenge> challenges;
   Challenge currentChallenge;
+  String currentChallengeUUID;
+  String previousChallengeUUID;
   PlankHistoryScreen({
     this.history,
     this.challenges,
     this.currentChallenge,
+    this.currentChallengeUUID,
+    this.previousChallengeUUID,
   });
 
   @override
@@ -75,20 +80,44 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return WillPopScope(
-                                      onWillPop: () async {
-                                        await context
-                                            .read<PlankModel>()
-                                            .setChallenge(Challenge.empty());
-                                        Navigator.of(context).pop();
-                                        return false;
-                                      },
-                                      child: Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              2.0,
-                                          child: _challengesView(
-                                              context, widget.challenges)));
+                                    onWillPop: () async {
+                                      await context
+                                          .read<PlankModel>()
+                                          .setChallenge(Challenge.empty());
+                                      Navigator.of(context).pop();
+                                      return false;
+                                    },
+                                    child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                2.0,
+                                        child: PlankPickChallenge(
+                                          challenges: widget.challenges,
+                                          currentChallengeUUID:
+                                              widget.currentChallengeUUID,
+                                          previousChallengeUUID:
+                                              widget.previousChallengeUUID,
+                                          onTap: (ChallengeMenu item) async {
+                                            if (item.type == 1) {
+                                              await context
+                                                  .read<PlankModel>()
+                                                  .setChallenge(
+                                                      Challenge.empty());
+                                              Navigator.pop(context);
+                                              return;
+                                            }
+
+                                            // Assumed 2
+                                            Challenge newChallenge =
+                                                item.data as Challenge;
+                                            await context
+                                                .read<PlankModel>()
+                                                .getChallengeWithHistory(
+                                                    newChallenge.uuid);
+                                            Navigator.pop(context);
+                                          },
+                                        )),
+                                  );
                                 });
                             //
                           },
@@ -100,71 +129,4 @@ class _PlankHistoryScreenState extends State<PlankHistoryScreen> {
                   ],
                 ])));
   }
-}
-
-Widget _challengesView(BuildContext context, List<Challenge> challenges) {
-  List<ChallengeMenu> items = List<ChallengeMenu>();
-  items.add(ChallengeMenu(name: "All my planks", type: 1));
-  items.addAll(challenges.map((challenge) {
-    return ChallengeMenu(name: challenge.description, type: 2, data: challenge);
-  }).toList());
-
-  return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints viewportConstraints) {
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: viewportConstraints.maxHeight,
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            children: <Widget>[
-              Container(
-                // A fixed-height child.
-                //height: MediaQuery.of(context).size.height / 0.5,
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                child: const Text('Pick from'),
-              ),
-              Expanded(
-                // A flexible child that will grow to fit the viewport but
-                // still be at least as big as necessary to fit its contents.
-                child: Container(
-                  height: 120.0,
-                  alignment: Alignment.center,
-                  child: ListView.separated(
-                    itemCount: items.length,
-                    separatorBuilder: (context, index) {
-                      return Divider();
-                    },
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Text('${items[index].name}'),
-                        onTap: () async {
-                          var item = items[index];
-                          var newChallenge = Challenge.empty();
-                          if (item.type == 2) {
-                            newChallenge = item.data as Challenge;
-                            await context
-                                .read<PlankModel>()
-                                .getChallengeWithHistory(newChallenge.uuid);
-                          } else {
-                            await context
-                                .read<PlankModel>()
-                                .setChallenge(newChallenge);
-                          }
-
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  });
 }

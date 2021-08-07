@@ -14,7 +14,7 @@ class LearnalistEnv {
   });
 
   factory LearnalistEnv.defaultValues() {
-    bool dev = false;
+    bool dev = true;
     if (!dev) {
       return LearnalistEnv(
           username: "",
@@ -26,7 +26,7 @@ class LearnalistEnv {
     return LearnalistEnv(
         username: "iamtest1",
         password: "test123",
-        basePath: "http://172.20.10.3:1234/api/v1",
+        basePath: "http://192.168.0.10:1234/api/v1",
         env: "dev");
   }
 }

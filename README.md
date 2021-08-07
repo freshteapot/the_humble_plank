@@ -152,7 +152,13 @@ token=$(echo $response | jq -r '.token')
 curl -i -XDELETE -H"Authorization: Bearer ${token}" "http://localhost:1234/api/v1/user/${userUUID}"
 ```
 
-
+# ios/Pod failure
+```
+rm ios/Podfile.lock
+cd ios
+pod install --repo-update
+cd -
+```
 
 #
 > error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.

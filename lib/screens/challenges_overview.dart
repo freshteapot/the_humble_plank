@@ -151,14 +151,6 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       Builder(
         builder: (BuildContext context) {
-          return ElevatedButton(
-            onPressed: () => shareChallenge(context, challenge),
-            child: const Text('Share'),
-          );
-        },
-      ),
-      Builder(
-        builder: (BuildContext context) {
           return TextButton(
               style: primaryButtonStyle(),
               onPressed: () {
@@ -173,49 +165,22 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
               ));
         },
       ),
-      TextButton(
-          style: primaryButtonStyle(),
-          onPressed: () {
-            shareChallenge(context, challenge);
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(Icons.share, size: 18),
-              Text("Share"),
-            ],
-          )),
-      SizedBox(
-          width: 60, // specific value
-          child: TextButton(
-            style: primaryButtonStyle(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.share, size: 18),
-                Text("Share"),
-              ],
-            ),
-            onPressed: () {
-              shareChallenge(context, challenge);
-            },
-          )),
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.close, size: 18),
-                Text("Leave"),
-              ],
-            ),
-            onPressed: () {
-              context.read<PlankModel>().leaveChallenge(challenge.uuid);
-            },
-          )),
+      Builder(
+        builder: (BuildContext context) {
+          return TextButton(
+              style: primaryButtonStyle(),
+              onPressed: () {
+                context.read<PlankModel>().leaveChallenge(challenge.uuid);
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.share, size: 18),
+                  Text("Leave"),
+                ],
+              ));
+        },
+      ),
     ]);
   }
 }

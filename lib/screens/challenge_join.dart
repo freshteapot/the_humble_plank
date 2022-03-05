@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/plank_model.dart';
-import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/theme.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 
 class ChallengeJoinScreen extends StatelessWidget {
   @override
@@ -36,6 +37,15 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
+    bool challengeNotificationShownOnJoin = context
+        .select((PlankModel model) => model.challengeNotificationShownOnJoin);
+
+    bool appPushNotifications =
+        context.select((PlankModel model) => model.appPushNotifications);
+
+    bool showNotificationNag =
+        !appPushNotifications && !challengeNotificationShownOnJoin;
+
     return Column(children: <Widget>[
       Align(
         alignment: Alignment.centerLeft,
@@ -57,13 +67,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
       Container(
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: 50),
-          child: FlatButton(
-            color: Colors.blue,
-            textColor: Colors.white,
-            disabledColor: Colors.grey,
-            disabledTextColor: Colors.black,
-            padding: EdgeInsets.all(8.0),
-            splashColor: Colors.blueAccent,
+          child: TextButton(
+            style: primaryButtonStyle(),
             onPressed: () async {
               FocusScopeNode currentFocus = FocusScope.of(context);
 
@@ -108,8 +113,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 )..show(context);
                 return;
               }
-
-              await checkAndAskForNotificationPermission(context);
+              if (showNotificationNag) {
+                await notifyMeBecauseIJoinedAChallenge(context);
+              }
               Navigator.of(context).pop();
             },
             child: Text(

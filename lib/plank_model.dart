@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'package:openapi/api.dart';
 import 'package:thehumbleplank/credentials_repository.dart';
@@ -23,9 +24,7 @@ import 'package:thehumbleplank/notifications.dart';
 LearnalistEnv learnalistEnv = LearnalistEnv.defaultValues();
 
 GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: <String>[
-    'email',
-  ],
+  scopes: <String>[],
 );
 
 class PlankModel extends ChangeNotifier {
@@ -60,6 +59,27 @@ class PlankModel extends ChangeNotifier {
   bool _showChallenge;
   bool get showChallenge => _showChallenge;
 
+  bool _challengeNotificationShownOnCreate;
+  bool get challengeNotificationShownOnCreate =>
+      _challengeNotificationShownOnCreate;
+
+  bool _challengeNotificationShownOnJoin;
+  bool get challengeNotificationShownOnJoin =>
+      _challengeNotificationShownOnJoin;
+
+  bool _challengeNotificationShownOnPlank;
+  bool get challengeNotificationShownOnPlank =>
+      _challengeNotificationShownOnPlank;
+
+  bool _challengeNotificationShownWithChallenges;
+  bool get challengeNotificationShownWithChallenges =>
+      _challengeNotificationShownWithChallenges;
+
+  String _currentChallengeUUID;
+  String get currentChallengeUUID => _currentChallengeUUID;
+
+  String _previousChallengeUUID;
+  String get previousChallengeUUID => _previousChallengeUUID;
   Challenge _challenge;
   Challenge get challenge => _challenge;
 
@@ -89,6 +109,10 @@ class PlankModel extends ChangeNotifier {
   bool _showCallToActionForDisplayName;
   bool get showCallToActionForDisplayName => _showCallToActionForDisplayName;
   bool _skipNotification;
+
+  bool _canSignInWithApple;
+  bool get canSignInWithApple => _canSignInWithApple;
+
   PlankModel({
     @required this.repository,
     @required this.challengeRepo,
@@ -101,7 +125,12 @@ class PlankModel extends ChangeNotifier {
         _history = [],
         _challenges = [],
         _challenge = Challenge.empty(),
-        _showChallenge = false,
+        _currentChallengeUUID = "",
+        _showChallenge = true,
+        _challengeNotificationShownOnCreate = false,
+        _challengeNotificationShownOnJoin = false,
+        _challengeNotificationShownOnPlank = false,
+        _challengeNotificationShownWithChallenges = false,
         _offline = false,
         _showIntervals = false,
         _intervalTime = 0,
@@ -110,9 +139,12 @@ class PlankModel extends ChangeNotifier {
         _bootstrapLogin = false,
         _displayName = "",
         _showCallToActionForDisplayName = true,
-        _skipNotification = false;
+        _skipNotification = false,
+        _canSignInWithApple = false;
 
   _notifyListeners() {
+    print(
+        "_notifyListeners _bootstrapping=$_bootstrapping, _skipNotification=$_skipNotification");
     if (_bootstrapping) {
       return;
     }
@@ -155,6 +187,10 @@ class PlankModel extends ChangeNotifier {
       _bootstrapGoogleSignIn();
     }
 
+    if (_credentials.idpAppleEnabled()) {
+      await _bootstrapAppleSignIn();
+    }
+
     _loggedIn = credentialsRepo.isLoggedIn();
 
     await _loadState();
@@ -162,8 +198,6 @@ class PlankModel extends ChangeNotifier {
     _bootstrapping = false;
     _bootstrapped = true;
     _bootstrapLogin = _loggedIn;
-    print(
-        "bootstrap $_loggedIn 2 ${_credentials.login.token} $_bootstrapLogin");
     _notifyListeners();
   }
 
@@ -171,6 +205,9 @@ class PlankModel extends ChangeNotifier {
     await loadSettings();
     await loadHistory();
     await loadChallenges();
+    await loadCurrentChallenge();
+    // if currentChallengeUUID
+    // getChallengeWithHistory
   }
 
   Future<void> loadSettings() async {
@@ -178,8 +215,26 @@ class PlankModel extends ChangeNotifier {
     _intervalTime = prefs.getInt("plank.settings.intervalTime");
     _showIntervals = prefs.getBool("plank.settings.showIntervals");
     _showChallenge = prefs.getBool("plank.settings.showChallenge");
+
+    _challengeNotificationShownOnCreate =
+        prefs.getBool("plank.settings.challengeNotificationShown.onCreate");
+    _challengeNotificationShownOnJoin =
+        prefs.getBool("plank.settings.challengeNotificationShown.onJoin");
+    _challengeNotificationShownOnPlank =
+        prefs.getBool("plank.settings.challengeNotificationShown.onPlank");
+    _challengeNotificationShownWithChallenges = prefs
+        .getBool("plank.settings.challengeNotificationShown.withChallenges");
+
+    _currentChallengeUUID =
+        prefs.getString("plank.settings.currentChallengeUUID");
+
+    _previousChallengeUUID =
+        prefs.getString("plank.settings.previousChallengeUUID");
+
     _appPushNotifications =
         prefs.getBool("plank.settings.notificationsEnabled");
+    _appPushNotificationsShown =
+        prefs.getBool("plank.settings.notificationsShown");
 
     if (_intervalTime == null) {
       _intervalTime = 0;
@@ -193,8 +248,36 @@ class PlankModel extends ChangeNotifier {
       _showChallenge = true;
     }
 
+    if (_challengeNotificationShownOnCreate == null) {
+      _challengeNotificationShownOnCreate = false;
+    }
+
+    if (_challengeNotificationShownOnJoin == null) {
+      _challengeNotificationShownOnJoin = false;
+    }
+
+    if (_challengeNotificationShownOnPlank == null) {
+      _challengeNotificationShownOnPlank = false;
+    }
+
+    if (_challengeNotificationShownWithChallenges == null) {
+      _challengeNotificationShownWithChallenges = false;
+    }
+
+    if (_currentChallengeUUID == null) {
+      _currentChallengeUUID = "";
+    }
+
+    if (_previousChallengeUUID == null) {
+      _previousChallengeUUID = "";
+    }
+
     if (_appPushNotifications == null) {
       _appPushNotifications = false;
+    }
+
+    if (_appPushNotificationsShown == null) {
+      _appPushNotificationsShown = false;
     }
 
     // Double check whats in the preferences
@@ -203,6 +286,15 @@ class PlankModel extends ChangeNotifier {
       await prefs.setBool("plank.settings.notificationsEnabled", actual);
       _appPushNotifications = actual;
     }
+
+    if (_appPushNotifications) {
+      if (!_appPushNotificationsShown) {
+        await prefs.setBool("plank.settings.notificationsShown", true);
+        _appPushNotificationsShown = true;
+      }
+    }
+
+    _canSignInWithApple = await SignInWithApple.isAvailable();
   }
 
   Future<void> loadHistory() async {
@@ -211,6 +303,7 @@ class PlankModel extends ChangeNotifier {
     }
 
     try {
+      // TODO is it possible to get the challenge from here? I dont think so.
       var loadedEntries = await repository.history();
       _history = loadedEntries;
       _notifyListeners();
@@ -293,8 +386,57 @@ class PlankModel extends ChangeNotifier {
     _notifyListeners();
   }
 
+  Future<void> setShownChallengeNotification(
+      String action, bool newValue) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    switch (action) {
+      case "onCreate":
+        _challengeNotificationShownOnCreate = newValue;
+        await prefs.setBool(
+            "plank.settings.challengeNotificationShown.onCreate",
+            _challengeNotificationShownOnCreate);
+        break;
+      case "onJoin":
+        _challengeNotificationShownOnJoin = newValue;
+        await prefs.setBool("plank.settings.challengeNotificationShown.onJoin",
+            _challengeNotificationShownOnJoin);
+        break;
+      case "onPlank":
+        _challengeNotificationShownOnPlank = newValue;
+        await prefs.setBool("plank.settings.challengeNotificationShown.onPlank",
+            _challengeNotificationShownOnPlank);
+        break;
+      case "withChallenges":
+        _challengeNotificationShownWithChallenges = newValue;
+        await prefs.setBool(
+            "plank.settings.challengeNotificationShown.withChallenges",
+            _challengeNotificationShownWithChallenges);
+        break;
+      default:
+        print("setShownChallengeNotification action, not supported");
+        return;
+    }
+
+    _notifyListeners();
+  }
+
   Future<void> setChallenge(Challenge newValue) async {
+    if (_currentChallengeUUID.isNotEmpty) {
+      _previousChallengeUUID = _currentChallengeUUID;
+    }
+
     _challenge = newValue;
+    _currentChallengeUUID = newValue.uuid;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await Future.wait([
+      prefs.setString(
+          "plank.settings.currentChallengeUUID", _currentChallengeUUID),
+      prefs.setString(
+          "plank.settings.previousChallengeUUID", _previousChallengeUUID),
+    ]);
+
     _notifyListeners();
   }
 
@@ -368,10 +510,6 @@ class PlankModel extends ChangeNotifier {
   }
 
   Future<void> loadChallenges() async {
-    //_challenges = [
-    //  Challenge(uuid: "fake-123", description: "Daily plank"),
-    //  Challenge(uuid: "fake-456", description: "Group plank"),
-    //];
     if (!_loggedIn) {
       return;
     }
@@ -395,6 +533,19 @@ class PlankModel extends ChangeNotifier {
     return;
   }
 
+  Future<void> loadCurrentChallenge() async {
+    if (!_loggedIn) {
+      return;
+    }
+
+    if (currentChallengeUUID == "") {
+      return;
+    }
+
+    await getChallengeWithHistory(currentChallengeUUID);
+    return;
+  }
+
   Future<void> getChallengeWithHistory(String uuid) async {
     try {
       var challenge = await challengeRepo.getChallenge(uuid);
@@ -405,6 +556,7 @@ class PlankModel extends ChangeNotifier {
         records: challenge.records,
       ));
     } catch (error) {
+      // TODO possibly can error because the challenge is removed
       _lastError = error;
       _checkErrorForOffline(error);
       _checkErrorFor403(error);
@@ -438,7 +590,7 @@ class PlankModel extends ChangeNotifier {
     _notifyListeners();
   }
 
-// Handle when  the notification is challenge:updated
+  // Handle when  the notification is challenge:updated
   // Get challenge
   // Set challenge
   // Update index for the screen
@@ -477,14 +629,11 @@ class PlankModel extends ChangeNotifier {
       return;
     }
 
-    print("idp:google Trying to login");
-
     HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
 
     var auth = await _credentials.idpGoogle.authentication;
     input.idp = CredentialsLoginTypeGoogle;
     input.idToken = auth.idToken;
-    input.accessToken = auth.accessToken;
 
     try {
       var session =
@@ -501,6 +650,48 @@ class PlankModel extends ChangeNotifier {
       _loggedIn = credentialsRepo.isLoggedIn();
       // Need to add it back as the credentials are reloaded.
       _credentials.idpGoogle = account;
+      _skipNotification = true;
+      await _loadState();
+
+      String token = await getToken();
+      sendTokenToServer(token);
+
+      _skipNotification = false;
+      _bootstrapLogin = true;
+      _notifyListeners();
+    } catch (error) {
+      _skipNotification = false;
+      var newCredentials = Credentials.defaultValues();
+      await credentialsRepo.saveCredentials(
+          newCredentials, learnalistEnv.basePath);
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+    }
+  }
+
+  Future<void> _handleAppleSignIn(AuthorizationCredentialAppleID auth) async {
+    HttpUserLoginIDPInput input = HttpUserLoginIDPInput();
+
+    input.idp = CredentialsLoginTypeApple;
+    input.idToken = auth.identityToken;
+    input.code = auth.authorizationCode;
+
+    try {
+      var session =
+          await credentialsRepo.loginWithIdp(input, learnalistEnv.basePath);
+
+      var newCredentials = Credentials();
+      newCredentials.login = session;
+      newCredentials.loginType = CredentialsLoginTypeApple;
+      newCredentials.idpApple = auth.userIdentifier;
+
+      await credentialsRepo.saveCredentials(
+          newCredentials, learnalistEnv.basePath);
+      await _loadCredentials();
+
+      _loggedIn = credentialsRepo.isLoggedIn();
+      // We store the user identifier, meaning we dont need to reload
       _skipNotification = true;
       await _loadState();
 
@@ -556,6 +747,7 @@ class PlankModel extends ChangeNotifier {
       String token = await getToken();
       sendTokenToServer(token);
 
+      _bootstrapLogin = true;
       _skipNotification = false;
       _notifyListeners();
     }).catchError((error) async {
@@ -599,6 +791,41 @@ class PlankModel extends ChangeNotifier {
     print("idp:google enabled and setup");
   }
 
+  Future<void> loginWithApple() async {
+    try {
+      _skipNotification = true;
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [],
+      );
+
+      await _handleAppleSignIn(credential);
+      _skipNotification = false;
+      _notifyListeners();
+    } catch (error) {
+      _skipNotification = false;
+      var newCredentials = Credentials.defaultValues();
+      await credentialsRepo.saveCredentials(
+          newCredentials, learnalistEnv.basePath);
+      _lastError = error;
+      _checkErrorForOffline(error);
+      _checkErrorFor403(error);
+    }
+  }
+
+  Future<void> _bootstrapAppleSignIn() async {
+    if (!_credentials.idpAppleEnabled()) {
+      return;
+    }
+
+    final state =
+        await SignInWithApple.getCredentialState(_credentials.idpApple);
+    if (state != CredentialState.authorized) {
+      await credentialsRepo.unloadCredentials();
+      await _loadCredentials();
+      return;
+    }
+  }
+
   Future<void> sendTokenToServer(String token) async {
     if (!loggedIn) {
       return;
@@ -617,11 +844,40 @@ class PlankModel extends ChangeNotifier {
   bool _appPushNotifications = false;
   bool get appPushNotifications => _appPushNotifications;
 
+  bool _appPushNotificationsShown = false;
+  bool get appPushNotificationsShown => _appPushNotificationsShown;
+
   Future<void> setPushNotifications(bool state) async {
     _appPushNotifications = state;
+    _appPushNotificationsShown = _appPushNotifications;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(
-        "plank.settings.notificationsEnabled", _appPushNotifications);
+
+    await Future.wait([
+      prefs.setBool(
+          "plank.settings.notificationsShown", _appPushNotificationsShown),
+      prefs.setBool(
+          "plank.settings.notificationsEnabled", _appPushNotifications),
+    ]);
+
+    if (!_appPushNotifications) {
+      _challengeNotificationShownOnCreate = false;
+      _challengeNotificationShownOnJoin = false;
+      _challengeNotificationShownOnPlank = false;
+      _challengeNotificationShownWithChallenges = false;
+
+      await Future.wait([
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.onCreate", false),
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.onJoin", false),
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.onPlank", false),
+        prefs.setBool(
+            "plank.settings.challengeNotificationShown.withChallenges", false),
+      ]);
+    }
+
     _notifyListeners();
   }
 }

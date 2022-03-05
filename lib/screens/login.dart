@@ -2,31 +2,119 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:flushbar/flushbar.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:openapi/api.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:thehumbleplank/env.dart';
-
 import 'package:thehumbleplank/plank_model.dart';
-
-import 'package:thehumbleplank/screens/plank_shell.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/topbar.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var canSignInWithApple =
+        context.select((PlankModel model) => model.canSignInWithApple);
+    LoginInfo loginInfo = defaultValues();
+    Widget body =
+        Center(child: Image(image: AssetImage('assets/icon/icon.png')));
+
+    var options = <Widget>[
+      body,
+      loginWithGoogle(context),
+      if (canSignInWithApple) ...[loginWithApple(context)],
+      if (loginInfo.env == "dev") ...[LoginForm(loginInfo: loginInfo)],
+    ];
+
     return Scaffold(
         appBar: topBar(),
         body: Container(
             margin: const EdgeInsets.only(
-                top: 100.0, bottom: 30.0, left: 30.0, right: 30.0),
-            child: SingleChildScrollView(
-                child: Column(children: <Widget>[
-              LoginForm(),
-            ]))));
+                top: 0.0, bottom: 20.0, left: 30.0, right: 30.0),
+            child: SingleChildScrollView(child: Column(children: options))));
+  }
+
+  Widget loginWithGoogle(BuildContext context) {
+    final String assetName = 'assets/login/google.svg';
+    final Widget svgIcon = SvgPicture.asset(
+      assetName,
+      semanticsLabel: 'Google logo',
+    );
+
+    return Container(
+        margin: const EdgeInsets.only(top: 20.0),
+        child: TextButton(
+            style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all(Colors.black38),
+              shape: MaterialStateProperty.all<OutlinedBorder>(
+                  RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              )),
+              overlayColor: MaterialStateProperty.all(Colors.white),
+              side: MaterialStateProperty.all<BorderSide>(
+                  BorderSide(color: Colors.black38, width: 1)),
+            ),
+            onPressed: () async {
+              await context.read<PlankModel>().loginWithGoogle();
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                svgIcon,
+                Text(
+                  "Sign in with Google",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                ),
+              ],
+            )));
+  }
+
+  Widget loginWithApple(BuildContext context) {
+    final String assetName = 'assets/login/apple.svg';
+    final Widget svgIcon = SvgPicture.asset(
+      assetName,
+      semanticsLabel: 'Apple logo',
+    );
+
+    return Container(
+        margin: const EdgeInsets.only(top: 20.0),
+        child: TextButton(
+            style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all(Colors.black),
+              shape: MaterialStateProperty.all<OutlinedBorder>(
+                  RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              )),
+              overlayColor: MaterialStateProperty.all(Colors.white),
+              side: MaterialStateProperty.all<BorderSide>(
+                  BorderSide(color: Colors.black, width: 1)),
+            ),
+            onPressed: () async {
+              await context.read<PlankModel>().loginWithApple();
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                svgIcon,
+                Text(
+                  "Sign in with Apple",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                ),
+              ],
+            )));
   }
 }
 
 class LoginForm extends StatefulWidget {
+  final LoginInfo loginInfo;
+
+  LoginForm({this.loginInfo});
+
   @override
   LoginFormState createState() {
     return LoginFormState();
@@ -61,18 +149,6 @@ class LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  Future<void> _redirectAfterLogin(BuildContext context) async {
-    var curveTween = CurveTween(curve: Curves.easeIn);
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (_, animation, ___) => FadeTransition(
-            opacity: animation.drive(curveTween), child: PlankShellScreen()),
-        transitionDuration: Duration(seconds: 1),
-      ),
-    );
-  }
-
   void validateform(BuildContext context) async {
     // Validate returns true if the form is valid, or false
     // otherwise.
@@ -102,7 +178,7 @@ class LoginFormState extends State<LoginForm> {
             title: "Error",
             message: "Something has gone wrong",
             blockBackgroundInteraction: true,
-            mainButton: FlatButton(
+            mainButton: TextButton(
               onPressed: () {
                 context.read<PlankModel>().logout();
                 Phoenix.rebirth(context);
@@ -116,18 +192,25 @@ class LoginFormState extends State<LoginForm> {
         }
         return;
       }
-
-      _redirectAfterLogin(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    LoginInfo loginInfo = defaultValues();
+    var options = <Widget>[
+      loginWithUsername(widget.loginInfo),
+    ];
+
     // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
       child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, children: options),
+    );
+  }
+
+  Widget loginWithUsername(LoginInfo loginInfo) {
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _Label(title: "Username"),
@@ -185,14 +268,9 @@ class LoginFormState extends State<LoginForm> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     focusNode: _submitFocus,
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    disabledColor: Colors.grey,
-                    disabledTextColor: Colors.black,
-                    padding: EdgeInsets.all(8.0),
-                    splashColor: Colors.blueAccent,
+                    style: primaryButtonStyle(),
                     onPressed: () {
                       validateform(context);
                     },
@@ -203,33 +281,7 @@ class LoginFormState extends State<LoginForm> {
                   ),
                 ],
               )),
-          Container(
-              margin: const EdgeInsets.only(top: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  FlatButton(
-                    focusNode: _submitFocus,
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    disabledColor: Colors.grey,
-                    disabledTextColor: Colors.black,
-                    padding: EdgeInsets.all(8.0),
-                    splashColor: Colors.blueAccent,
-                    onPressed: () async {
-                      await context.read<PlankModel>().loginWithGoogle();
-                      _redirectAfterLogin(context);
-                    },
-                    child: Text(
-                      "Login with google",
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                  ),
-                ],
-              )),
-        ],
-      ),
-    );
+        ]);
   }
 }
 
@@ -266,16 +318,21 @@ class LoginInfo {
   final String basePath;
   final String username;
   final String password;
+  final String env;
 
   LoginInfo({
     @required this.basePath,
     @required this.username,
     @required this.password,
+    @required this.env,
   });
 }
 
 LoginInfo defaultValues() {
   var env = LearnalistEnv.defaultValues();
   return LoginInfo(
-      username: env.username, password: env.password, basePath: env.basePath);
+      username: env.username,
+      password: env.password,
+      basePath: env.basePath,
+      env: env.env);
 }

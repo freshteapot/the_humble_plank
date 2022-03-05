@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:thehumbleplank/theme.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
+import 'package:thehumbleplank/widget/plank_pick_challenge.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -7,21 +10,28 @@ import 'package:openapi/api.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
-import 'package:thehumbleplank/widget/plank_screen_call_to_action.dart';
 
 class PlankScreen extends StatefulWidget {
   int intervalTime;
   bool showIntervals;
-  Challenge currentChallenge;
   List<Challenge> challenges;
+  Challenge currentChallenge;
+  String currentChallengeUUID;
+  String previousChallengeUUID;
 
-  PlankScreen(
-      {Key key,
-      this.intervalTime: 0,
-      this.showIntervals: false,
-      this.currentChallenge,
-      this.challenges})
-      : super(key: key);
+  bool showNotificationNagOnPlank;
+  // TODO add
+
+  PlankScreen({
+    Key key,
+    this.intervalTime: 0,
+    this.showIntervals: false,
+    this.challenges,
+    this.currentChallenge,
+    this.currentChallengeUUID,
+    this.previousChallengeUUID,
+    this.showNotificationNagOnPlank: false,
+  }) : super(key: key);
 
   @override
   _PlankScreenState createState() => _PlankScreenState();
@@ -61,7 +71,6 @@ class _PlankScreenState extends State<PlankScreen> {
 
     double historyHeight = MediaQuery.of(context).size.height / 1.5;
     bool showChallenges = widget.challenges.length > 0;
-    //bool showChallenge = widget.currentChallenge.uuid != "";
 
     return Align(
         alignment: Alignment.topCenter,
@@ -120,51 +129,26 @@ class _PlankScreenState extends State<PlankScreen> {
 
                         if (hasChallenge) ...[
                           Dismissible(
-                            // Each Dismissible must contain a Key. Keys allow Flutter to
-                            // uniquely identify widgets.
-                            key: Key("fake"),
-                            // Provide a function that tells the app
-                            // what to do after an item has been swiped away.
-                            onDismissed: (direction) {
-                              // Remove the item from the data source.
-                              context
-                                  .read<PlankModel>()
-                                  .setChallenge(Challenge.empty());
-                            },
-                            direction: DismissDirection.endToStart,
-
-                            background: Container(color: Colors.red),
-                            child: ListTile(
-                                title: Container(
-                                    alignment: Alignment.center,
-                                    child: GestureDetector(
-                                        onTap: () async {
-                                          await showModalBottomSheet(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return WillPopScope(
-                                                    onWillPop: () async {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      return false;
-                                                    },
-                                                    child: Container(
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height /
-                                                            2.0,
-                                                        child: plankScreenCallToAction(
-                                                            context,
-                                                            widget
-                                                                .currentChallenge)));
-                                              });
-                                        },
-                                        child: Text(
-                                          widget.currentChallenge.description,
-                                          style: TextStyle(color: Colors.black),
-                                        )))),
-                          ),
+                              // Each Dismissible must contain a Key. Keys allow Flutter to
+                              // uniquely identify widgets.
+                              key: Key("fake"),
+                              // Provide a function that tells the app
+                              // what to do after an item has been swiped away.
+                              onDismissed: (direction) {
+                                // Remove the item from the data source.
+                                context
+                                    .read<PlankModel>()
+                                    .setChallenge(Challenge.empty());
+                              },
+                              direction: DismissDirection.endToStart,
+                              background: Container(color: Colors.red),
+                              child: ListTile(
+                                  title: Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        widget.currentChallenge.description,
+                                        style: TextStyle(color: Colors.black),
+                                      )))),
                         ],
                       ],
                     ),
@@ -172,33 +156,44 @@ class _PlankScreenState extends State<PlankScreen> {
               if (showChallenges) ...[
                 Container(
                     alignment: Alignment.center,
-                    child: FlatButton(
-                      color: Colors.blue,
-                      textColor: Colors.white,
-                      disabledColor: Colors.grey,
-                      disabledTextColor: Colors.black,
-                      padding: EdgeInsets.all(8.0),
-                      splashColor: Colors.blueAccent,
+                    child: TextButton(
+                      style: primaryButtonStyle(),
                       onPressed: () async {
                         await showModalBottomSheet(
                             context: context,
                             builder: (BuildContext context) {
-                              return WillPopScope(
-                                  onWillPop: () async {
-                                    await context
-                                        .read<PlankModel>()
-                                        .setChallenge(Challenge.empty());
-                                    Navigator.of(context).pop();
-                                    return false;
-                                  },
-                                  child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              2.0,
-                                      child: _challengesView(
-                                          context, widget.challenges)));
+                              return Container(
+                                  height:
+                                      MediaQuery.of(context).size.height / 2.0,
+                                  //child: _challengesView(
+                                  //    context, widget.challenges));
+
+                                  child: PlankPickChallenge(
+                                    challenges: widget.challenges,
+                                    currentChallengeUUID:
+                                        widget.currentChallengeUUID,
+                                    previousChallengeUUID:
+                                        widget.previousChallengeUUID,
+                                    onTap: (ChallengeMenu item) async {
+                                      if (item.type == 1) {
+                                        await context
+                                            .read<PlankModel>()
+                                            .setChallenge(Challenge.empty());
+                                        Navigator.pop(context);
+                                        return;
+                                      }
+
+                                      // Assumed 2
+                                      Challenge newChallenge =
+                                          item.data as Challenge;
+                                      await context
+                                          .read<PlankModel>()
+                                          .getChallengeWithHistory(
+                                              newChallenge.uuid);
+                                      Navigator.pop(context);
+                                    },
+                                  ));
                             });
-                        //
                       },
                       child: Text(
                         "Pick a Challenge",
@@ -234,8 +229,16 @@ class _PlankScreenState extends State<PlankScreen> {
   }
 
   Future<void> onTimerSave(BuildContext context) async {
+    // TODO what if this fails?
     // TODO save to local storage first
+
     await context.read<PlankModel>().addEntry(record);
+
+    if (widget.currentChallenge.uuid != "" &&
+        widget.showNotificationNagOnPlank) {
+      await notifyMeBecauseIHaveAddedToAChallenge(context);
+    }
+
     record = defaultPlank(widget.showIntervals, widget.intervalTime);
     _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
     beginningTime = null;
@@ -255,8 +258,6 @@ class _PlankScreenState extends State<PlankScreen> {
     beginningTime = null;
     currentTime = null;
 
-    context.read<PlankModel>().setChallenge(Challenge.empty());
-
     setState(() {
       Wakelock.disable();
       state = "plank_start";
@@ -272,7 +273,8 @@ class _PlankScreenState extends State<PlankScreen> {
 
     record.timerNow = currentTime.millisecondsSinceEpoch -
         beginningTime.millisecondsSinceEpoch;
-
+    // TODO possible bug here, in reporting "currentTime"
+    // Back to the server
     if (record.showIntervals) {
       if (record.intervalTimerNow > record.intervalTime * 1000) {
         DateTime intervalBeginning = DateTime.now();
@@ -380,13 +382,12 @@ Widget menu(BuildContext context, String state, Function onStart,
     Function onStop, Function onSave, Function onReset) {
   Widget start = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.blue,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.blueAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.green),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.green, width: 1)),
+        ),
         onPressed: () {
           onStart();
         },
@@ -398,13 +399,12 @@ Widget menu(BuildContext context, String state, Function onStart,
 
   Widget stop = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.red,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.redAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.red),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.red, width: 1)),
+        ),
         onPressed: () {
           onStop();
         },
@@ -416,31 +416,29 @@ Widget menu(BuildContext context, String state, Function onStart,
 
   Widget reset = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.red,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.redAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.red),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.red, width: 1)),
+        ),
         onPressed: () {
           onReset(context);
         },
         child: Text(
-          'Discard',
+          "Discard",
           style: TextStyle(fontSize: 20.0),
         ),
       ));
 
   Widget save = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FlatButton(
-        color: Colors.green,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
-        padding: EdgeInsets.all(8.0),
-        splashColor: Colors.greenAccent,
+      child: TextButton(
+        style: primaryButtonStyle().copyWith(
+          foregroundColor: MaterialStateProperty.all(Colors.green),
+          side: MaterialStateProperty.all<BorderSide>(
+              BorderSide(color: Colors.green, width: 1)),
+        ),
         onPressed: () {
           onSave(context);
         },
@@ -499,73 +497,4 @@ Widget menu(BuildContext context, String state, Function onStart,
       ],
     ),
   );
-}
-
-Widget _challengesView(BuildContext context, List<Challenge> challenges) {
-  List<ChallengeMenu> items = List<ChallengeMenu>();
-  items.add(ChallengeMenu(name: "No challenge", type: 1));
-  items.addAll(challenges.map((challenge) {
-    return ChallengeMenu(name: challenge.description, type: 2, data: challenge);
-  }).toList());
-
-  return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints viewportConstraints) {
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: viewportConstraints.maxHeight,
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            children: <Widget>[
-              Container(
-                // A fixed-height child.
-                //height: MediaQuery.of(context).size.height / 0.5,
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                child: const Text('Pick from'),
-              ),
-              Expanded(
-                // A flexible child that will grow to fit the viewport but
-                // still be at least as big as necessary to fit its contents.
-                child: Container(
-                  height: 120.0,
-                  alignment: Alignment.center,
-                  child: ListView.separated(
-                    itemCount: items.length,
-                    separatorBuilder: (context, index) {
-                      return Divider();
-                    },
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Text('${items[index].name}'),
-                        onTap: () async {
-                          var item = items[index];
-
-                          if (item.type == 1) {
-                            await context
-                                .read<PlankModel>()
-                                .setChallenge(Challenge.empty());
-                            Navigator.pop(context);
-                            return;
-                          }
-
-                          // Assumed 2
-                          Challenge newChallenge = item.data as Challenge;
-                          await context
-                              .read<PlankModel>()
-                              .getChallengeWithHistory(newChallenge.uuid);
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  });
 }

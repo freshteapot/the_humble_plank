@@ -6,6 +6,7 @@ import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/learnalist/challenge.dart';
 import 'package:thehumbleplank/screens/challenge_create.dart';
 import 'package:thehumbleplank/screens/challenge_join.dart';
+import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/widget/onshare.dart';
 
 class ChallengesOverviewScreen extends StatefulWidget {
@@ -47,13 +48,8 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
           ),
           Container(
               alignment: Alignment.center,
-              child: FlatButton(
-                color: Colors.blue,
-                textColor: Colors.white,
-                disabledColor: Colors.grey,
-                disabledTextColor: Colors.black,
-                padding: EdgeInsets.all(8.0),
-                splashColor: Colors.blueAccent,
+              child: TextButton(
+                style: primaryButtonStyle(),
                 onPressed: () async {
                   // Create or ask for name
 
@@ -80,13 +76,8 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
               )),
           Container(
               alignment: Alignment.center,
-              child: FlatButton(
-                color: Colors.blue,
-                textColor: Colors.white,
-                disabledColor: Colors.grey,
-                disabledTextColor: Colors.black,
-                padding: EdgeInsets.all(8.0),
-                splashColor: Colors.blueAccent,
+              child: TextButton(
+                style: primaryButtonStyle(),
                 onPressed: () async {
                   await showModalBottomSheet(
                       isScrollControlled: true,
@@ -158,38 +149,38 @@ class _ChallengesOverviewScreenState extends State<ChallengesOverviewScreen> {
 
   Widget menuRow(BuildContext context, Challenge challenge) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.share, size: 18),
-                Text("Share"),
-              ],
-            ),
-            onPressed: () {
-              shareChallenge(context, challenge);
-            },
-          )),
-      SizedBox(
-          width: 60, // specific value
-          child: RaisedButton(
-            color: Colors.white,
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.close, size: 18),
-                Text("Leave"),
-              ],
-            ),
-            onPressed: () {
-              context.read<PlankModel>().leaveChallenge(challenge.uuid);
-            },
-          )),
+      Builder(
+        builder: (BuildContext context) {
+          return TextButton(
+              style: primaryButtonStyle(),
+              onPressed: () {
+                shareChallenge(context, challenge);
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.share, size: 18),
+                  Text("Share"),
+                ],
+              ));
+        },
+      ),
+      Builder(
+        builder: (BuildContext context) {
+          return TextButton(
+              style: primaryButtonStyle(),
+              onPressed: () {
+                context.read<PlankModel>().leaveChallenge(challenge.uuid);
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.share, size: 18),
+                  Text("Leave"),
+                ],
+              ));
+        },
+      ),
     ]);
   }
 }

@@ -21,11 +21,14 @@ class _StartScreenState extends State<StartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("StartScreen");
     var bootstrapped = context.select((PlankModel model) => model.bootstrapped);
 
     if (!bootstrapped) {
-      // TODO this could be a logo
-      Widget body = SizedBox.shrink();
+      Widget body = Container(
+          margin: const EdgeInsets.only(left: 30.0, right: 30.0),
+          child:
+              Center(child: Image(image: AssetImage('assets/icon/icon.png'))));
       return Scaffold(backgroundColor: Colors.white, body: body);
     }
 
@@ -64,7 +67,7 @@ void _redirectToMain(BuildContext context) {
       PageRouteBuilder(
         pageBuilder: (_, animation, ___) => FadeTransition(
             opacity: animation.drive(curveTween), child: PlankShellScreen()),
-        transitionDuration: Duration(seconds: 2),
+        transitionDuration: Duration(milliseconds: 500),
       ),
     );
   });

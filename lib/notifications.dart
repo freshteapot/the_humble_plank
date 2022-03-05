@@ -135,6 +135,10 @@ Future<void> setupNotifications(
   await plankModel.sendTokenToServer(token);
 }
 
+Future<NotificationSettings> getNotificationSettings() {
+  return FirebaseMessaging.instance.getNotificationSettings();
+}
+
 Future<NotificationSettings> requestPermission() {
   return FirebaseMessaging.instance.requestPermission(
     alert: true,

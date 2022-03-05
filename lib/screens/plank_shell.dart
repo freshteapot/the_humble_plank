@@ -2,7 +2,6 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:openapi/api.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/learnalist/challenge.dart';
@@ -11,7 +10,7 @@ import 'package:thehumbleplank/screens/challenges_overview.dart';
 import 'package:thehumbleplank/screens/plank_history.dart';
 import 'package:thehumbleplank/screens/plank_screen.dart';
 import 'package:thehumbleplank/screens/plank_settings.dart';
-import 'package:thehumbleplank/utils.dart';
+import 'package:thehumbleplank/widget/notify_me.dart';
 import 'package:thehumbleplank/widget/topbar.dart';
 
 class PlankShellScreen extends StatefulWidget {
@@ -29,6 +28,24 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
   @override
   void initState() {
     super.initState();
+    /*
+    Challenge challenge = context.read<PlankModel>().challenge;
+    bool showChallenge = context.read<PlankModel>().showChallenge;
+
+    bool challengeNotificationShown =
+        context.read<PlankModel>().challengeNotificationShown;
+    bool appPushNotificationsShown =
+        context.read<PlankModel>().appPushNotificationsShown;
+
+    print("""
+initState
+
+challenge=${challenge.toJson()}
+showChallenge=$showChallenge
+challengeNotificationShown=$challengeNotificationShown
+appPushNotificationsShown=$appPushNotificationsShown
+    """);
+    */
   }
 
   Widget getChallengeScreen() {
@@ -43,7 +60,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if online
+    print("Why do I load twice? $_currentIndex");
 
     bool offline = context.select((PlankModel model) => model.offline);
 
@@ -54,6 +71,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
     // Check if 403
     bool loggedIn = context.select((PlankModel model) => model.loggedIn);
+
     if (!loggedIn) {
       Widget body = Container(
           color: Colors.white,
@@ -64,7 +82,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
             title: "You are no longer logged.",
             message: "You need to log in again.",
             blockBackgroundInteraction: true,
-            mainButton: FlatButton(
+            mainButton: TextButton(
               onPressed: () {
                 context.read<PlankModel>().logout();
                 Phoenix.rebirth(context);
@@ -78,36 +96,91 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
       return body;
     }
 
+    bool appPushNotifications =
+        context.select((PlankModel model) => model.appPushNotifications);
+
     Challenge challenge = context.select((PlankModel model) => model.challenge);
     bool showChallenge =
         context.select((PlankModel model) => model.showChallenge);
+
+    bool challengeNotificationShownWithChallenges = context.select(
+        (PlankModel model) => model.challengeNotificationShownWithChallenges);
+
+    bool challengeNotificationShownOnPlank = context
+        .select((PlankModel model) => model.challengeNotificationShownOnPlank);
+
     bool showIntervals =
         context.select((PlankModel model) => model.showIntervals);
     int intervalTime = context.select((PlankModel model) => model.intervalTime);
+
+    List<Challenge> challenges =
+        context.select((PlankModel model) => model.challenges);
+    String currentChallengeUUID =
+        context.select((PlankModel model) => model.currentChallengeUUID);
+
+    String previousChallengeUUID =
+        context.select((PlankModel model) => model.previousChallengeUUID);
+    List<Plank> history = context.select((PlankModel model) => model.history);
+
+    String latestNotificationId =
+        context.select((PlankModel model) => model.latestNotificationId);
+    String lastNotificationId =
+        context.select((PlankModel model) => model.lastNotificationId);
+    String notificationAction =
+        context.select((PlankModel model) => model.notificationAction);
+
+    bool appPushNotificationsShown =
+        context.select((PlankModel model) => model.appPushNotificationsShown);
+
+    bool showNotificationNagWithChallenges =
+        !appPushNotifications && !challengeNotificationShownWithChallenges;
+    bool showNotificationNagOnPlank =
+        !appPushNotifications && !challengeNotificationShownOnPlank;
+
+    print("""
+loggedIn=$loggedIn
+challenge=${challenge.toJson()}
+showChallenge=$showChallenge
+challengeNotificationShownWithChallenges=$challengeNotificationShownWithChallenges
+showIntervals=$showIntervals
+intervalTime=$intervalTime
+challenges=${challenges.length}
+history=${history.length}
+latestNotificationId=$latestNotificationId
+lastNotificationId=$lastNotificationId
+notificationAction=$notificationAction
+appPushNotificationsShown=$appPushNotificationsShown
+showNotificationNagWithChallenges=$showNotificationNagWithChallenges
+    """);
 
     bool showChallengeChanged = false;
     if (_showChallenge != showChallenge) {
       showChallengeChanged = true;
     }
 
-    List<Challenge> challenges =
-        context.select((PlankModel model) => model.challenges);
-    List<Plank> history = context.select((PlankModel model) => model.history);
-
-    _notificationNag(context, challenges.length > 0);
+    if (_currentIndex == 0 &&
+        challenges.length > 0 &&
+        showNotificationNagWithChallenges) {
+      _notificationNag(context);
+    }
 
     // Out the box challenge will cause this to show the correct one
     List<Widget> screens = [
       PlankHistoryScreen(
+        history: history,
         challenges: challenges,
         currentChallenge: challenge,
-        history: history,
+        currentChallengeUUID: currentChallengeUUID,
+        previousChallengeUUID: previousChallengeUUID,
       ),
       PlankScreen(
         showIntervals: showIntervals,
         intervalTime: intervalTime,
-        currentChallenge: challenge,
         challenges: challenges,
+        currentChallenge: challenge,
+        currentChallengeUUID: currentChallengeUUID,
+        previousChallengeUUID: previousChallengeUUID,
+        showNotificationNagOnPlank: showNotificationNagOnPlank,
       ),
       getChallengeScreen(),
       PlankSettings(),
@@ -156,12 +229,6 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
     // the challenge should change, if it doesnt then we dont need to rerender.
     // The logic below might be overkill for reloading.
     // The logic below is needed to make sure a new notification triggers a rebuild.
-    String latestNotificationId =
-        context.select((PlankModel model) => model.latestNotificationId);
-    String lastNotificationId =
-        context.select((PlankModel model) => model.lastNotificationId);
-    String notificationAction =
-        context.select((PlankModel model) => model.notificationAction);
 
     if (showChallenge &&
         notificationAction == "challenge.updated" &&
@@ -174,6 +241,7 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
 
     Widget bottomNav = BottomNavigationBar(
       backgroundColor: Colors.white,
+      selectedItemColor: Colors.black,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
       items: bottomNavItems,
@@ -200,17 +268,9 @@ class _PlankShellScreenState extends State<PlankShellScreen> {
   }
 }
 
-Future<void> _notificationNag(BuildContext context, hasChallenges) async {
-  // quit if notifications set?
-  PermissionStatus permission = await Permission.notification.status;
-  if (permission != PermissionStatus.undetermined) {
-    return;
-  }
-
-  if (!hasChallenges) {
-    return;
-  }
-
-  // Could be where we add logic to ask after X times
-  checkAndAskForNotificationPermission(context);
+Future<void> _notificationNag(BuildContext context) async {
+  // TODO this breaks if PermissionStatus.permanentlyDenied
+  await Future.delayed(Duration(seconds: 1));
+  await notifyMeBecauseIHaveChallenges(context);
+  return;
 }

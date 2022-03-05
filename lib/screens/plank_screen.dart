@@ -273,7 +273,8 @@ class _PlankScreenState extends State<PlankScreen> {
 
     record.timerNow = currentTime.millisecondsSinceEpoch -
         beginningTime.millisecondsSinceEpoch;
-
+    // TODO possible bug here, in reporting "currentTime"
+    // Back to the server
     if (record.showIntervals) {
       if (record.intervalTimerNow > record.intervalTime * 1000) {
         DateTime intervalBeginning = DateTime.now();

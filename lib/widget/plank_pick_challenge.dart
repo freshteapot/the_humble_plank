@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
 import 'package:thehumbleplank/learnalist/challenge.dart';
-import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/widget/challenge_menu.dart';
 
 class PlankPickChallenge extends StatelessWidget {

@@ -1,6 +1,5 @@
 import 'dart:core';
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
 import 'package:http/http.dart';
 
 import 'package:openapi/api.dart';

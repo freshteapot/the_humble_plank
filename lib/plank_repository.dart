@@ -39,6 +39,9 @@ class RemotePlankRepository implements PlankRepository {
   Future<bool> deleteEntry(String uuid) async {
     try {
       var response = await plankApi.deletePlankEntryWithHttpInfo(uuid);
+      // TODO this was a bug which will now be fixed
+      // Not an issue as we didn't care for the response and just reloaded
+      // The actual delete logic worked
       if (response.statusCode > 200) {
         return false;
       }

@@ -24,28 +24,28 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences:
-  share_plus: "^2.1.4"
-  provider: ^5.0.0
-  stop_watch_timer: ^1.3.0
+  share_plus: ^6.3.0
+  provider: ^6.0.4
+  stop_watch_timer: ^2.0.0
   flutter_phoenix: ^1.0.0
-  jiffy: ^4.1.0
+  jiffy: ^5.0.0
   flushbar: ^1.10.4
   google_sign_in: ^5.0.4
   openapi:
     path: ./learnalist-openapi-dart
-  firebase_messaging: ^10.0.2
-  flutter_local_notifications: ^8.1.1
-  permission_handler: ^8.1.1
-  wakelock: ^0.5.2
-  sign_in_with_apple: ^3.0.0
-  flutter_svg: ^0.22.0
+  firebase_messaging: ^14.1.0
+  flutter_local_notifications: ^12.0.3+1
+  permission_handler: ^10.2.0
+  wakelock: ^0.6.2
+  sign_in_with_apple: ^4.2.0
+  flutter_svg: ^1.1.6
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.9.0
+  flutter_launcher_icons: ^0.10.0
   flutter_test:
     sdk: flutter
 

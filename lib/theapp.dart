@@ -1,8 +1,6 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:thehumbleplank/notifications.dart';
 
 import 'package:thehumbleplank/theme.dart';
 import 'package:thehumbleplank/routes.dart';

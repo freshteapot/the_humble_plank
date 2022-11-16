@@ -11,9 +11,7 @@ class AppTheme {
       scaffoldBackgroundColor: Colors.white,
       backgroundColor: Colors.white,
       primaryColor: Colors.grey[800],
-      accentColor: Colors.cyan[300],
-      buttonColor: Colors.grey[800],
-      textSelectionColor: Colors.cyan[100],
+      //textSelectionColor: Colors.cyan[100],
       toggleableActiveColor: Colors.cyan[300],
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: Colors.cyan[300],
@@ -25,7 +23,7 @@ class AppTheme {
       ),
       textTheme: textTheme.copyWith(
         bodyText2: bodyText2,
-      ),
+      ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.cyan[300]),
     );
   }
 }

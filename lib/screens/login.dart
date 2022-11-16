@@ -5,7 +5,6 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:openapi/api.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:thehumbleplank/env.dart';
 import 'package:thehumbleplank/plank_model.dart';
 import 'package:thehumbleplank/theme.dart';

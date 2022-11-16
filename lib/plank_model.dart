@@ -4,7 +4,6 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';

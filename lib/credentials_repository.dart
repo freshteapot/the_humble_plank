@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 import 'package:meta/meta.dart';
 import 'package:openapi/api.dart';
@@ -52,7 +51,6 @@ abstract class CredentialsRepository {
   Future<void> unloadCredentials();
   Credentials getCredentials();
   bool isLoggedIn();
-  void setIdpGoogle(GoogleSignInAccount account);
 }
 
 class RemoteCredentialsRepository implements CredentialsRepository {
@@ -163,24 +161,5 @@ class RemoteCredentialsRepository implements CredentialsRepository {
     }
 
     return _credentials.login.token != "" ? true : false;
-  }
-
-  void setIdpGoogle(GoogleSignInAccount account) {
-    _credentials.idpGoogle = account;
-    if (_credentials.idpGoogle != null) {
-      _credentials.login.userUuid = _credentials.idpGoogle.id;
-    }
-    _debugGoogle();
-  }
-
-  Future<void> _debugGoogle() async {
-    if (_credentials.idpGoogle == null) {
-      return;
-    }
-    print(_credentials.idpGoogle);
-    var a = await _credentials.idpGoogle.authentication;
-    print("idToken: ${a.idToken}");
-    print("accessToken: ${a.accessToken}");
-    print("serverAuthCode: ${a.serverAuthCode}");
   }
 }

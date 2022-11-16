@@ -124,7 +124,7 @@ Widget _recordOptionsPopup(BuildContext context, Plank record) {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      FlatButton(
+                                      TextButton(
                                         child: Text("Yes, delete",
                                             style: TextStyle(
                                                 color: Colors.red,
@@ -140,7 +140,7 @@ Widget _recordOptionsPopup(BuildContext context, Plank record) {
                                               .pop(); // Second dismiss popup
                                         },
                                       ),
-                                      FlatButton(
+                                      TextButton(
                                         child: Text("Escape"),
                                         onPressed: () {
                                           Navigator.of(context).pop();
